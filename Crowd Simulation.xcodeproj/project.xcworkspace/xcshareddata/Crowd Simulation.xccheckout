@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>DBE5417D-0272-448A-8DD0-29BA7D58EFCA</string>
+	<key>IDESourceControlProjectName</key>
+	<string>Crowd Simulation</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>F787978F2C78170054A22469CF85787B6019BDAC</key>
+		<string>https://github.com/SatanWoo/Crowd-Simulation.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>Crowd Simulation.xcodeproj</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>F787978F2C78170054A22469CF85787B6019BDAC</key>
+		<string>../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>https://github.com/SatanWoo/Crowd-Simulation.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>111</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>F787978F2C78170054A22469CF85787B6019BDAC</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>F787978F2C78170054A22469CF85787B6019BDAC</string>
+			<key>IDESourceControlWCCName</key>
+			<string>Crowd%20Simulation</string>
+		</dict>
+	</array>
+</dict>
+</plist>

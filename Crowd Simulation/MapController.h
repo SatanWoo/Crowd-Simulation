@@ -28,7 +28,7 @@ protected:
 	//void forEach(callback);
 
 public:
-	MapController(int width, int height, int count, double timeStep = 0.5);
+	MapController(int width, int height, int count, double timeStep = 0.02);
 	~MapController();
 
 	void render();

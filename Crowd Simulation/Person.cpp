@@ -47,11 +47,11 @@ void Person::setVelocity(const Vector2D &newVel)
 void Person::applyAndPredict()
 {
 	neighboursIndex.clear();
-    std::cout << m_mMap << std::endl;
-	updateVelocity(Vector2D(0.0, -9.8), m_mMap->getTimeStep());
+    
+    m_vVelocity = m_vVelocity + Vector2D(0.0, -9.8) / m_dMass * m_mMap->getTimeStep();
 
 	Vector2D old = m_vPosTmp;
-	predictPosition(m_mMap->getTimeStep());
+    m_vPosTmp = m_vPos + m_vVelocity * m_mMap->getTimeStep();
 	m_mMap->movePerson(old, m_vPosTmp, m_iID);
 }
 
@@ -64,26 +64,13 @@ void Person::updateNeighbours()
 
 void Person::render()
 {
-    glPointSize(5.0f);
-    glBegin(GL_POINTS);
-    glVertex2d(m_vPosTmp.getX(), m_vPosTmp.getY());
-    glEnd();
+    glVertex2f(m_vPos.getX(), m_vPos.getY());
 }
 
 // Protected
-void Person::updateVelocity(Vector2D externalForce, double timeStep)
-{
-	m_vVelocity = m_vVelocity + externalForce / m_dMass * timeStep;
-}
-
 void Person::updateTempPosition(double timeStep)
 {
 	m_vPosTmp = m_vPosTmp + m_vVelocity * timeStep;
-}
-
-void Person::predictPosition(double timeStep)
-{
-	m_vPosTmp = m_vPos + m_vVelocity * timeStep;
 }
 
 void Person::computeLambda(calculatorV d)

@@ -40,8 +40,6 @@ public:
     void render();
 
 protected:
-	void updateVelocity(Vector2D externalForce, double timeStep);
-	void predictPosition(double timeStep);
 	void updateTempPosition(double timeStep);
 	
 private:

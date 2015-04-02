@@ -4,6 +4,8 @@
 #include "Person.h"
 #include <set>
 
+using namespace std;
+
 class MapController;
 typedef bool(MapController::*filter)(int, int);
 
@@ -13,7 +15,7 @@ private:
 	double m_dY;
 	double m_dZ;
     
-	std::set<int> people;
+	set<int> people;
 
 	MapController *m_map;
 public:
@@ -22,7 +24,7 @@ public:
 	void addPerson(int index);
 	void removePerson(int index);
 	void setMap(MapController *map);
-	std::vector<int> filterPeople(filter f, int pID);
+	vector<int> filterPeople(filter f, int pID);
 
 	virtual int obstacleCoefficient()const{return 0;}
 	virtual int maxPeople()const{return INT_MAX;}

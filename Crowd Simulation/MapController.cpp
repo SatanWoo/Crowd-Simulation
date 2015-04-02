@@ -13,23 +13,23 @@ MapController::MapController(int width, int height, int count, double timeStep)
 	m_dTimeStep = timeStep;
 
 	people = new Person[count];
-    double xPos = 0;
-    double yPos = 0;
+   
+    double gap = 0.9 * MapGridSize;
+    double xPos = gap;
+    double yPos = gap;
+    
 	for (int i = 0; i < count; i++)
 	{
-        
-        xPos += i * MapGridSize;
-        if (xPos >= width)
-        {
-            xPos = 0.0;
-            yPos += MapGridSize;
+        people[i].init(i, Vector2D(xPos, yPos));
+        yPos += gap;
+        if(yPos >= height - gap){
+            yPos = gap;
+            xPos += gap;
         }
         
-		people[i].init(i, Vector2D(xPos, yPos));
+        cout << people[i].getPos().getX() << ":" << people[i].getPos().getY() << endl;
 		people[i].setMap(this);
 	}
-    
-    std::cout << "Init Finish" << std::endl;
 
 	terrain = new Terrain *[width];
 	for (int i = 0; i < width; i++)
@@ -59,12 +59,11 @@ MapController::~MapController()
 }
 
 void MapController::render()
-{
-    //glTranslatef(-1.0, 0, 0);
+{    
+    glPointSize(2);
+    glBegin(GL_POINTS);
     
-    glPointSize(5);
     glColor3f(1.0, 1.0, 1.0);
-    glBegin(GL_POINT);
     
     for (int i = 0; i < m_iCount; i++) {
         Person &p = people[i];
@@ -76,11 +75,11 @@ void MapController::render()
 
 void MapController::update()
 {
-	for (int i = 0; i < m_iCount; i++)
-	{
-		Person &p = people[i];
-		p.applyAndPredict();
-	}
+//	for (int i = 0; i < m_iCount; i++)
+//	{
+//		Person &p = people[i];
+//		p.applyAndPredict();
+//	}
 //
 //	for (int i = 0; i < m_iCount; i++)
 //	{
@@ -124,11 +123,11 @@ void MapController::movePerson(Vector2D old, Vector2D cur, int pID)
 	int oldX = old.getX() / MapGridSize;
 	int oldY = old.getY() / MapGridSize;
 
-	//terrain[oldX][oldY].removePerson(pID);
+	terrain[oldX][oldY].removePerson(pID);
 
 	int curX = cur.getX() / MapGridSize;
 	int curY = cur.getY() / MapGridSize;
-	//terrain[curX][curY].addPerson(pID);
+	terrain[curX][curY].addPerson(pID);
 }
 
 std::vector<int> MapController::findNeighbours(int pID)
