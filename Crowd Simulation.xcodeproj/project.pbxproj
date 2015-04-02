@@ -1,0 +1,293 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1955D0E91AC44362001318C6 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1955D0E81AC44362001318C6 /* main.cpp */; };
+		1955D0F01AC44379001318C6 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1955D0EF1AC44379001318C6 /* GLUT.framework */; };
+		1955D0F41AC443D4001318C6 /* Vector.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1955D0F21AC443D4001318C6 /* Vector.cpp */; };
+		1955D0F71AC443E7001318C6 /* MathHelper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1955D0F51AC443E7001318C6 /* MathHelper.cpp */; };
+		1955D0FE1AC445BC001318C6 /* MapController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1955D0F81AC445BC001318C6 /* MapController.cpp */; };
+		1955D0FF1AC445BC001318C6 /* Person.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1955D0FA1AC445BC001318C6 /* Person.cpp */; };
+		1955D1001AC445BC001318C6 /* Terrain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1955D0FC1AC445BC001318C6 /* Terrain.cpp */; };
+		1955D1031AC46E4C001318C6 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1955D1021AC46E4C001318C6 /* OpenGL.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		1955D0E31AC44362001318C6 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		1955D0E51AC44362001318C6 /* Crowd Simulation */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "Crowd Simulation"; sourceTree = BUILT_PRODUCTS_DIR; };
+		1955D0E81AC44362001318C6 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		1955D0EF1AC44379001318C6 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = System/Library/Frameworks/GLUT.framework; sourceTree = SDKROOT; };
+		1955D0F21AC443D4001318C6 /* Vector.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Vector.cpp; sourceTree = "<group>"; };
+		1955D0F31AC443D4001318C6 /* Vector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Vector.h; sourceTree = "<group>"; };
+		1955D0F51AC443E7001318C6 /* MathHelper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MathHelper.cpp; sourceTree = "<group>"; };
+		1955D0F61AC443E7001318C6 /* MathHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MathHelper.h; sourceTree = "<group>"; };
+		1955D0F81AC445BC001318C6 /* MapController.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MapController.cpp; sourceTree = "<group>"; };
+		1955D0F91AC445BC001318C6 /* MapController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MapController.h; sourceTree = "<group>"; };
+		1955D0FA1AC445BC001318C6 /* Person.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Person.cpp; sourceTree = "<group>"; };
+		1955D0FB1AC445BC001318C6 /* Person.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Person.h; sourceTree = "<group>"; };
+		1955D0FC1AC445BC001318C6 /* Terrain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Terrain.cpp; sourceTree = "<group>"; };
+		1955D0FD1AC445BC001318C6 /* Terrain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Terrain.h; sourceTree = "<group>"; };
+		1955D1021AC46E4C001318C6 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		1955D0E21AC44362001318C6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1955D1031AC46E4C001318C6 /* OpenGL.framework in Frameworks */,
+				1955D0F01AC44379001318C6 /* GLUT.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		1955D0DC1AC44362001318C6 = {
+			isa = PBXGroup;
+			children = (
+				1955D1021AC46E4C001318C6 /* OpenGL.framework */,
+				1955D0EF1AC44379001318C6 /* GLUT.framework */,
+				1955D0E71AC44362001318C6 /* Crowd Simulation */,
+				1955D0E61AC44362001318C6 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		1955D0E61AC44362001318C6 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				1955D0E51AC44362001318C6 /* Crowd Simulation */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		1955D0E71AC44362001318C6 /* Crowd Simulation */ = {
+			isa = PBXGroup;
+			children = (
+				1955D1011AC445BF001318C6 /* App */,
+				1955D0F11AC443C5001318C6 /* Foundation */,
+				1955D0E81AC44362001318C6 /* main.cpp */,
+			);
+			path = "Crowd Simulation";
+			sourceTree = "<group>";
+		};
+		1955D0F11AC443C5001318C6 /* Foundation */ = {
+			isa = PBXGroup;
+			children = (
+				1955D0F51AC443E7001318C6 /* MathHelper.cpp */,
+				1955D0F61AC443E7001318C6 /* MathHelper.h */,
+				1955D0F21AC443D4001318C6 /* Vector.cpp */,
+				1955D0F31AC443D4001318C6 /* Vector.h */,
+			);
+			name = Foundation;
+			sourceTree = "<group>";
+		};
+		1955D1011AC445BF001318C6 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				1955D0F81AC445BC001318C6 /* MapController.cpp */,
+				1955D0F91AC445BC001318C6 /* MapController.h */,
+				1955D0FA1AC445BC001318C6 /* Person.cpp */,
+				1955D0FB1AC445BC001318C6 /* Person.h */,
+				1955D0FC1AC445BC001318C6 /* Terrain.cpp */,
+				1955D0FD1AC445BC001318C6 /* Terrain.h */,
+			);
+			name = App;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		1955D0E41AC44362001318C6 /* Crowd Simulation */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1955D0EC1AC44362001318C6 /* Build configuration list for PBXNativeTarget "Crowd Simulation" */;
+			buildPhases = (
+				1955D0E11AC44362001318C6 /* Sources */,
+				1955D0E21AC44362001318C6 /* Frameworks */,
+				1955D0E31AC44362001318C6 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Crowd Simulation";
+			productName = "Crowd Simulation";
+			productReference = 1955D0E51AC44362001318C6 /* Crowd Simulation */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		1955D0DD1AC44362001318C6 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0610;
+				ORGANIZATIONNAME = SatanWoo;
+				TargetAttributes = {
+					1955D0E41AC44362001318C6 = {
+						CreatedOnToolsVersion = 6.1;
+					};
+				};
+			};
+			buildConfigurationList = 1955D0E01AC44362001318C6 /* Build configuration list for PBXProject "Crowd Simulation" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 1955D0DC1AC44362001318C6;
+			productRefGroup = 1955D0E61AC44362001318C6 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				1955D0E41AC44362001318C6 /* Crowd Simulation */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		1955D0E11AC44362001318C6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1955D0FE1AC445BC001318C6 /* MapController.cpp in Sources */,
+				1955D0F71AC443E7001318C6 /* MathHelper.cpp in Sources */,
+				1955D0F41AC443D4001318C6 /* Vector.cpp in Sources */,
+				1955D0FF1AC445BC001318C6 /* Person.cpp in Sources */,
+				1955D0E91AC44362001318C6 /* main.cpp in Sources */,
+				1955D1001AC445BC001318C6 /* Terrain.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		1955D0EA1AC44362001318C6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		1955D0EB1AC44362001318C6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		1955D0ED1AC44362001318C6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		1955D0EE1AC44362001318C6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1955D0E01AC44362001318C6 /* Build configuration list for PBXProject "Crowd Simulation" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1955D0EA1AC44362001318C6 /* Debug */,
+				1955D0EB1AC44362001318C6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1955D0EC1AC44362001318C6 /* Build configuration list for PBXNativeTarget "Crowd Simulation" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1955D0ED1AC44362001318C6 /* Debug */,
+				1955D0EE1AC44362001318C6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 1955D0DD1AC44362001318C6 /* Project object */;
+}
