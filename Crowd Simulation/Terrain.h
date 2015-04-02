@@ -23,7 +23,7 @@ public:
 
 	void addPerson(int index);
 	void removePerson(int index);
-	void setMap(MapController *map);
+    void setMap(MapController *map){m_map = map;}
 	vector<int> filterPeople(filter f, int pID);
 
 	virtual int obstacleCoefficient()const{return 0;}

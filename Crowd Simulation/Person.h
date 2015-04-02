@@ -38,9 +38,6 @@ public:
 	double getMass()const{return m_dMass;}
     
     void render();
-
-protected:
-	void updateTempPosition(double timeStep);
 	
 private:
 	Vector2D m_vPos;

@@ -58,6 +58,7 @@ void Person::applyAndPredict()
 void Person::updateNeighbours()
 {
 	neighboursIndex.clear();
+    
 	std::vector<int> neighbours = m_mMap->findNeighbours(m_iID);
 	neighboursIndex.assign(neighbours.begin(), neighbours.end());
 }
@@ -65,12 +66,6 @@ void Person::updateNeighbours()
 void Person::render()
 {
     glVertex2f(m_vPos.getX(), m_vPos.getY());
-}
-
-// Protected
-void Person::updateTempPosition(double timeStep)
-{
-	m_vPosTmp = m_vPosTmp + m_vVelocity * timeStep;
 }
 
 void Person::computeLambda(calculatorV d)

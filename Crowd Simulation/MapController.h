@@ -3,13 +3,13 @@
 
 #include "MathHelper.h"
 #include "Person.h"
-#include "Terrain.h"
 #include <iostream>
 #include <vector>
 #include "Vector.h"
 
 //typedef void (*callback)(Person *p);
 
+class Terrain;
 class MapController
 {
 private:
