@@ -98,7 +98,7 @@ void Person::computeLambda(calculatorV d)
 
 void Person::computeDeltaP(calculatorV l)
 {
-	int size = neighboursIndex.size();
+	size_t size = neighboursIndex.size();
 	Vector2D deltaP = Vector2D::vec2Zero;
 	for (int i = 0; i < size; i++)
 	{
@@ -111,7 +111,7 @@ void Person::computeDeltaP(calculatorV l)
 
 void Person::computeConstraint(calculatorD d)
 {
-	int size = neighboursIndex.size();
+	size_t size = neighboursIndex.size();
 	double total = 0.0f;
 	for (int i = 0; i < size; i++)
 	{
@@ -120,4 +120,5 @@ void Person::computeConstraint(calculatorD d)
 	}
 
     m_dConstraint = total / MapController::restDensity - 1;
+    std::cout << m_dConstraint << " ";
 }

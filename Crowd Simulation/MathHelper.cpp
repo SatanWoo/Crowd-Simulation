@@ -1,5 +1,6 @@
 #include "MathHelper.h"
 #include <math.h>
+#include <iostream>
 
 MathHelper::MathHelper(double radius)
 {
@@ -18,8 +19,8 @@ MathHelper::~MathHelper()
 
 double MathHelper::poly6(const Vector2D& vec)
 {
-	double t = m_dRadius2 - vec.squaredLength();
-	return t <= 0.0 ? 0.0 : m_dPoly6 * t * t * t;
+	double t = m_dRadius2 - vec.length();
+	return t < 0.0 ? 0.0 : m_dPoly6 * t * t * t;
 }
 
 Vector2D MathHelper::spikyGrad(const Vector2D& vec)

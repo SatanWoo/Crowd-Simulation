@@ -33,8 +33,9 @@ std::vector<int> Terrain::filterPeople(filter f, int pID)
 	{
         if ((m_map->*f)(*it, pID)) {
             result.push_back(*it);
-            cout << "P " << pID << " " << *it << endl;
+            //cout << "P " << pID << " " << *it << endl;
         }
 	}
+    
 	return result;
 }

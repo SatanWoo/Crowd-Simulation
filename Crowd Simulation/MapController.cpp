@@ -41,11 +41,10 @@ MapController::MapController(int width, int height, int count, double timeStep)
         for (int j = 0; j < height; j++)
         {
             terrain[i][j].setMap(this);
-            //cout << terrain[i][j].maxPeople() << endl;
         }
     }
 
-	helper = new MathHelper(2.0);
+	helper = new MathHelper(1.5);
 }
 
 MapController::~MapController()
@@ -95,11 +94,11 @@ void MapController::update()
 		p.updateNeighbours();
 	}
 
-//	for (int i = 0; i < m_iCount; i++)
-//	{
-//		Person &p = people[i];
-//		p.computeConstraint(&MapController::density);
-//	}
+	for (int i = 0; i < m_iCount; i++)
+	{
+		Person &p = people[i];
+		p.computeConstraint(&MapController::density);
+	}
 //
 //	for (int i = 0; i < m_iCount; i++)
 //	{
@@ -164,7 +163,7 @@ std::vector<int> MapController::findNeighbours(int pID)
 		Terrain &curUnit = terrain[curX][curY];
 
 		std::vector<int> temp = curUnit.filterPeople(&MapController::filterNeightbours, pID);
-		result.assign(temp.begin(), temp.end());
+        result.insert(result.end(), temp.begin(), temp.end());
 	}
 
 	return result;
