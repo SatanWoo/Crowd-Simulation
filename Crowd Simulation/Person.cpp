@@ -94,6 +94,7 @@ void Person::computeLambda(calculatorV d)
 	}
 
 	m_dLambda = m_dConstraint * (-1) / (total + 50.0);
+    std::cout << m_dLambda << " ";
 }
 
 void Person::computeDeltaP(calculatorV l)
@@ -120,5 +121,5 @@ void Person::computeConstraint(calculatorD d)
 	}
 
     m_dConstraint = total / MapController::restDensity - 1;
-    std::cout << m_dConstraint << " ";
+    //std::cout << m_dConstraint << " ";
 }

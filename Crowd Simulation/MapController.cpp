@@ -99,12 +99,12 @@ void MapController::update()
 		Person &p = people[i];
 		p.computeConstraint(&MapController::density);
 	}
-//
-//	for (int i = 0; i < m_iCount; i++)
-//	{
-//		Person &p = people[i];
-//		p.computeLambda(&MapController::lamda);
-//	}
+
+	for (int i = 0; i < m_iCount; i++)
+	{
+		Person &p = people[i];
+		p.computeLambda(&MapController::lamda);
+	}
 //
 //	for (int i = 0; i < m_iCount; i++)
 //	{
