@@ -41,6 +41,7 @@ MapController::MapController(int width, int height, int count, double timeStep)
         for (int j = 0; j < height; j++)
         {
             terrain[i][j].setMap(this);
+            //cout << terrain[i][j].maxPeople() << endl;
         }
     }
 
@@ -94,35 +95,35 @@ void MapController::update()
 		p.updateNeighbours();
 	}
 
-	for (int i = 0; i < m_iCount; i++)
-	{
-		Person &p = people[i];
-		p.computeConstraint(&MapController::density);
-	}
-
-	for (int i = 0; i < m_iCount; i++)
-	{
-		Person &p = people[i];
-		p.computeLambda(&MapController::lamda);
-	}
-
-	for (int i = 0; i < m_iCount; i++)
-	{
-		Person &p = people[i];
-		p.computeDeltaP(&MapController::deltaP);
-	}
-
-	for (int i = 0; i < m_iWidth; i++)
-	{
-		Person &p = people[i];
-		p.setTmpPos(p.getTmpPos() + p.getDeltaP());
-	}
-
-	for (int i = 0; i < m_iCount; i++)
-	{
-		Person &p = people[i];
-		p.setVelocity((p.getTmpPos() - p.getPos()/m_dTimeStep));
-	}
+//	for (int i = 0; i < m_iCount; i++)
+//	{
+//		Person &p = people[i];
+//		p.computeConstraint(&MapController::density);
+//	}
+//
+//	for (int i = 0; i < m_iCount; i++)
+//	{
+//		Person &p = people[i];
+//		p.computeLambda(&MapController::lamda);
+//	}
+//
+//	for (int i = 0; i < m_iCount; i++)
+//	{
+//		Person &p = people[i];
+//		p.computeDeltaP(&MapController::deltaP);
+//	}
+//
+//	for (int i = 0; i < m_iWidth; i++)
+//	{
+//		Person &p = people[i];
+//		p.setTmpPos(p.getTmpPos() + p.getDeltaP());
+//	}
+//
+//	for (int i = 0; i < m_iCount; i++)
+//	{
+//		Person &p = people[i];
+//		p.setVelocity((p.getTmpPos() - p.getPos()/m_dTimeStep));
+//	}
 }
 
 void MapController::movePerson(Vector2D old, Vector2D cur, int pID)
@@ -149,18 +150,17 @@ std::vector<int> MapController::findNeighbours(int pID)
 	Person &p = people[pID];
 	int cellX = p.getTmpPos().getX() / MapGridSize;
 	int cellY = p.getTmpPos().getY() / MapGridSize;
-
-	Terrain &unit = terrain[cellX][cellY];
-	unit.addPerson(pID);
-	
+    
+    //cout << "PID" << pID << ":" << cellX << " " << cellY << endl;
+    
 	std::vector<int> result;
-
 	for (int i = 0; i < 9; i++)
 	{
 		int curX = cellX + direction[i][0];
-		int curY = cellY + direction[i][1];
-
-		if (!isInMap(curX, curY)) continue;
+        int curY = cellY + direction[i][1];
+        
+        if (!isInMap(curX, curY)) continue;
+        
 		Terrain &curUnit = terrain[curX][curY];
 
 		std::vector<int> temp = curUnit.filterPeople(&MapController::filterNeightbours, pID);
@@ -175,16 +175,8 @@ bool MapController::filterNeightbours(int neighborID, int pID)
 	Person &n = people[neighborID];
 	Person &p = people[pID];
 	double distance = (p.getTmpPos() - n.getTmpPos()).squaredLength();
-
-	return distance < MapGridSize;
-}
-
-bool MapController::isInMap(int x, int y)
-{
-	if (x < 0 || x >= m_iWidth) return false;
-	if (y < 0 || y >= m_iHeight) return false;
-
-	return true;
+    
+	return distance < MapGridSize * MapGridSize;
 }
 
 double MapController::density(int neighbourID, int pID)
@@ -250,4 +242,11 @@ Vector2D MapController::deltaP(int neighbourID, int pID)
 	}
 
 	return result;
+}
+
+bool MapController::isInMap(int x, int y)
+{
+    if (x < 0 || x >= m_iWidth) return false;
+    if (y < 0 || y >= m_iHeight) return false;
+    return true;
 }

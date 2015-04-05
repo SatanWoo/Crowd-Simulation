@@ -15,24 +15,22 @@ class MapController
 private:
 	Terrain **terrain;
 	Person *people;
+    MathHelper *helper;
 
 	int m_iWidth;
 	int m_iHeight;
 	int m_iCount;
 
 	double m_dTimeStep;
-
-	MathHelper *helper;
+    
 protected:
-	bool isInMap(int x, int y);
-	//void forEach(callback);
-
+    bool isInMap(int x, int y);
+    
 public:
 	MapController(int width, int height, int count, double timeStep = 0.02);
 	~MapController();
 
 	void render();
-
 	void update();
 	double getTimeStep()const{return m_dTimeStep;}
 	

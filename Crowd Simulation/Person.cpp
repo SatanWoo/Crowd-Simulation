@@ -88,12 +88,12 @@ void Person::computeLambda(calculatorV d)
 		}
 		else
 		{
-			temp = (m_mMap->*d)(neighbourID, m_iID) * -1;
+			temp = (m_mMap->*d)(neighbourID, m_iID) * (-1.0);
 		}
 		total += (temp / MapController::restDensity).length();
 	}
 
-	m_dLambda = total;
+	m_dLambda = m_dConstraint * (-1) / (total + 50.0);
 }
 
 void Person::computeDeltaP(calculatorV l)
@@ -119,5 +119,5 @@ void Person::computeConstraint(calculatorD d)
 		total += (m_mMap->*d)(neighbourID, m_iID);
 	}
 
-	m_dConstraint = total;
+    m_dConstraint = total / MapController::restDensity - 1;
 }

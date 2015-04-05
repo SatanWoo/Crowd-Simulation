@@ -53,7 +53,7 @@ int main(int argc, const char * argv[])
     glLoadIdentity();
     glEnable(GL_POINT_SMOOTH);
     
-    mapController = new MapController(MapWidth, MapHeight, 1000);
+    mapController = new MapController(MapWidth, MapHeight, 10);
 
     glutMainLoop();
 
