@@ -34,7 +34,6 @@ void Person::setPos(const Vector2D &newPos)
 
 void Person::setTmpPos(const Vector2D &newTmpPos)
 {
-    std::cout << newTmpPos.getX() << " : " << newTmpPos.getY() << std::endl;
 	m_vPosTmp.setX(newTmpPos.getX());
 	m_vPosTmp.setY(newTmpPos.getY());
 }
@@ -66,12 +65,13 @@ void Person::updateNeighbours()
 
 void Person::render()
 {
+    glColor3f(1.0, (m_dConstraint + 1) * MapController::restDensity / 2.0, 0.5);
     glVertex2f(m_vPos.getX(), m_vPos.getY());
 }
 
 void Person::computeLambda(calculatorV d)
 {
-	int size = neighboursIndex.size();
+	size_t size = neighboursIndex.size();
 	double total = 0.0f;
 	for (int i = 0; i < size; i++)
 	{
@@ -110,8 +110,8 @@ void Person::computeDeltaP(calculatorV l, collision c)
 		deltaP += temp;
 	}
     
-    (m_mMap->*c)(m_iID);
 	m_deltaP = deltaP / MapController::restDensity;
+    (m_mMap->*c)(m_iID);
 }
 
 void Person::computeConstraint(calculatorD d)

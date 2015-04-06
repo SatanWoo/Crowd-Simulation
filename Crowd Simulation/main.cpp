@@ -32,7 +32,11 @@ void glRender()
 
 void glIdle()
 {
-    mapController->update();
+    int n = 1;
+    while (n--) {
+        mapController->update();
+    }
+    
     glutPostRedisplay();
 }
 
@@ -53,7 +57,7 @@ int main(int argc, const char * argv[])
     glLoadIdentity();
     glEnable(GL_POINT_SMOOTH);
     
-    mapController = new MapController(MapWidth, MapHeight, 10);
+    mapController = new MapController(MapWidth, MapHeight, 500);
 
     glutMainLoop();
 

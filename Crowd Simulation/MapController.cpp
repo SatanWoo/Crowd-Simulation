@@ -70,8 +70,6 @@ void MapController::render()
     glPointSize(2);
     glBegin(GL_POINTS);
     
-    glColor3f(1.0, 1.0, 1.0);
-    
     for (int i = 0; i < m_iCount; i++) {
         Person &p = people[i];
         p.render();
@@ -93,37 +91,41 @@ void MapController::update()
 		Person &p = people[i];
 		p.updateNeighbours();
 	}
+    
+    static int iteration = 3;
+    
+    for (int w = 0; w < iteration; w++) {
+        for (int i = 0; i < m_iCount; i++)
+        {
+            Person &p = people[i];
+            p.computeConstraint(&MapController::density);
+        }
+        
+        for (int i = 0; i < m_iCount; i++)
+        {
+            Person &p = people[i];
+            p.computeLambda(&MapController::lamda);
+        }
+        
+        for (int i = 0; i < m_iCount; i++)
+        {
+            Person &p = people[i];
+            p.computeDeltaP(&MapController::deltaP, &MapController::collision);
+        }
+        
+        for (int i = 0; i < m_iCount; i++)
+        {
+            Person &p = people[i];
+            p.setTmpPos(p.getTmpPos() + p.getDeltaP());
+        }
+    }
 
 	for (int i = 0; i < m_iCount; i++)
 	{
 		Person &p = people[i];
-		p.computeConstraint(&MapController::density);
+		p.setVelocity((p.getTmpPos() - p.getPos())/m_dTimeStep);
+        p.setPos(p.getTmpPos());
 	}
-
-	for (int i = 0; i < m_iCount; i++)
-	{
-		Person &p = people[i];
-		p.computeLambda(&MapController::lamda);
-	}
-
-	for (int i = 0; i < m_iCount; i++)
-	{
-		Person &p = people[i];
-        p.computeDeltaP(&MapController::deltaP, &MapController::collision);
-	}
-
-	for (int i = 0; i < m_iCount; i++)
-	{
-		Person &p = people[i];
-		p.setTmpPos(p.getTmpPos() + p.getDeltaP());
-	}
-//
-//	for (int i = 0; i < m_iCount; i++)
-//	{
-//		Person &p = people[i];
-//		p.setVelocity((p.getTmpPos() - p.getPos()/m_dTimeStep));
-//        p.setPos(p.getTmpPos());
-//	}
 }
 
 void MapController::movePerson(Vector2D old, Vector2D cur, int pID)
