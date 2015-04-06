@@ -66,15 +66,37 @@ MapController::~MapController()
 }
 
 void MapController::render()
-{    
+{
+    glLineWidth(1);
+    glBegin(GL_LINES);
+    
+    static int fourDir[4][2] = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+    
+    glColor4f(1.0f, 1.0f, 1.0f, 0.1);
+    for (int i = 0; i < m_iWidth; i++) {
+        for (int j = 0; j < m_iHeight; j++) {
+            double xPos = i * MapGridSize;
+            double yPos = j * MapGridSize;
+            
+            for (int k = 0; k < 4; k++) {
+                int kx = i + fourDir[k][0];
+                int ky = j + fourDir[k][1];
+                
+                if (isInMap(kx, ky)) {
+                    glVertex2d(xPos, yPos);
+                    glVertex2d(kx * MapGridSize, ky * MapGridSize);
+                }
+            }
+        }
+    }
+    glEnd();
+
     glPointSize(2);
     glBegin(GL_POINTS);
-    
     for (int i = 0; i < m_iCount; i++) {
         Person &p = people[i];
         p.render();
     }
-    
     glEnd();
 }
 

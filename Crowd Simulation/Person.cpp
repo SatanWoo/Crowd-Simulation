@@ -94,7 +94,7 @@ void Person::computeLambda(calculatorV d)
 		total += (temp / MapController::restDensity).length();
 	}
 
-	m_dLambda = m_dConstraint * (-1) / (total + 50.0);
+	m_dLambda = m_dConstraint * (-1.0) / (total + 50.0);
 }
 
 void Person::computeDeltaP(calculatorV l, collision c)
