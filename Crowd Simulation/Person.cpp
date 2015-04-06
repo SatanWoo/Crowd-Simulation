@@ -27,6 +27,11 @@ void Person::init(int pID, Vector2D pos, Vector2D vel, double mass)
 	m_dMass = mass;
 }
 
+void Person::steer(steering s)
+{
+    (m_mMap->*s)(m_iID);
+}
+
 void Person::setPos(const Vector2D &newPos)
 {
 	m_vPos.setX(newPos.getX());

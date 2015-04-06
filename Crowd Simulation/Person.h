@@ -8,6 +8,7 @@ class MapController;
 typedef double (MapController::*calculatorD)(int, int);
 typedef Vector2D (MapController::*calculatorV)(int, int);
 typedef void (MapController::*collision)(int);
+typedef void (MapController::*steering)(int);
 
 class Person {
 public:
@@ -16,6 +17,7 @@ public:
 	~Person();
     
     // Steer
+    void steer(steering s);
 
 	void init(int pID, Vector2D pos = Vector2D::vec2Zero, Vector2D vel = Vector2D::vec2Zero, double mass = 1.0);
 	void applyAndPredict();

@@ -1,6 +1,7 @@
 #include "MapController.h"
 #include "Terrain.h"
 #include <GLUT/GLUT.h>
+#include <math.h>
 
 
 const double MapController::restDensity = 1.0;
@@ -14,19 +15,12 @@ MapController::MapController(int width, int height, int count, double timeStep)
 	m_dTimeStep = timeStep;
 
 	people = new Person[count];
-   
-    double gap = 0.9 * MapGridSize;
-    double xPos = gap;
-    double yPos = gap;
+    srand( (unsigned)time(NULL));
     
 	for (int i = 0; i < count; i++)
 	{
-        people[i].init(i, Vector2D(xPos, yPos));
-        yPos += gap;
-        if(yPos >= height - gap){
-            yPos = gap;
-            xPos += gap;
-        }
+        Vector2D pos = Vector2D(rand() % m_iWidth * MapGridSize, rand()% m_iHeight * MapGridSize);
+        people[i].init(i, pos);
 		people[i].setMap(this);
 	}
 
@@ -44,8 +38,8 @@ MapController::MapController(int width, int height, int count, double timeStep)
         }
     }
     
-//    destinationPoint.setX(m_iWidth * MapGridSize - 2);
-//    destinationPoint.setY(m_iHeight * MapGridSize - 5);
+    //destinationPoint.setX(m_iWidth * MapGridSize - 2);
+    //destinationPoint.setY(m_iHeight * MapGridSize - 5);
 
 	helper = new MathHelper(1.5);
 }
@@ -95,7 +89,7 @@ void MapController::render()
     }
     glEnd();
 
-    glPointSize(2);
+    glPointSize(10);
     glBegin(GL_POINTS);
     for (int i = 0; i < m_iCount; i++) {
         Person &p = people[i];
@@ -106,52 +100,52 @@ void MapController::render()
 
 void MapController::update()
 {
-	for (int i = 0; i < m_iCount; i++)
-	{
-		Person &p = people[i];
-		p.applyAndPredict();
-	}
-
-	for (int i = 0; i < m_iCount; i++)
-	{
-		Person &p = people[i];
-		p.updateNeighbours();
-	}
-    
-    static int iteration = 3;
-    
-    for (int w = 0; w < iteration; w++) {
-        for (int i = 0; i < m_iCount; i++)
-        {
-            Person &p = people[i];
-            p.computeConstraint(&MapController::density);
-        }
-        
-        for (int i = 0; i < m_iCount; i++)
-        {
-            Person &p = people[i];
-            p.computeLambda(&MapController::lamda);
-        }
-        
-        for (int i = 0; i < m_iCount; i++)
-        {
-            Person &p = people[i];
-            p.computeDeltaP(&MapController::deltaP, &MapController::collision);
-        }
-        
-        for (int i = 0; i < m_iCount; i++)
-        {
-            Person &p = people[i];
-            p.setTmpPos(p.getTmpPos() + p.getDeltaP());
-        }
-    }
-
-	for (int i = 0; i < m_iCount; i++)
-	{
-		Person &p = people[i];
-		p.setVelocity((p.getTmpPos() - p.getPos())/m_dTimeStep);
-        p.setPos(p.getTmpPos());
-	}
+//	for (int i = 0; i < m_iCount; i++)
+//	{
+//		Person &p = people[i];
+//		p.applyAndPredict();
+//	}
+//
+//	for (int i = 0; i < m_iCount; i++)
+//	{
+//		Person &p = people[i];
+//		p.updateNeighbours();
+//	}
+//    
+//    static int iteration = 3;
+//    
+//    for (int w = 0; w < iteration; w++) {
+//        for (int i = 0; i < m_iCount; i++)
+//        {
+//            Person &p = people[i];
+//            p.computeConstraint(&MapController::density);
+//        }
+//        
+//        for (int i = 0; i < m_iCount; i++)
+//        {
+//            Person &p = people[i];
+//            p.computeLambda(&MapController::lamda);
+//        }
+//        
+//        for (int i = 0; i < m_iCount; i++)
+//        {
+//            Person &p = people[i];
+//            p.computeDeltaP(&MapController::deltaP, &MapController::collision);
+//        }
+//        
+//        for (int i = 0; i < m_iCount; i++)
+//        {
+//            Person &p = people[i];
+//            p.setTmpPos(p.getTmpPos() + p.getDeltaP());
+//        }
+//    }
+//
+//	for (int i = 0; i < m_iCount; i++)
+//	{
+//		Person &p = people[i];
+//		p.setVelocity((p.getTmpPos() - p.getPos())/m_dTimeStep);
+//        p.setPos(p.getTmpPos());
+//	}
 }
 
 void MapController::movePerson(Vector2D old, Vector2D cur, int pID)
