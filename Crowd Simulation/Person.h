@@ -7,6 +7,7 @@
 class MapController;
 typedef double (MapController::*calculatorD)(int, int);
 typedef Vector2D (MapController::*calculatorV)(int, int);
+typedef void (MapController::*collision)(int);
 
 class Person {
 public:
@@ -19,7 +20,7 @@ public:
 	void updateNeighbours();
 	void computeConstraint(calculatorD d);
 	void computeLambda(calculatorV l);
-	void computeDeltaP(calculatorV l);
+	void computeDeltaP(calculatorV l, collision c);
 
 	void setMap(MapController *map){m_mMap = map;}
 

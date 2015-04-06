@@ -39,6 +39,8 @@ public:
 	double density(int neighbourID, int pID);
 	Vector2D lamda(int neighbourID, int pID);
 	Vector2D deltaP(int neighbourID, int pID);
+    void collision(int pID);
+    
 	bool filterNeightbours(int neighborID, int pID);
 	void movePerson(Vector2D old, Vector2D cur, int pID);
 

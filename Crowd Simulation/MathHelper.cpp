@@ -2,6 +2,7 @@
 #include <math.h>
 #include <algorithm>
 #include <iostream>
+#include <iomanip>
 
 MathHelper::MathHelper(double radius)
 {
@@ -26,11 +27,14 @@ double MathHelper::poly6(const Vector2D& vec)
 
 Vector2D MathHelper::spikyGrad(const Vector2D& vec)
 {
-	double l = fmax(vec.squaredLength(), 1e-8);
+    double l = std::max(vec.squaredLength(), 1e-8);
 	double t = m_dRadius - l;
-
+    
 	if (t <= 0.0) return Vector2D::vec2Zero;
-    return vec * t * t * m_dSpikyGrad / l;
+
+    double value = t * t * m_dSpikyGrad;
+    Vector2D temp = vec * value;
+    return vec * value / l;
 }
 
 double MathHelper::vislap(const Vector2D& vec)

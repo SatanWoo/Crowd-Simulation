@@ -105,23 +105,24 @@ void MapController::update()
 		Person &p = people[i];
 		p.computeLambda(&MapController::lamda);
 	}
-//
-//	for (int i = 0; i < m_iCount; i++)
-//	{
-//		Person &p = people[i];
-//		p.computeDeltaP(&MapController::deltaP);
-//	}
-//
-//	for (int i = 0; i < m_iWidth; i++)
-//	{
-//		Person &p = people[i];
-//		p.setTmpPos(p.getTmpPos() + p.getDeltaP());
-//	}
+
+	for (int i = 0; i < m_iCount; i++)
+	{
+		Person &p = people[i];
+        p.computeDeltaP(&MapController::deltaP, &MapController::collision);
+	}
+
+	for (int i = 0; i < m_iCount; i++)
+	{
+		Person &p = people[i];
+		p.setTmpPos(p.getTmpPos() + p.getDeltaP());
+	}
 //
 //	for (int i = 0; i < m_iCount; i++)
 //	{
 //		Person &p = people[i];
 //		p.setVelocity((p.getTmpPos() - p.getPos()/m_dTimeStep));
+//        p.setPos(p.getTmpPos());
 //	}
 }
 
@@ -129,12 +130,13 @@ void MapController::movePerson(Vector2D old, Vector2D cur, int pID)
 {
 	int oldX = old.getX() / MapGridSize;
 	int oldY = old.getY() / MapGridSize;
-
-	terrain[oldX][oldY].removePerson(pID);
+    if (isInMap(oldX, oldY))
+        terrain[oldX][oldY].removePerson(pID);
 
 	int curX = cur.getX() / MapGridSize;
 	int curY = cur.getY() / MapGridSize;
-	terrain[curX][curY].addPerson(pID);
+    if (isInMap(curX, curY))
+        terrain[curX][curY].addPerson(pID);
 }
 
 std::vector<int> MapController::findNeighbours(int pID)
@@ -149,9 +151,7 @@ std::vector<int> MapController::findNeighbours(int pID)
 	Person &p = people[pID];
 	int cellX = p.getTmpPos().getX() / MapGridSize;
 	int cellY = p.getTmpPos().getY() / MapGridSize;
-    
-    //cout << "PID" << pID << ":" << cellX << " " << cellY << endl;
-    
+
 	std::vector<int> result;
 	for (int i = 0; i < 9; i++)
 	{
@@ -198,49 +198,55 @@ Vector2D MapController::deltaP(int neighbourID, int pID)
 {
 	Person &pj = people[neighbourID];
 	Person &pi = people[pID];
-
-	Vector2D result =  helper->spikyGrad(pi.getTmpPos() - pj.getTmpPos()) * (pi.getLambda() + pj.getLambda());
-
-	static double BEDDING = 0.5 * MapGridSize;
-	static double REBOUND = -0.5;
-
-	if (pi.getTmpPos().getX() < 0.0 + BEDDING) 
-	{
-		pi.setTmpPos(Vector2D(BEDDING, pi.getTmpPos().getY()));
-		if (pi.getVelocity().getX() < 0.0) 
-		{
-			pi.setVelocity(Vector2D(pi.getVelocity().getX() * REBOUND, pi.getVelocity().getY()));
-		}
-	}
-
-	if (pi.getTmpPos().getY() < 0.0 + BEDDING) 
-	{
-		pi.setTmpPos(Vector2D(pi.getTmpPos().getX(), BEDDING));
-		if (pi.getVelocity().getY() < 0.0) 
-		{
-			pi.setVelocity(Vector2D(pi.getVelocity().getX(), pi.getVelocity().getY() * REBOUND));
-		}
-	}
-
-	if (pi.getTmpPos().getX() < m_iWidth * MapGridSize - BEDDING) 
-	{
-		pi.setTmpPos(Vector2D(m_iWidth * MapGridSize - BEDDING, pi.getTmpPos().getY()));
-		if (pi.getVelocity().getX() > 0.0) 
-		{
-			pi.setVelocity(Vector2D(pi.getVelocity().getX() * REBOUND, pi.getVelocity().getY()));
-		}
-	}
-
-	if (pi.getTmpPos().getY() < m_iHeight * MapGridSize - BEDDING) 
-	{
-		pi.setTmpPos(Vector2D(pi.getTmpPos().getX(), m_iHeight * MapGridSize - BEDDING));
-		if (pi.getVelocity().getY() > 0.0) 
-		{
-			pi.setVelocity(Vector2D(pi.getVelocity().getX(), pi.getVelocity().getY() * REBOUND));
-		}
-	}
+    double factor = (pi.getLambda() + pj.getLambda());
+    Vector2D temp = helper->spikyGrad(pi.getTmpPos() - pj.getTmpPos());
+	Vector2D result =  temp * factor;
 
 	return result;
+}
+
+void MapController::collision(int pID)
+{
+    static double BEDDING = 0.5 * MapGridSize;
+    static double REBOUND = -0.5;
+    
+    Person &pi = people[pID];
+
+    if (pi.getTmpPos().getX() < 0.0 + BEDDING)
+    {
+        pi.setTmpPos(Vector2D(BEDDING, pi.getTmpPos().getY()));
+        if (pi.getVelocity().getX() < 0.0)
+        {
+            pi.setVelocity(Vector2D(pi.getVelocity().getX() * REBOUND, pi.getVelocity().getY()));
+        }
+    }
+
+    if (pi.getTmpPos().getY() < 0.0 + BEDDING)
+    {
+        pi.setTmpPos(Vector2D(pi.getTmpPos().getX(), BEDDING));
+        if (pi.getVelocity().getY() < 0.0)
+        {
+            pi.setVelocity(Vector2D(pi.getVelocity().getX(), pi.getVelocity().getY() * REBOUND));
+        }
+    }
+
+    if (pi.getTmpPos().getX() > m_iWidth - BEDDING)
+    {
+        pi.setTmpPos(Vector2D(m_iWidth  - BEDDING, pi.getTmpPos().getY()));
+        if (pi.getVelocity().getX() > 0.0)
+        {
+            pi.setVelocity(Vector2D(pi.getVelocity().getX() * REBOUND, pi.getVelocity().getY()));
+        }
+    }
+
+    if (pi.getTmpPos().getY() > m_iHeight  - BEDDING)
+    {
+        pi.setTmpPos(Vector2D(pi.getTmpPos().getX(), m_iHeight - BEDDING));
+        if (pi.getVelocity().getY() > 0.0)
+        {
+            pi.setVelocity(Vector2D(pi.getVelocity().getX(), pi.getVelocity().getY() * REBOUND));
+        }
+    }
 }
 
 bool MapController::isInMap(int x, int y)

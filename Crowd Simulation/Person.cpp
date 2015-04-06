@@ -34,6 +34,7 @@ void Person::setPos(const Vector2D &newPos)
 
 void Person::setTmpPos(const Vector2D &newTmpPos)
 {
+    std::cout << newTmpPos.getX() << " : " << newTmpPos.getY() << std::endl;
 	m_vPosTmp.setX(newTmpPos.getX());
 	m_vPosTmp.setY(newTmpPos.getY());
 }
@@ -94,19 +95,22 @@ void Person::computeLambda(calculatorV d)
 	}
 
 	m_dLambda = m_dConstraint * (-1) / (total + 50.0);
-    std::cout << m_dLambda << " ";
 }
 
-void Person::computeDeltaP(calculatorV l)
+void Person::computeDeltaP(calculatorV l, collision c)
 {
 	size_t size = neighboursIndex.size();
-	Vector2D deltaP = Vector2D::vec2Zero;
+	Vector2D deltaP = Vector2D(0, 0);
+    
 	for (int i = 0; i < size; i++)
 	{
 		int nID = neighboursIndex[i];
-		deltaP = deltaP + (m_mMap->*l)(nID, m_iID);
+        
+        Vector2D temp = (m_mMap->*l)(nID, m_iID);
+		deltaP += temp;
 	}
-
+    
+    (m_mMap->*c)(m_iID);
 	m_deltaP = deltaP / MapController::restDensity;
 }
 
@@ -121,5 +125,4 @@ void Person::computeConstraint(calculatorD d)
 	}
 
     m_dConstraint = total / MapController::restDensity - 1;
-    //std::cout << m_dConstraint << " ";
 }
