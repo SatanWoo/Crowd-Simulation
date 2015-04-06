@@ -15,6 +15,7 @@ Person::Person(Vector2D pos, Vector2D vel, double mass)
 Person::~Person()
 {
 	neighboursIndex.clear();
+    m_mMap = NULL;
 }
 
 void Person::init(int pID, Vector2D pos, Vector2D vel, double mass)

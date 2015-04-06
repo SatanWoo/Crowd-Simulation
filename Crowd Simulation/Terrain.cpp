@@ -12,6 +12,7 @@ Terrain::Terrain(double x /* = 0.0 */, double y /* = 0.0 */, double z /* = 0.0 *
 Terrain::~Terrain()
 {
 	people.clear();
+    m_map = NULL;
 }
 
 void Terrain::addPerson(int index)
@@ -22,6 +23,11 @@ void Terrain::addPerson(int index)
 void Terrain::removePerson(int index)
 {
     people.erase(index);
+}
+
+void Terrain::render()
+{
+    
 }
 
 std::vector<int> Terrain::filterPeople(filter f, int pID)

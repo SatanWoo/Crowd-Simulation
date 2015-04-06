@@ -20,6 +20,8 @@ private:
 	int m_iWidth;
 	int m_iHeight;
 	int m_iCount;
+    
+    Vector2D destinationPoint;
 
 	double m_dTimeStep;
     

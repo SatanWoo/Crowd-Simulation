@@ -56,6 +56,7 @@ int main(int argc, const char * argv[])
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     glEnable(GL_POINT_SMOOTH);
+    //glEnable(GL_BLEND);
     
     mapController = new MapController(MapWidth, MapHeight, 500);
 

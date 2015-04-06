@@ -14,6 +14,8 @@ public:
 	Person();
 	Person(Vector2D pos, Vector2D vel, double mass);
 	~Person();
+    
+    // Steer
 
 	void init(int pID, Vector2D pos = Vector2D::vec2Zero, Vector2D vel = Vector2D::vec2Zero, double mass = 1.0);
 	void applyAndPredict();

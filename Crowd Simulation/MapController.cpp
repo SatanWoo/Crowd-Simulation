@@ -43,6 +43,9 @@ MapController::MapController(int width, int height, int count, double timeStep)
             terrain[i][j].setMap(this);
         }
     }
+    
+//    destinationPoint.setX(m_iWidth * MapGridSize - 2);
+//    destinationPoint.setY(m_iHeight * MapGridSize - 5);
 
 	helper = new MathHelper(1.5);
 }
@@ -72,7 +75,8 @@ void MapController::render()
     
     static int fourDir[4][2] = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
     
-    glColor4f(1.0f, 1.0f, 1.0f, 0.1);
+    glColor4d(1.0f, 1.0f, 1.0f, 0.1);
+    
     for (int i = 0; i < m_iWidth; i++) {
         for (int j = 0; j < m_iHeight; j++) {
             double xPos = i * MapGridSize;

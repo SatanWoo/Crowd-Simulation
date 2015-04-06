@@ -10,9 +10,9 @@ class MapController;
 typedef bool(MapController::*filter)(int, int);
 
 class Terrain {
-private:
-	double m_dX;
-	double m_dY;
+protected:
+	double m_dX; // Top Left
+	double m_dY; // Top Left
 	double m_dZ;
     
 	set<int> people;
@@ -27,6 +27,7 @@ public:
 	vector<int> filterPeople(filter f, int pID);
 
 	virtual int obstacleCoefficient()const{return 0;}
+    virtual void render();
 	virtual int maxPeople()const{return INT_MAX;}
 	virtual ~Terrain();
 };

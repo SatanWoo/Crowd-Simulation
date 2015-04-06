@@ -15,6 +15,7 @@
 		1955D0FF1AC445BC001318C6 /* Person.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1955D0FA1AC445BC001318C6 /* Person.cpp */; };
 		1955D1001AC445BC001318C6 /* Terrain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1955D0FC1AC445BC001318C6 /* Terrain.cpp */; };
 		1955D1031AC46E4C001318C6 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1955D1021AC46E4C001318C6 /* OpenGL.framework */; };
+		19A802F31AD2888E00CC6FBC /* Path.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 19A802F21AD2888E00CC6FBC /* Path.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -44,6 +45,8 @@
 		1955D0FC1AC445BC001318C6 /* Terrain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Terrain.cpp; sourceTree = "<group>"; };
 		1955D0FD1AC445BC001318C6 /* Terrain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Terrain.h; sourceTree = "<group>"; };
 		1955D1021AC46E4C001318C6 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
+		19A802F11AD2844A00CC6FBC /* Path.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Path.h; sourceTree = "<group>"; };
+		19A802F21AD2888E00CC6FBC /* Path.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Path.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -80,6 +83,7 @@
 		1955D0E71AC44362001318C6 /* Crowd Simulation */ = {
 			isa = PBXGroup;
 			children = (
+				19A802F41AD29B5400CC6FBC /* Object */,
 				1955D1011AC445BF001318C6 /* App */,
 				1955D0F11AC443C5001318C6 /* Foundation */,
 				1955D0E81AC44362001318C6 /* main.cpp */,
@@ -109,6 +113,15 @@
 				1955D0FD1AC445BC001318C6 /* Terrain.h */,
 			);
 			name = App;
+			sourceTree = "<group>";
+		};
+		19A802F41AD29B5400CC6FBC /* Object */ = {
+			isa = PBXGroup;
+			children = (
+				19A802F11AD2844A00CC6FBC /* Path.h */,
+				19A802F21AD2888E00CC6FBC /* Path.cpp */,
+			);
+			name = Object;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -170,6 +183,7 @@
 				1955D0FE1AC445BC001318C6 /* MapController.cpp in Sources */,
 				1955D0F71AC443E7001318C6 /* MathHelper.cpp in Sources */,
 				1955D0F41AC443D4001318C6 /* Vector.cpp in Sources */,
+				19A802F31AD2888E00CC6FBC /* Path.cpp in Sources */,
 				1955D0FF1AC445BC001318C6 /* Person.cpp in Sources */,
 				1955D0E91AC44362001318C6 /* main.cpp in Sources */,
 				1955D1001AC445BC001318C6 /* Terrain.cpp in Sources */,
