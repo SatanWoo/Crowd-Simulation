@@ -39,6 +39,7 @@ public:
 
 	void render();
 	void update();
+    void setDestionationPoint(Vector2D point){destinationPoint = point;}
 	double getTimeStep()const{return m_dTimeStep;}
 
    

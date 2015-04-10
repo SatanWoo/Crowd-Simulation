@@ -14,10 +14,10 @@
 
 using namespace std;
 
-const int ScreenWidth = 800;
-const int ScreenHeight = 600;
-const int MapWidth = 60;
-const int MapHeight = 60;
+const double ScreenWidth = 800;
+const double ScreenHeight = 600;
+const double MapWidth = 60;
+const double MapHeight = 60;
 
 MapController *mapController = NULL;
 
@@ -40,6 +40,19 @@ void glIdle()
     glutPostRedisplay();
 }
 
+void glMouse(int button, int state, int x, int y)
+{
+    switch (button)
+    {
+        case GLUT_LEFT_BUTTON:
+            
+            double xPos = (double)x * MapWidth / ScreenWidth * MapController::MapGridSize;
+            double yPos = (MapHeight - (double)y * MapHeight / ScreenHeight) * MapController::MapGridSize;
+            mapController->setDestionationPoint(Vector2D(xPos, yPos));
+            break;
+    }
+}
+
 int main(int argc, const char * argv[])
 {
     glutInit(&argc, const_cast<char **>(argv));
@@ -49,6 +62,7 @@ int main(int argc, const char * argv[])
     
     glutDisplayFunc(glRender);
     glutIdleFunc(glIdle);
+    glutMouseFunc(glMouse);
     
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();

@@ -40,6 +40,8 @@ MapController::MapController(int width, int height, int count, double timeStep)
     
     destinationPoint.setX(rand() % m_iWidth * MapGridSize);
     destinationPoint.setY(rand()% m_iHeight * MapGridSize);
+    
+    cout << destinationPoint.getX() << " || " << destinationPoint.getY() << endl;
 
 	helper = new MathHelper(1.5);
 }
@@ -94,7 +96,7 @@ void MapController::render()
     }
     glEnd();
 
-    glPointSize(10);
+    glPointSize(5);
     glBegin(GL_POINTS);
     for (int i = 0; i < m_iCount; i++) {
         Person &p = people[i];
