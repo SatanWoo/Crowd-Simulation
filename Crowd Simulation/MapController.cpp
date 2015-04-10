@@ -70,12 +70,10 @@ void MapController::render()
     glVertex2d(destinationPoint.getX(), destinationPoint.getY());
     glEnd();
     
-    
     glLineWidth(1);
     glBegin(GL_LINES);
     
     static int fourDir[4][2] = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
-    
     glColor4f(1.0f, 1.0f, 1.0f, 0.1);
     
     for (int i = 0; i < m_iWidth; i++) {
@@ -127,8 +125,8 @@ Vector2D MapController::flock(int pID)
     for (int i = 0; i < m_iCount; i++) {
         if (i == pID) continue;
         
-        //sepForce += separation(pID, i, sepNeighbour);
-        //cohForce += cohesion(pID, i, cohNeighbour);
+        sepForce += separation(pID, i, sepNeighbour);
+        cohForce += cohesion(pID, i, cohNeighbour);
         //alignForce += alignment(pID, i, alignNeighbour);
     }
     
@@ -137,11 +135,12 @@ Vector2D MapController::flock(int pID)
     
     cohForce /= cohNeighbour;
     cohForce = seek(pID, cohForce);
+    cohForce = cohNeighbour == 1 ? Vector2D::vec2Zero : cohForce ;
     
-//    alignForce /= alignNeighbour;
-//    alignForce *= pi.getMaxSpeed();
-//    alignForce -= pi.getVelocity();
-//    alignForce *= (pi.getMaxForce() / pi.getMaxSpeed());
+    alignForce /= alignNeighbour;
+    alignForce *= pi.getMaxSpeed();
+    alignForce -= pi.getVelocity();
+    alignForce *= (pi.getMaxForce() / pi.getMaxSpeed());
     
     allForce = seekForce + (sepForce * 2) + (cohForce * 0.2) + alignForce * 0.5;
     
