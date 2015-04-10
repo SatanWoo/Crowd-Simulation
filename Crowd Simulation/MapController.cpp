@@ -38,8 +38,8 @@ MapController::MapController(int width, int height, int count, double timeStep)
         }
     }
     
-    //destinationPoint.setX(m_iWidth * MapGridSize - 2);
-    //destinationPoint.setY(m_iHeight * MapGridSize - 5);
+    destinationPoint.setX(rand() % m_iWidth * MapGridSize);
+    destinationPoint.setY(rand()% m_iHeight * MapGridSize);
 
 	helper = new MathHelper(1.5);
 }
@@ -64,12 +64,19 @@ MapController::~MapController()
 
 void MapController::render()
 {
+    glPointSize(10);
+    glBegin(GL_POINTS);
+    glColor4f(0.0, 1.0, 0.0, 1.0);
+    glVertex2d(destinationPoint.getX(), destinationPoint.getY());
+    glEnd();
+    
+    
     glLineWidth(1);
     glBegin(GL_LINES);
     
     static int fourDir[4][2] = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
     
-    glColor4d(1.0f, 1.0f, 1.0f, 0.1);
+    glColor4f(1.0f, 1.0f, 1.0f, 0.1);
     
     for (int i = 0; i < m_iWidth; i++) {
         for (int j = 0; j < m_iHeight; j++) {
@@ -98,8 +105,117 @@ void MapController::render()
     glEnd();
 }
 
+Vector2D MapController::seek(int pID, Vector2D des)
+{
+    Person &pi = people[pID];
+    Vector2D distance = des - pi.getPos();
+    Vector2D desiredSpeed = distance * (pi.getMaxSpeed() / distance.squaredLength());
+    Vector2D velocityChange = desiredSpeed - pi.getVelocity();
+    
+    return velocityChange * (pi.getMaxForce() / pi.getMaxSpeed());
+}
+
+Vector2D MapController::flock(int pID)
+{
+    Person &pi = people[pID];
+    
+    Vector2D allForce = Vector2D::vec2Zero;
+    
+    Vector2D seekForce = seek(pID, destinationPoint);
+    Vector2D sepForce = Vector2D::vec2Zero, cohForce = pi.getPos(), alignForce = Vector2D::vec2Zero;
+    int sepNeighbour = 1, cohNeighbour = 1, alignNeighbour = 1;
+    for (int i = 0; i < m_iCount; i++) {
+        if (i == pID) continue;
+        
+        //sepForce += separation(pID, i, sepNeighbour);
+        //cohForce += cohesion(pID, i, cohNeighbour);
+        //alignForce += alignment(pID, i, alignNeighbour);
+    }
+    
+    sepForce /= sepNeighbour;
+    sepForce *= pi.getMaxForce();
+    
+    cohForce /= cohNeighbour;
+    cohForce = seek(pID, cohForce);
+    
+//    alignForce /= alignNeighbour;
+//    alignForce *= pi.getMaxSpeed();
+//    alignForce -= pi.getVelocity();
+//    alignForce *= (pi.getMaxForce() / pi.getMaxSpeed());
+    
+    allForce = seekForce + (sepForce * 2) + (cohForce * 0.2) + alignForce * 0.5;
+    
+    if (allForce.squaredLength() > pi.getMaxForce())
+    {
+        allForce = allForce.normalize() * pi.getMaxForce();
+    }
+    
+    return allForce;
+}
+
+Vector2D MapController::separation(int pID, int nID, int& count)
+{
+    Person &pi = people[pID];
+    Person &pn = people[nID];
+    
+    double distance = pi.getPos().distanceTo(pn.getPos());
+    
+    Vector2D pushForce = Vector2D::vec2Zero;
+    
+    if (distance > 0 && distance < pi.getRadius())
+    {
+        count = count + 1;
+        Vector2D dis = pi.getPos() - pn.getPos();
+        pushForce += dis.normalize() * (1 - dis.squaredLength() / pi.getRadius());
+    }
+
+    return pushForce;
+}
+
+Vector2D MapController::cohesion(int pID, int nID, int& count)
+{
+    Person &pi = people[pID];
+    Person &pn = people[nID];
+    
+    double distance = pi.getPos().distanceTo(pn.getPos());
+    
+    if (distance < pi.getRadius())
+    {
+        count = count + 1;
+        return pn.getPos();
+    }
+    
+    return Vector2D::vec2Zero;
+}
+
+Vector2D MapController::alignment(int pID, int nID, int &count)
+{
+    Person &pi = people[pID];
+    Person &pn = people[nID];
+    
+    double distance = pi.getPos().distanceTo(pn.getPos());
+    
+    if (distance < pi.getRadius() && pn.getVelocity().squaredLength() > 0)
+    {
+        count = count + 1;
+        return pn.getVelocity().normalize();
+    }
+    
+    return Vector2D::vec2Zero;
+}
+
 void MapController::update()
 {
+    for (int i = 0; i < m_iCount; i++) {
+        Person &pi = people[i];
+        pi.flock(&MapController::flock);
+    }
+    
+    for (int i = 0; i < m_iCount; i++) {
+        Person &pi = people[i];
+        pi.steer();
+    }
+//
 //	for (int i = 0; i < m_iCount; i++)
 //	{
 //		Person &p = people[i];

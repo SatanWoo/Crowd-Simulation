@@ -33,7 +33,6 @@ Vector2D MathHelper::spikyGrad(const Vector2D& vec)
 	if (t <= 0.0) return Vector2D::vec2Zero;
 
     double value = t * t * m_dSpikyGrad;
-    Vector2D temp = vec * value;
     return vec * value / l;
 }
 

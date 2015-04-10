@@ -28,6 +28,11 @@ private:
 protected:
     bool isInMap(int x, int y);
     
+    Vector2D seek(int pID, Vector2D des);
+    Vector2D separation(int pID, int nID, int &);
+    Vector2D cohesion(int pID, int nID, int &);
+    Vector2D alignment(int pID, int nID, int &);
+    
 public:
 	MapController(int width, int height, int count, double timeStep = 0.02);
 	~MapController();
@@ -35,7 +40,10 @@ public:
 	void render();
 	void update();
 	double getTimeStep()const{return m_dTimeStep;}
-	
+
+   
+    Vector2D flock(int pID);
+  
 	std::vector<int> findNeighbours(int pID);
 
 	double density(int neighbourID, int pID);

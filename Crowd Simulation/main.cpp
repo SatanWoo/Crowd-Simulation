@@ -52,13 +52,13 @@ int main(int argc, const char * argv[])
     
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluOrtho2D(0, MapWidth, 0, MapHeight);
+    gluOrtho2D(0, MapWidth * MapController::MapGridSize, 0, MapHeight * MapController::MapGridSize);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     glEnable(GL_POINT_SMOOTH);
     //glEnable(GL_BLEND);
     
-    mapController = new MapController(MapWidth, MapHeight, 50);
+    mapController = new MapController(MapWidth, MapHeight, 10);
 
     glutMainLoop();
 

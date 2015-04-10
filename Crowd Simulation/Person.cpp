@@ -20,6 +20,10 @@ Person::~Person()
 
 void Person::init(int pID, Vector2D pos, Vector2D vel, double mass)
 {
+    m_dMaxForce = 4;
+    m_dMaxSpeed = 5;
+    m_dRadius = 2;
+    
 	m_iID = pID;
 	m_vPos = pos;
 	m_vVelocity = vel;
@@ -27,9 +31,21 @@ void Person::init(int pID, Vector2D pos, Vector2D vel, double mass)
 	m_dMass = mass;
 }
 
-void Person::steer(steering s)
+void Person::steer()
 {
-    (m_mMap->*s)(m_iID);
+    Vector2D force = m_vForce;
+    m_vVelocity += force * m_mMap->getTimeStep();
+    double curSpeed = m_vVelocity.squaredLength();
+    if (curSpeed > m_dMaxSpeed) {
+        m_vVelocity *= (4 / curSpeed);
+    }
+    
+    m_vPos += m_vVelocity * m_mMap->getTimeStep();
+}
+
+void Person::flock(::flock f)
+{
+    m_vForce = (m_mMap->*f)(m_iID);
 }
 
 void Person::setPos(const Vector2D &newPos)
@@ -71,7 +87,7 @@ void Person::updateNeighbours()
 
 void Person::render()
 {
-    glColor3f(1.0, (m_dConstraint + 1) * MapController::restDensity / 2.0, 0.5);
+//    glColor3f(1.0, (m_dConstraint + 1) * MapController::restDensity / 2.0, 0.5);
     glVertex2f(m_vPos.getX(), m_vPos.getY());
 }
 

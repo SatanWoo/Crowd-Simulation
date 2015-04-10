@@ -8,7 +8,9 @@ class MapController;
 typedef double (MapController::*calculatorD)(int, int);
 typedef Vector2D (MapController::*calculatorV)(int, int);
 typedef void (MapController::*collision)(int);
-typedef void (MapController::*steering)(int);
+
+typedef Vector2D (MapController::*steering)(int);
+typedef Vector2D (MapController::*flock)(int);
 
 class Person {
 public:
@@ -17,7 +19,8 @@ public:
 	~Person();
     
     // Steer
-    void steer(steering s);
+    void steer();
+    void flock(flock f);
 
 	void init(int pID, Vector2D pos = Vector2D::vec2Zero, Vector2D vel = Vector2D::vec2Zero, double mass = 1.0);
 	void applyAndPredict();
@@ -38,6 +41,10 @@ public:
 	void setVelocity(const Vector2D &newVel);
 	
 	Vector2D getDeltaP()const{return m_deltaP;}
+    
+    double getMaxSpeed()const{return m_dMaxSpeed;}
+    double getMaxForce()const{return m_dMaxForce;}
+    double getRadius()const{return m_dRadius;}
 	
 	double getLambda()const {return m_dLambda;}
 	double getMass()const{return m_dMass;}
@@ -49,6 +56,11 @@ private:
 	Vector2D m_vPosTmp;
 	Vector2D m_vVelocity;
 	Vector2D m_deltaP;
+    Vector2D m_vForce;
+    
+    double m_dMaxSpeed;
+    double m_dMaxForce;
+    double m_dRadius;
 
 	double m_dLambda;
 	double m_dMass;
