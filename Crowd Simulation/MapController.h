@@ -15,7 +15,7 @@ class MapController
 private:
 	Terrain **terrain;
 	Person *people;
-    Vector2D **flow;
+    //Vector2D **flow;
     MathHelper *helper;
 
 	int m_iWidth;
@@ -29,18 +29,18 @@ private:
 protected:
     bool isInMap(int x, int y);
     
-    Vector2D steeringFromFlowFleid(int pID, Vector2D des);
+    //Vector2D steeringFromFlowFleid(int pID, Vector2D des);
     
     Vector2D seek(int pID, Vector2D des);
     Vector2D separation(int pID, int nID, int &);
     Vector2D cohesion(int pID, int nID, int &);
     Vector2D alignment(int pID, int nID, int &);
     
-    void buildDijkstra();
-    void buildFlowField();
-    
-    std::vector<Vector2D> fourAdjacentNeighbours(const Vector2D& vec);
-    std::vector<Vector2D> eightAdjacentNeighbours(const Vector2D& vec);
+//    void buildDijkstra();
+//    void buildFlowField();
+//    
+//    std::vector<Vector2D> fourAdjacentNeighbours(const Vector2D& vec);
+//    std::vector<Vector2D> eightAdjacentNeighbours(const Vector2D& vec);
     
 public:
 	MapController(int width, int height, int count, double timeStep = 0.02);
