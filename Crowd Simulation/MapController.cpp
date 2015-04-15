@@ -240,8 +240,18 @@ void MapController::render()
                 }
             }
             
-//            glBegin(GL_QUADS);
-//            glColor3f(1.0f, 0.0f, 0.0f);
+        }
+    }
+    glEnd();
+    
+//    glBegin(GL_QUADS);
+//    glColor3f(1.0f, 0.0f, 0.0f);
+//    for (int i = 0; i < m_iWidth; i++) {
+//        for (int j = 0; j < m_iHeight; j++) {
+//           
+//            double xPos = i * MapGridSize;
+//            double yPos = j * MapGridSize;
+//
 //            if (terrain[i][j].getDistance() == INT_MAX)
 //            {
 //                glVertex2d(xPos, yPos);
@@ -249,12 +259,12 @@ void MapController::render()
 //                glVertex2d((i + 1) * MapGridSize, (j + 0) * MapGridSize);
 //                glVertex2d((i + 1) * MapGridSize, (j + 1) * MapGridSize);
 //            }
-//            glEnd();
-        }
-    }
-    glEnd();
-
+//        }
+//    }
+//    glEnd();
+    
     glPointSize(5);
+    glColor3f(1.0f, 1.0f, 1.0f);
     glBegin(GL_POINTS);
     for (int i = 0; i < m_iCount; i++) {
         Person &p = people[i];
