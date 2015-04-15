@@ -85,6 +85,22 @@ double Vector2D::distanceTo(const Vector2D &vec)
     return sqrt(diffX * diffX + diffY * diffY);
 }
 
+
+Vector2D Vector2D::round()
+{
+    return Vector2D(roundf(m_dX), roundf(m_dY));
+}
+
+Vector2D Vector2D::floor()
+{
+    return Vector2D(floorf(m_dX), floorf(m_dY));
+}
+
+Vector2D Vector2D::ceiling()
+{
+    return Vector2D(ceilf(m_dX), ceilf(m_dY));
+}
+
 // Vector 3D
 Vector3D Vector3D::vec3Zero = Vector3D(0, 0, 0);
 

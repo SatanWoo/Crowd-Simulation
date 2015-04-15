@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		191B3B1B1ADD84A10035D157 /* Obstacle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 191B3B1A1ADD84A10035D157 /* Obstacle.cpp */; };
 		1955D0E91AC44362001318C6 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1955D0E81AC44362001318C6 /* main.cpp */; };
 		1955D0F01AC44379001318C6 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1955D0EF1AC44379001318C6 /* GLUT.framework */; };
 		1955D0F41AC443D4001318C6 /* Vector.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1955D0F21AC443D4001318C6 /* Vector.cpp */; };
@@ -31,6 +32,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		191B3B191ADD824E0035D157 /* Obstacle.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Obstacle.h; sourceTree = "<group>"; };
+		191B3B1A1ADD84A10035D157 /* Obstacle.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Obstacle.cpp; sourceTree = "<group>"; };
+		191B3B1C1ADD86D40035D157 /* TerrainFactory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TerrainFactory.h; sourceTree = "<group>"; };
 		1955D0E51AC44362001318C6 /* Crowd Simulation */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "Crowd Simulation"; sourceTree = BUILT_PRODUCTS_DIR; };
 		1955D0E81AC44362001318C6 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		1955D0EF1AC44379001318C6 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = System/Library/Frameworks/GLUT.framework; sourceTree = SDKROOT; };
@@ -109,8 +113,11 @@
 				1955D0F91AC445BC001318C6 /* MapController.h */,
 				1955D0FA1AC445BC001318C6 /* Person.cpp */,
 				1955D0FB1AC445BC001318C6 /* Person.h */,
+				191B3B1A1ADD84A10035D157 /* Obstacle.cpp */,
+				191B3B191ADD824E0035D157 /* Obstacle.h */,
 				1955D0FC1AC445BC001318C6 /* Terrain.cpp */,
 				1955D0FD1AC445BC001318C6 /* Terrain.h */,
+				191B3B1C1ADD86D40035D157 /* TerrainFactory.h */,
 			);
 			name = App;
 			sourceTree = "<group>";
@@ -182,6 +189,7 @@
 			files = (
 				1955D0FE1AC445BC001318C6 /* MapController.cpp in Sources */,
 				1955D0F71AC443E7001318C6 /* MathHelper.cpp in Sources */,
+				191B3B1B1ADD84A10035D157 /* Obstacle.cpp in Sources */,
 				1955D0F41AC443D4001318C6 /* Vector.cpp in Sources */,
 				19A802F31AD2888E00CC6FBC /* Path.cpp in Sources */,
 				1955D0FF1AC445BC001318C6 /* Person.cpp in Sources */,
