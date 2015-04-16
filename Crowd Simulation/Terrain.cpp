@@ -10,6 +10,7 @@ Terrain::Terrain(double x /* = 0.0 */, double y /* = 0.0 */, double z /* = 0.0 *
 	m_dZ = z;
     
     obstacle = -1;
+    m_iDistance = -1;
 }
 
 Terrain::~Terrain()
