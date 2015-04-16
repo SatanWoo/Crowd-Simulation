@@ -21,6 +21,7 @@ MapController::MapController(int width, int height, int count, double timeStep)
 	for (int i = 0; i < count; i++)
 	{
         Vector2D pos = Vector2D(rand() % m_iWidth * MapGridSize, rand()% m_iHeight * MapGridSize);
+        cout << pos.getX() << "+" << pos.getY() << endl;
         people[i].init(i, pos);
 		people[i].setMap(this);
 	}
@@ -119,7 +120,11 @@ Vector2D MapController::steeringFromFlowFleid(int pID, Vector2D des)
 {
     Person &pi = people[pID];
     
-    Vector2D floor = pi.getPos().floor();
+    //cout <<  pID << " " << pi.getPos().getX() << ":" << pi.getPos().getY() << endl;
+
+    if (isnan(pi.getPos().getX()) || isnan(pi.getPos().getY())) return Vector2D::vec2Zero;
+    
+    Vector2D floor = pi.getPos().floorV();
     
     int fx = floor.getX() / MapGridSize;
     int fy = floor.getY() / MapGridSize;
@@ -289,8 +294,7 @@ Vector2D MapController::seek(int pID, Vector2D des)
 Vector2D MapController::flock(int pID)
 {
     Person &pi = people[pID];
-    
-//    return steeringFromFlowFleid(pID, destinationPoint);
+    return steeringFromFlowFleid(pID, destinationPoint);
 //
     Vector2D allForce = Vector2D::vec2Zero;
 //    

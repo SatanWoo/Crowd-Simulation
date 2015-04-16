@@ -86,19 +86,19 @@ double Vector2D::distanceTo(const Vector2D &vec)
 }
 
 
-Vector2D Vector2D::round()
+Vector2D Vector2D::roundV()
 {
-    return Vector2D(roundf(m_dX), roundf(m_dY));
+    return Vector2D(round(m_dX), round(m_dY));
 }
 
-Vector2D Vector2D::floor()
+Vector2D Vector2D::floorV()
 {
-    return Vector2D(floorf(m_dX), floorf(m_dY));
+    return Vector2D(floor(m_dX), floor(m_dY));
 }
 
-Vector2D Vector2D::ceiling()
+Vector2D Vector2D::ceilingV()
 {
-    return Vector2D(ceilf(m_dX), ceilf(m_dY));
+    return Vector2D(ceil(m_dX), ceil(m_dY));
 }
 
 // Vector 3D

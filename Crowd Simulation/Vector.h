@@ -14,9 +14,9 @@ public:
     
     Vector2D normalize();
     
-    Vector2D round();
-    Vector2D floor();
-    Vector2D ceiling();
+    Vector2D roundV();
+    Vector2D floorV();
+    Vector2D ceilingV();
 
 	Vector2D& operator+= (const Vector2D& b);
 	Vector2D& operator-= (const Vector2D& b);

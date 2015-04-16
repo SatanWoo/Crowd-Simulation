@@ -20,9 +20,9 @@ Person::~Person()
 
 void Person::init(int pID, Vector2D pos, Vector2D vel, double mass)
 {
-    m_dMaxForce = 4;
-    m_dMaxSpeed = 5;
-    m_dRadius = 2;
+    m_dMaxForce = 20;
+    m_dMaxSpeed = 4;
+    m_dRadius = 0.4;
     
 	m_iID = pID;
 	m_vPos = pos;
@@ -37,7 +37,7 @@ void Person::steer()
     m_vVelocity += force * m_mMap->getTimeStep();
     double curSpeed = m_vVelocity.squaredLength();
     if (curSpeed > m_dMaxSpeed) {
-        m_vVelocity *= (4 / curSpeed);
+        m_vVelocity *= m_dMaxSpeed / curSpeed;
     }
     
     m_vPos += m_vVelocity * m_mMap->getTimeStep();
