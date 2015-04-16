@@ -15,7 +15,7 @@ class MapController
 private:
 	Terrain **terrain;
 	Person *people;
-    //Vector2D **flow;
+    Vector2D **flow;
     MathHelper *helper;
 
 	int m_iWidth;

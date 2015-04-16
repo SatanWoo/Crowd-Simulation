@@ -25,12 +25,12 @@ MapController::MapController(int width, int height, int count, double timeStep)
 		people[i].setMap(this);
 	}
     
-    //flow = new Vector2D*[width];
+    flow = new Vector2D*[width];
 	terrain = new Terrain *[width];
 	for (int i = 0; i < width; i++)
     {
 		terrain[i] = new Terrain [height];
-        //flow[i] = new Vector2D[height];
+        flow[i] = new Vector2D[height];
 	}
     
     for (int i = 0; i < width; i++)
@@ -57,17 +57,17 @@ MapController::~MapController()
 	for (int i = 0; i < m_iWidth; i++)
 	{
 		delete [] terrain[i];
-        //delete [] flow[i];
+        delete [] flow[i];
         
 		terrain[i] = NULL;
-        //flow[i] = NULL;
+        flow[i] = NULL;
 	}
 
 	delete [] terrain;
 	terrain = NULL;
     
-//    delete [] flow;
-//    flow = NULL;
+    delete [] flow;
+    flow = NULL;
 
 	delete [] people;
 	people = NULL;
