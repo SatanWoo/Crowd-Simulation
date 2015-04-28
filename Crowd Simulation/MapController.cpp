@@ -23,7 +23,6 @@ MapController::MapController(int width, int height, int count, double timeStep)
 	for (int i = 0; i < count; i++)
 	{
         Vector2D pos = Vector2D(rand() % m_iWidth * MapGridSize, rand()% m_iHeight * MapGridSize);
-        //cout << pos.getX() << "+" << pos.getY() << endl;
         people[i].init(i, pos);
 		people[i].setMap(this);
 	}
@@ -53,7 +52,7 @@ MapController::MapController(int width, int height, int count, double timeStep)
     destinationPoint.setX(rand() % m_iWidth * MapGridSize);
     destinationPoint.setY(rand() % m_iHeight * MapGridSize);
 
-	helper = new MathHelper(1.5);
+	helper = new MathHelper(MapGridSize);
     
     buildDijkstra();
     buildFlowField();
