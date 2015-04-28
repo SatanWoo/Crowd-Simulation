@@ -28,8 +28,11 @@ private:
     
 protected:
     bool isInMap(int x, int y);
+    bool isAccessible(int x, int y);
     
     Vector2D steeringFromFlowFleid(int pID, Vector2D des);
+    Vector2D steeringFromLowestCost(int pID, Vector2D des);
+    Vector2D steeringTowards(int pID, Vector2D desiredDirection);
     
     Vector2D seek(int pID, Vector2D des);
     Vector2D separation(int pID, int nID, int &);

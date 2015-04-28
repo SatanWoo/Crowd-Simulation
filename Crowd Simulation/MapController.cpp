@@ -1,6 +1,8 @@
 #include "MapController.h"
 #include "Terrain.h"
 #include "TerrainFactory.h"
+#include "MathLib.h"
+
 #include <GLUT/GLUT.h>
 #include <math.h>
 #include <deque>
@@ -21,7 +23,7 @@ MapController::MapController(int width, int height, int count, double timeStep)
 	for (int i = 0; i < count; i++)
 	{
         Vector2D pos = Vector2D(rand() % m_iWidth * MapGridSize, rand()% m_iHeight * MapGridSize);
-        cout << pos.getX() << "+" << pos.getY() << endl;
+        //cout << pos.getX() << "+" << pos.getY() << endl;
         people[i].init(i, pos);
 		people[i].setMap(this);
 	}
@@ -81,6 +83,39 @@ MapController::~MapController()
 	helper = NULL;
 }
 
+void MapController::buildDijkstra()
+{
+    int desX = destinationPoint.getX() / MapGridSize;
+    int desY = destinationPoint.getY() / MapGridSize;
+    
+    deque<Vector2D> bfs;
+    bfs.push_back(Vector2D(desX, desY));
+    terrain[desX][desY].setDistance(0);
+    
+    while (!bfs.empty())
+    {
+        Vector2D head = bfs.front();
+        vector<Vector2D> neighbours = fourAdjacentNeighbours(head);
+        
+        int hx = head.getX();
+        int hy = head.getY();
+        
+        for (int i = 0; i < neighbours.size(); i++)
+        {
+            int nx = neighbours[i].getX();
+            int ny = neighbours[i].getY();
+            
+            if (terrain[nx][ny].getDistance() == -1)
+            {
+                terrain[nx][ny].setDistance(terrain[hx][hy].getDistance() + 1);
+                bfs.push_back(Vector2D(nx, ny));
+            }
+        }
+        
+        bfs.pop_front();
+    }
+}
+
 void MapController::buildFlowField()
 {
     for (int i = 0; i < m_iWidth; i++)
@@ -120,8 +155,6 @@ Vector2D MapController::steeringFromFlowFleid(int pID, Vector2D des)
 {
     Person &pi = people[pID];
     
-    //cout <<  pID << " " << pi.getPos().getX() << ":" << pi.getPos().getY() << endl;
-
     if (isnan(pi.getPos().getX()) || isnan(pi.getPos().getY())) return Vector2D::vec2Zero;
     
     Vector2D floor = pi.getPos().floorV();
@@ -129,10 +162,10 @@ Vector2D MapController::steeringFromFlowFleid(int pID, Vector2D des)
     int fx = floor.getX() / MapGridSize;
     int fy = floor.getY() / MapGridSize;
     
-    Vector2D f00 = flow[fx][fy];
-    Vector2D f01 = flow[fx][fy + 1];
-    Vector2D f10 = flow[fx + 1][fy];
-    Vector2D f11 = flow[fx + 1][fy + 1];
+    Vector2D f00 = isAccessible(fx, fy) ? flow[fx][fy] : Vector2D::vec2Zero;
+    Vector2D f01 = isAccessible(fx, fy + 1) ? flow[fx][fy + 1] : Vector2D::vec2Zero;
+    Vector2D f10 = isAccessible(fx + 1, fy) ? flow[fx + 1][fy] : Vector2D::vec2Zero;
+    Vector2D f11 = isAccessible(fx + 1, fy + 1) ? flow[fx + 1][fy + 1] : Vector2D::vec2Zero;
     
     double xWeight = pi.getPos().getX() - floor.getX();
     Vector2D top = f00 * (1 - xWeight) + f10 *xWeight;
@@ -141,45 +174,70 @@ Vector2D MapController::steeringFromFlowFleid(int pID, Vector2D des)
     double yWeight = pi.getPos().getY() - floor.getY();
     Vector2D direction = top * (1 - yWeight) + (bottom * yWeight).normalize();
     
-    Vector2D desiredVelocity = direction * pi.getMaxSpeed();
-    
-    Vector2D velocityChange = desiredVelocity - pi.getVelocity();
-    return velocityChange * (pi.getMaxForce() / pi.getMaxSpeed());
+    return steeringTowards(pID, direction);
 }
 
-void MapController::buildDijkstra()
+Vector2D MapController::steeringFromLowestCost(int pID, Vector2D des)
 {
-    int desX = destinationPoint.getX() / MapGridSize;
-    int desY = destinationPoint.getY() / MapGridSize;
+    Person &pi = people[pID];
     
-    deque<Vector2D> bfs;
-    bfs.push_back(Vector2D(desX, desY));
-    terrain[desX][desY].setDistance(0);
+    if (isnan(pi.getPos().getX()) || isnan(pi.getPos().getY())) return Vector2D::vec2Zero;
+    if (pi.getVelocity().squaredLength() == 0) return Vector2D::vec2Zero;
     
-    while (!bfs.empty())
+    Vector2D floor = pi.getPos().floorV();
+    int fx = floor.getX() / MapGridSize;
+    int fy = floor.getY() / MapGridSize;
+    
+    float f00 = isAccessible(fx, fy) ? terrain[fx][fy].getDistance() : INT_MAX;
+    float f01 = isAccessible(fx, fy + 1) ? terrain[fx][fy + 1].getDistance() : INT_MAX;
+    float f10 = isAccessible(fx + 1, fy) ? terrain[fx + 1][fy].getDistance() : INT_MAX;
+    float f11 = isAccessible(fx + 1, fy + 1) ? terrain[fx + 1][fy + 1].getDistance() : INT_MAX;
+    
+    float minVal = MathLib::min4(f00, f01, f10, f11);
+    vector<Vector2D> minCoords;
+    
+    if (minVal == f00)
     {
-        Vector2D head = bfs.front();
-        vector<Vector2D> neighbours = fourAdjacentNeighbours(head);
-        
-        int hx = head.getX();
-        int hy = head.getY();
-        
-        //cout << hx << ":" << hy << "||" << terrain[hx][hy].getDistance() << endl;
-        
-        for (int i = 0; i < neighbours.size(); i++)
-        {
-            int nx = neighbours[i].getX();
-            int ny = neighbours[i].getY();
-            
-            if (terrain[nx][ny].getDistance() == -1)
-            {
-                terrain[nx][ny].setDistance(terrain[hx][hy].getDistance() + 1);
-                bfs.push_back(Vector2D(nx, ny));
-            }
-        }
-        
-        bfs.pop_front();
+        minCoords.push_back(Vector2D(fx, fy));
     }
+    if (minVal == f01)
+    {
+        minCoords.push_back(Vector2D(fx, fy+1));
+    }
+    if (minVal == f10)
+    {
+        minCoords.push_back(Vector2D(fx + 1, fy));
+    }
+    if (minVal == f11)
+    {
+        minCoords.push_back(Vector2D(fx + 1, fy + 1));
+    }
+    
+    Vector2D currentDirection = pi.getVelocity().normalize();
+    Vector2D desireDirection;
+    minVal = INT_MAX;
+    
+    for (int i = 0; i < minCoords.size(); i++)
+    {
+        Vector2D directionTo = (minCoords[i] - pi.getPos()).normalize();
+        float length = (directionTo - currentDirection).squaredLength();
+        if (length < minVal)
+        {
+            minVal = length;
+            desireDirection = directionTo;
+        }
+    }
+    
+    return steeringTowards(pID, desireDirection);
+}
+
+Vector2D MapController::steeringTowards(int pID, Vector2D desiredDirection)
+{
+    Person &pi = people[pID];
+    Vector2D desiredVelocity = desiredDirection * pi.getMaxSpeed();
+    Vector2D velocityChange = desiredVelocity - pi.getVelocity();
+    
+    return velocityChange * (pi.getMaxForce() / pi.getMaxSpeed());
 }
 
 vector<Vector2D> MapController::fourAdjacentNeighbours(const Vector2D &vec)
@@ -203,82 +261,105 @@ vector<Vector2D> MapController::fourAdjacentNeighbours(const Vector2D &vec)
 
 vector<Vector2D> MapController::eightAdjacentNeighbours(const Vector2D &vec)
 {
-    
+    // 参数 Vec 已经是基于索引得了
     vector<Vector2D> result;
     
-    static int dir[8][2] = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}, {-1, -1}, {-1, 1}, {1, -1}, {1, 1}};
+    //static int dir[8][2] = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}, {-1, -1}, {-1, 1}, {1, -1}, {1, 1}};
     
     int x = vec.getX();
     int y = vec.getY();
-    for (int i = 0; i < 8; i++) {
-        int dx = x + dir[i][0];
-        int dy = y + dir[i][1];
-        
-        if (isInMap(dx, dy)) result.push_back(Vector2D(dx, dy));
+    
+    bool up = isAccessible(x, y - 1);
+    bool down = isAccessible(x, y + 1);
+    bool left = isAccessible(x - 1, y);
+    bool right = isAccessible(x + 1, y);
+    
+    if (left)
+    {
+        result.push_back(Vector2D(x - 1, y));
+        if (up && isAccessible(x - 1, y - 1))
+        {
+            result.push_back(Vector2D(x - 1, y - 1));
+        }
+    }
+    
+    if (right)
+    {
+        result.push_back(Vector2D(x + 1, y));
+        if (down && isAccessible(x + 1, y + 1))
+        {
+            result.push_back(Vector2D(x + 1, y + 1));
+        }
+    }
+    
+    if (up)
+    {
+        result.push_back(Vector2D(x, y - 1));
+        if (right && isAccessible(x + 1, y - 1))
+        {
+            result.push_back(Vector2D(x + 1, y - 1));
+        }
+    }
+    
+    if (down)
+    {
+        result.push_back(Vector2D(x, y + 1));
+        if (left && isAccessible(x - 1, y + 1))
+        {
+            result.push_back(Vector2D(x - 1, y + 1));
+        }
     }
     
     return result;
 }
 
-
-void MapController::render()
+Vector2D MapController::flock(int pID)
 {
-    glPointSize(10);
-    glBegin(GL_POINTS);
-    glColor4f(0.0, 1.0, 0.0, 1.0);
-    glVertex2d(destinationPoint.getX(), destinationPoint.getY());
-    glEnd();
+    Vector2D flowForce = steeringFromFlowFleid(pID, destinationPoint);
+    Vector2D lowCostForce = steeringFromFlowFleid(pID, destinationPoint);
+    Vector2D appliedForce = flowForce + (lowCostForce * 0.3);
     
-    glLineWidth(1);
-    glBegin(GL_LINES);
-    
-    static int fourDir[4][2] = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
-    glColor4f(1.0f, 1.0f, 1.0f, 0.1);
-    
-    for (int i = 0; i < m_iWidth; i++) {
-        for (int j = 0; j < m_iHeight; j++) {
-            double xPos = i * MapGridSize;
-            double yPos = j * MapGridSize;
-            
-            for (int k = 0; k < 4; k++) {
-                int kx = i + fourDir[k][0];
-                int ky = j + fourDir[k][1];
-                
-                if (isInMap(kx, ky)) {
-                    glVertex2d(xPos, yPos);
-                    glVertex2d(kx * MapGridSize, ky * MapGridSize);
-                }
-            }
-        }
+    float l = appliedForce.squaredLength();
+    if (l > people[pID].getMaxForce())
+    {
+        appliedForce = appliedForce * (people[pID].getMaxForce() / l);
     }
-    glEnd();
-    glBegin(GL_QUADS);
-    glColor3f(1.0f, 0.0f, 0.0f);
-    for (int i = 0; i < m_iWidth; i++) {
-        for (int j = 0; j < m_iHeight; j++) {
-           
-            double xPos = i * MapGridSize;
-            double yPos = j * MapGridSize;
-            
-            if (terrain[i][j].obstacleCoefficient() == INT_MAX)
-            {
-                glVertex2d(xPos, yPos);
-                glVertex2d(xPos + MapGridSize, yPos);
-                glVertex2d(xPos + MapGridSize, yPos + MapGridSize);
-                glVertex2d(xPos, yPos + MapGridSize);
-            }
-        }
-    }
-    glEnd();
     
-    glPointSize(3);
-    glColor3f(1.0f, 1.0f, 1.0f);
-    glBegin(GL_POINTS);
-    for (int i = 0; i < m_iCount; i++) {
-        Person &p = people[i];
-        p.render();
-    }
-    glEnd();
+    return appliedForce;
+//
+//    Vector2D allForce = Vector2D::vec2Zero;
+////    
+//    Vector2D seekForce = seek(pID, destinationPoint);
+//    Vector2D sepForce = Vector2D::vec2Zero, cohForce = pi.getPos(), alignForce = Vector2D::vec2Zero;
+//    int sepNeighbour = 1, cohNeighbour = 1, alignNeighbour = 1;
+//    for (int i = 0; i < m_iCount; i++) {
+//        if (i == pID) continue;
+//        
+//        sepForce += separation(pID, i, sepNeighbour);
+//        cohForce += cohesion(pID, i, cohNeighbour);
+//        //alignForce += alignment(pID, i, alignNeighbour);
+//    }
+//    
+//    sepForce /= sepNeighbour;
+//    sepForce *= pi.getMaxForce();
+//    
+//    cohForce /= cohNeighbour;
+//    cohForce = seek(pID, cohForce);
+//    cohForce = cohNeighbour == 1 ? Vector2D::vec2Zero : cohForce ;
+//    
+//    alignForce /= alignNeighbour;
+//    alignForce *= pi.getMaxSpeed();
+//    alignForce -= pi.getVelocity();
+//    alignForce *= (pi.getMaxForce() / pi.getMaxSpeed());
+//    
+//    allForce = seekForce + (sepForce * 2) + (cohForce * 0.2) + alignForce * 0.5;
+//    
+//    if (allForce.squaredLength() > pi.getMaxForce())
+//    {
+//        allForce = allForce.normalize() * pi.getMaxForce();
+//    }
+//    
+//    return allForce;
 }
 
 Vector2D MapController::seek(int pID, Vector2D des)
@@ -289,46 +370,6 @@ Vector2D MapController::seek(int pID, Vector2D des)
     Vector2D velocityChange = desiredSpeed - pi.getVelocity();
     
     return velocityChange * (pi.getMaxForce() / pi.getMaxSpeed());
-}
-
-Vector2D MapController::flock(int pID)
-{
-    Person &pi = people[pID];
-    return steeringFromFlowFleid(pID, destinationPoint);
-//
-    Vector2D allForce = Vector2D::vec2Zero;
-//    
-    Vector2D seekForce = seek(pID, destinationPoint);
-    Vector2D sepForce = Vector2D::vec2Zero, cohForce = pi.getPos(), alignForce = Vector2D::vec2Zero;
-    int sepNeighbour = 1, cohNeighbour = 1, alignNeighbour = 1;
-    for (int i = 0; i < m_iCount; i++) {
-        if (i == pID) continue;
-        
-        sepForce += separation(pID, i, sepNeighbour);
-        cohForce += cohesion(pID, i, cohNeighbour);
-        //alignForce += alignment(pID, i, alignNeighbour);
-    }
-    
-    sepForce /= sepNeighbour;
-    sepForce *= pi.getMaxForce();
-    
-    cohForce /= cohNeighbour;
-    cohForce = seek(pID, cohForce);
-    cohForce = cohNeighbour == 1 ? Vector2D::vec2Zero : cohForce ;
-    
-    alignForce /= alignNeighbour;
-    alignForce *= pi.getMaxSpeed();
-    alignForce -= pi.getVelocity();
-    alignForce *= (pi.getMaxForce() / pi.getMaxSpeed());
-    
-    allForce = seekForce + (sepForce * 2) + (cohForce * 0.2) + alignForce * 0.5;
-    
-    if (allForce.squaredLength() > pi.getMaxForce())
-    {
-        allForce = allForce.normalize() * pi.getMaxForce();
-    }
-    
-    return allForce;
 }
 
 Vector2D MapController::separation(int pID, int nID, int& count)
@@ -442,6 +483,7 @@ void MapController::update()
 //	}
 }
 
+///////////
 void MapController::movePerson(Vector2D old, Vector2D cur, int pID)
 {
 	int oldX = old.getX() / MapGridSize;
@@ -570,4 +612,72 @@ bool MapController::isInMap(int x, int y)
     if (x < 0 || x >= m_iWidth) return false;
     if (y < 0 || y >= m_iHeight) return false;
     return true;
+}
+
+bool MapController::isAccessible(int x, int y)
+{
+    if (!isInMap(x, y)) return false;
+    if (terrain[x][y].getDistance() == INT_MAX) return false;
+    
+    return true;
+}
+
+void MapController::render()
+{
+    glPointSize(10);
+    glBegin(GL_POINTS);
+    glColor4f(0.0, 1.0, 0.0, 1.0);
+    glVertex2d(destinationPoint.getX(), destinationPoint.getY());
+    glEnd();
+    
+    glLineWidth(1);
+    glBegin(GL_LINES);
+    
+    static int fourDir[4][2] = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+    glColor4f(1.0f, 1.0f, 1.0f, 0.1);
+    
+    for (int i = 0; i < m_iWidth; i++) {
+        for (int j = 0; j < m_iHeight; j++) {
+            double xPos = i * MapGridSize;
+            double yPos = j * MapGridSize;
+            
+            for (int k = 0; k < 4; k++) {
+                int kx = i + fourDir[k][0];
+                int ky = j + fourDir[k][1];
+                
+                if (isInMap(kx, ky)) {
+                    glVertex2d(xPos, yPos);
+                    glVertex2d(kx * MapGridSize, ky * MapGridSize);
+                }
+            }
+        }
+    }
+    glEnd();
+    glBegin(GL_QUADS);
+    glColor3f(1.0f, 0.0f, 0.0f);
+    for (int i = 0; i < m_iWidth; i++) {
+        for (int j = 0; j < m_iHeight; j++) {
+            
+            double xPos = i * MapGridSize;
+            double yPos = j * MapGridSize;
+            
+            if (terrain[i][j].obstacleCoefficient() == INT_MAX)
+            {
+                glVertex2d(xPos, yPos);
+                glVertex2d(xPos + MapGridSize, yPos);
+                glVertex2d(xPos + MapGridSize, yPos + MapGridSize);
+                glVertex2d(xPos, yPos + MapGridSize);
+            }
+        }
+    }
+    glEnd();
+    
+    glPointSize(3);
+    glColor3f(1.0f, 1.0f, 1.0f);
+    glBegin(GL_POINTS);
+    for (int i = 0; i < m_iCount; i++) {
+        Person &p = people[i];
+        p.render();
+    }
+    glEnd();
 }

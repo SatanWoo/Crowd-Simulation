@@ -49,6 +49,7 @@
 		1955D0FC1AC445BC001318C6 /* Terrain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Terrain.cpp; sourceTree = "<group>"; };
 		1955D0FD1AC445BC001318C6 /* Terrain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Terrain.h; sourceTree = "<group>"; };
 		1955D1021AC46E4C001318C6 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
+		196734C31AEFEEA200765E4F /* MathLib.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MathLib.h; sourceTree = "<group>"; };
 		19A802F11AD2844A00CC6FBC /* Path.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Path.h; sourceTree = "<group>"; };
 		19A802F21AD2888E00CC6FBC /* Path.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Path.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -102,6 +103,7 @@
 				1955D0F61AC443E7001318C6 /* MathHelper.h */,
 				1955D0F21AC443D4001318C6 /* Vector.cpp */,
 				1955D0F31AC443D4001318C6 /* Vector.h */,
+				196734C31AEFEEA200765E4F /* MathLib.h */,
 			);
 			name = Foundation;
 			sourceTree = "<group>";

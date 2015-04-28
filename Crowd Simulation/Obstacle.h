@@ -16,7 +16,7 @@ class Obstacle : public Terrain
 public:
     Obstacle(double x, double y, double z);
     virtual ~Obstacle();
-    virtual int obstacleCoefficient()const{return 1999999;}
+    virtual int obstacleCoefficient()const{return INT_MAX;}
 };
 
 
