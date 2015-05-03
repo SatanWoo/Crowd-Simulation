@@ -160,6 +160,7 @@
 		1987ED3A1AF136C9007BACE5 /* b2WeldJoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = b2WeldJoint.h; sourceTree = "<group>"; };
 		19A802F11AD2844A00CC6FBC /* Path.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Path.h; sourceTree = "<group>"; };
 		19A802F21AD2888E00CC6FBC /* Path.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Path.cpp; sourceTree = "<group>"; };
+		19AC4BD81AF67B9E009831BA /* B2Vec2DHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = B2Vec2DHelper.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -236,6 +237,7 @@
 		1987ECEB1AF136C9007BACE5 /* Box2D */ = {
 			isa = PBXGroup;
 			children = (
+				19AC4BD81AF67B9E009831BA /* B2Vec2DHelper.h */,
 				1987ECEC1AF136C9007BACE5 /* Box2D.h */,
 				1987ECED1AF136C9007BACE5 /* Box2DConfig.cmake */,
 				1987ECEE1AF136C9007BACE5 /* CMakeLists.txt */,

@@ -16,13 +16,15 @@ MapController::MapController(int width, int height, int count, double timeStep)
 	m_iHeight = height;
 	m_iCount = count;
 	m_dTimeStep = timeStep;
+    
+    world = new b2World(b2Vec2_zero, true);
 
 	people = new Person[count];
     srand( (unsigned)time(NULL));
     
 	for (int i = 0; i < count; i++)
 	{
-        Vector2D pos = Vector2D(rand() % m_iWidth * MapGridSize, rand()% m_iHeight * MapGridSize);
+        b2Vec2 pos = b2Vec2(rand() % m_iWidth * MapGridSize, rand()% m_iHeight * MapGridSize);
         people[i].init(i, pos);
 		people[i].setMap(this);
 	}
@@ -49,8 +51,8 @@ MapController::MapController(int width, int height, int count, double timeStep)
         }
     }
     
-    destinationPoint.setX(rand() % m_iWidth * MapGridSize);
-    destinationPoint.setY(rand() % m_iHeight * MapGridSize);
+    destinationPoint.x =  rand() % m_iWidth * MapGridSize;
+    destinationPoint.y = rand() % m_iHeight * MapGridSize;
 
 	helper = new MathHelper(MapGridSize);
     
@@ -84,30 +86,30 @@ MapController::~MapController()
 
 void MapController::buildDijkstra()
 {
-    int desX = destinationPoint.getX() / MapGridSize;
-    int desY = destinationPoint.getY() / MapGridSize;
+    int desX = destinationPoint.x / MapGridSize;
+    int desY = destinationPoint.y / MapGridSize;
     
-    deque<Vector2D> bfs;
-    bfs.push_back(Vector2D(desX, desY));
+    deque<b2Vec2> bfs;
+    bfs.push_back(b2Vec2(desX, desY));
     terrain[desX][desY].setDistance(0);
     
     while (!bfs.empty())
     {
-        Vector2D head = bfs.front();
-        vector<Vector2D> neighbours = fourAdjacentNeighbours(head);
+        b2Vec2 head = bfs.front();
+        vector<b2Vec2> neighbours = fourAdjacentNeighbours(head);
         
-        int hx = head.getX();
-        int hy = head.getY();
+        int hx = head.x;
+        int hy = head.y;
         
         for (int i = 0; i < neighbours.size(); i++)
         {
-            int nx = neighbours[i].getX();
-            int ny = neighbours[i].getY();
+            int nx = neighbours[i].x;
+            int ny = neighbours[i].y;
             
             if (terrain[nx][ny].getDistance() == -1)
             {
                 terrain[nx][ny].setDistance(terrain[hx][hy].getDistance() + 1);
-                bfs.push_back(Vector2D(nx, ny));
+                bfs.push_back(b2Vec2(nx, ny));
             }
         }
         
@@ -123,22 +125,22 @@ void MapController::buildFlowField()
         {
             if (terrain[i][j].getDistance() == INT_MAX) continue;
             
-            Vector2D pos = Vector2D(i, j);
-            vector<Vector2D> neighbours = eightAdjacentNeighbours(pos);
+            b2Vec2 pos = b2Vec2(i, j);
+            vector<b2Vec2> neighbours = eightAdjacentNeighbours(pos);
             
             bool isMinFound = false;
-            Vector2D min;
+            b2Vec2 min;
             int minDist = 0;
             for (int k = 0; k < neighbours.size(); k++) {
-                int nx = neighbours[k].getX();
-                int ny = neighbours[k].getY();
+                int nx = neighbours[k].x;
+                int ny = neighbours[k].y;
                 
                 int dist = terrain[nx][ny].getDistance() - terrain[i][j].getDistance();
                 if (dist < minDist)
                 {
                     isMinFound = true;
                     minDist = dist;
-                    min = Vector2D(nx, ny);
+                    min = b2Vec2(nx, ny);
                 }
             }
             
@@ -150,13 +152,13 @@ void MapController::buildFlowField()
     }
 }
 
-Vector2D MapController::steeringFromFlowFleid(int pID, Vector2D des)
+b2Vec2 MapController::steeringFromFlowFleid(int pID, b2Vec2 des)
 {
     Person &pi = people[pID];
     
-    if (isnan(pi.getPos().getX()) || isnan(pi.getPos().getY())) return Vector2D::vec2Zero;
+    if (isnan(pi.getPosition().x) || isnan(pi.getPosition().y)) return b2Vec2_zero;
     
-    Vector2D floor = pi.getPos().floorV();
+    Vector2D floor = pi.getPosition().floorV ;
     
     int fx = floor.getX() / MapGridSize;
     int fy = floor.getY() / MapGridSize;
@@ -166,7 +168,7 @@ Vector2D MapController::steeringFromFlowFleid(int pID, Vector2D des)
     Vector2D f10 = isAccessible(fx + 1, fy) ? flow[fx + 1][fy] : Vector2D::vec2Zero;
     Vector2D f11 = isAccessible(fx + 1, fy + 1) ? flow[fx + 1][fy + 1] : Vector2D::vec2Zero;
     
-    double xWeight = pi.getPos().getX() - floor.getX();
+    double xWeight = pi.getPos().x - floor.getX();
     Vector2D top = f00 * (1 - xWeight) + f10 *xWeight;
     Vector2D bottom = f01 * (1 - xWeight) + f11 * xWeight;
     
@@ -212,7 +214,7 @@ Vector2D MapController::steeringFromLowestCost(int pID, Vector2D des)
         minCoords.push_back(Vector2D(fx + 1, fy + 1));
     }
     
-    Vector2D currentDirection = pi.getVelocity().normalize();
+    Vector2D currentDirection = pi.getVelocity(). Normalize();
     Vector2D desireDirection;
     minVal = INT_MAX;
     
@@ -433,6 +435,9 @@ void MapController::update()
         Person &pi = people[i];
         pi.steer();
     }
+    
+    world->Step(m_dTimeStep, 10, 10);
+    world->ClearForces();
 //
 //	for (int i = 0; i < m_iCount; i++)
 //	{

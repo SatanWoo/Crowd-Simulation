@@ -2,27 +2,33 @@
 #define _WZPERSON_H
 
 #include "Vector.h"
+#include "Box2D.h"
 #include <vector>
 
 class MapController;
 typedef double (MapController::*calculatorD)(int, int);
-typedef Vector2D (MapController::*calculatorV)(int, int);
+typedef b2Vec2 (MapController::*calculatorV)(int, int);
 typedef void (MapController::*collision)(int);
 
-typedef Vector2D (MapController::*steering)(int);
-typedef Vector2D (MapController::*flock)(int);
+typedef b2Vec2 (MapController::*steering)(int);
+typedef b2Vec2 (MapController::*flock)(int);
 
 class Person {
 public:
 	Person();
-	Person(Vector2D pos, Vector2D vel, double mass);
+    Person(MapController *map);
+	Person(b2Vec2 pos, b2Vec2 vel, double mass);
 	~Person();
     
-    // Steer
+    // Continuum Crowd
     void steer();
     void flock(flock f);
+    
+    b2Vec2 getLinearVelocity()const{return body->GetLinearVelocity();}
+    b2Vec2 getPosition()const{return body->GetPosition();}
 
-	void init(int pID, Vector2D pos = Vector2D::vec2Zero, Vector2D vel = Vector2D::vec2Zero, double mass = 1.0);
+    //
+	void init(int pID, b2Vec2 pos = b2Vec2_zero, b2Vec2 vel = b2Vec2_zero, double mass = 1.0);
 	void applyAndPredict();
 	void updateNeighbours();
 	void computeConstraint(calculatorD d);
@@ -31,16 +37,16 @@ public:
 
 	void setMap(MapController *map){m_mMap = map;}
 
-	Vector2D getPos()const{return m_vPos;}
+	b2Vec2 getPos()const{return m_vPos;}
 	void setPos(const Vector2D &newPos);
 
-	Vector2D getTmpPos()const {return m_vPosTmp;}
+	b2Vec2 getTmpPos()const {return m_vPosTmp;}
 	void setTmpPos(const Vector2D &newTmpPos);
 
-	Vector2D getVelocity()const {return m_vVelocity;}
+	b2Vec2 getVelocity()const {return m_vVelocity;}
 	void setVelocity(const Vector2D &newVel);
-	
-	Vector2D getDeltaP()const{return m_deltaP;}
+    
+	b2Vec2 getDeltaP()const{return m_deltaP;}
     
     double getMaxSpeed()const{return m_dMaxSpeed;}
     double getMaxForce()const{return m_dMaxForce;}
@@ -50,13 +56,23 @@ public:
 	double getMass()const{return m_dMass;}
     
     void render();
+    
+protected:
+    void initFixtureDef();
+    void initBodyDef();
 	
 private:
-	Vector2D m_vPos;
-	Vector2D m_vPosTmp;
-	Vector2D m_vVelocity;
-	Vector2D m_deltaP;
-    Vector2D m_vForce;
+    b2FixtureDef *fixtureDef;
+    b2Fixture *fixture;
+    
+    b2Body *body;
+    b2BodyDef *bodyDef;
+    
+	b2Vec2 m_vPos;
+	b2Vec2 m_vPosTmp;
+	b2Vec2 m_vVelocity;
+	b2Vec2 m_deltaP;
+    b2Vec2 m_vForce;
     
     double m_dMaxSpeed;
     double m_dMaxForce;
