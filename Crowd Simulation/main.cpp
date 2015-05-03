@@ -48,7 +48,7 @@ void glMouse(int button, int state, int x, int y)
             
             double xPos = (double)x * MapWidth / ScreenWidth * MapController::MapGridSize;
             double yPos = (MapHeight - (double)y * MapHeight / ScreenHeight) * MapController::MapGridSize;
-            mapController->setDestionationPoint(Vector2D(xPos, yPos));
+            mapController->setDestionationPoint(b2Vec2(xPos, yPos));
             break;
     }
 }

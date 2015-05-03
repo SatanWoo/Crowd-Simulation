@@ -314,16 +314,20 @@ vector<Vector2D> MapController::eightAdjacentNeighbours(const Vector2D &vec)
     return result;
 }
 
-Vector2D MapController::flock(int pID)
+b2Vec2 MapController::flock(int pID)
 {
-    Vector2D flowForce = steeringFromFlowFleid(pID, destinationPoint);
-    Vector2D lowCostForce = steeringFromFlowFleid(pID, destinationPoint);
-    Vector2D appliedForce = flowForce + (lowCostForce * 0.3);
+    b2Vec2 flowForce = steeringFromFlowFleid(pID, destinationPoint);
+    b2Vec2 separationForce = steeringFromSeparation(pID, destinationPoint);
+    b2Vec2 alignForce = steeringFromAlignment(pID, destinationPoint);
+    b2Vec2 cohesionForce = steeringFromCohesion(pID, destinationPoint);
     
-    float l = appliedForce.squaredLength();
+    //Vector2D lowCostForce = steeringFromFlowFleid(pID, destinationPoint);
+    b2Vec2 appliedForce = flowForce + separationForce * 1.0 + alignForce * 0.9 + cohesionForce * 0.05;
+    
+    float32 l = appliedForce.LengthSquared();
     if (l > people[pID].getMaxForce())
     {
-        appliedForce = appliedForce * (people[pID].getMaxForce() / l);
+        appliedForce = appliedForce * (people[pID].getMaxForce() / sqrt(l));
     }
     
     return appliedForce;

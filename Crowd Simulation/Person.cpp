@@ -4,16 +4,16 @@
 
 Person::Person()
 {
-	init(0, Vector2D::vec2Zero, Vector2D::vec2Zero, 1.0);
+	init(0, b2Vec2_zero, b2Vec2_zero, 1.0);
 }
 
 Person::Person(MapController *map)
 {
     setMap(map);
-    init(0, Vector2D::vec2Zero, Vector2D::vec2Zero, 1.0);
+    init(0, b2Vec2_zero, b2Vec2_zero, 1.0);
 }
 
-Person::Person(Vector2D pos, Vector2D vel, double mass)
+Person::Person(b2Vec2 pos, b2Vec2 vel, double mass)
 {
 	init(0, pos, vel, mass);
 }
@@ -37,7 +37,7 @@ void Person::initBodyDef()
 {
     bodyDef = new b2BodyDef();
     bodyDef->type = b2_dynamicBody;
-    bodyDef->position.Set(m_vPos.getX(), m_vPos.getY());
+    bodyDef->position.Set(m_vPos.x, m_vPos.y);
     
     body = m_mMap->getWorld()->CreateBody(bodyDef);
     initFixtureDef();

@@ -16,7 +16,7 @@ class MapController
 private:
 	Terrain **terrain;
 	Person *people;
-    Vector2D **flow;
+    b2Vec2 **flow;
     MathHelper *helper;
     
     b2World *world;
@@ -34,6 +34,9 @@ protected:
     bool isAccessible(int x, int y);
     
     b2Vec2 steeringFromFlowFleid(int pID, b2Vec2 des);
+    b2Vec2 steeringFromSeparation(int pID, b2Vec2 des);
+    b2Vec2 steeringFromAlignment(int pID, b2Vec2 des);
+    b2Vec2 steeringFromCohesion(int pID, b2Vec2 des);
     b2Vec2 steeringFromLowestCost(int pID, b2Vec2 des);
     b2Vec2 steeringTowards(int pID, b2Vec2 desiredDirection);
     
