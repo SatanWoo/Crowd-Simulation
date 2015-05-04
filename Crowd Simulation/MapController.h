@@ -37,6 +37,7 @@ protected:
     b2Vec2 steeringFromSeparation(int pID, b2Vec2 des);
     b2Vec2 steeringFromAlignment(int pID, b2Vec2 des);
     b2Vec2 steeringFromCohesion(int pID, b2Vec2 des);
+    b2Vec2 steeringFromAvoidance(int pID, b2Vec2 des);
     b2Vec2 steeringFromLowestCost(int pID, b2Vec2 des);
     b2Vec2 steeringTowards(int pID, b2Vec2 desiredDirection);
         

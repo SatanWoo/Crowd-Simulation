@@ -4,18 +4,18 @@
 
 Person::Person()
 {
-	init(0, b2Vec2_zero, b2Vec2_zero, 1.0);
+	init(0, 0, b2Vec2_zero, b2Vec2_zero, 1.0);
 }
 
 Person::Person(MapController *map)
 {
     setMap(map);
-    init(0, b2Vec2_zero, b2Vec2_zero, 1.0);
+    init(0, 0, b2Vec2_zero, b2Vec2_zero, 1.0);
 }
 
 Person::Person(b2Vec2 pos, b2Vec2 vel, double mass)
 {
-	init(0, pos, vel, mass);
+	init(0, 0, pos, vel, mass);
 }
 
 Person::~Person()
@@ -54,15 +54,17 @@ void Person::initFixtureDef()
     fixture = body->CreateFixture(fixtureDef);
 }
 
-void Person::init(int pID, b2Vec2 pos, b2Vec2 vel, double mass)
+void Person::init(int pID, int gID, b2Vec2 pos, b2Vec2 vel, double mass)
 {
     m_dMaxForce = 20;
     m_dMaxSpeed = 4;
-    m_dRadius = 0.4;
+    m_dRadius = 0.23;
     m_minSeparation = 0.8;
     m_cohesion = 2;
     
 	m_iID = pID;
+    m_iGID = gID;
+    
 	m_vPos = pos;
 	m_vVelocity = vel;
 	m_vPosTmp = b2Vec2_zero;

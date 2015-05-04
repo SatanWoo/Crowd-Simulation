@@ -27,7 +27,7 @@ MapController::MapController(int width, int height, int count, double timeStep)
 	{
         b2Vec2 pos = b2Vec2(rand() % m_iWidth * MapGridSize, rand()% m_iHeight * MapGridSize);
         people[i].setMap(this);
-        people[i].init(i, pos);
+        people[i].init(i, 0, pos);
         people[i].initBodyDef();
 	}
     
@@ -214,7 +214,7 @@ b2Vec2 MapController::steeringFromSeparation(int pID, b2Vec2 des)
             neighCount += 1;
             b2Vec2 pushForce = pi.getPosition() - pn.getPosition();
             float32 length = pushForce.Normalize();
-            float32 r = pi.getRadius() * pn.getRadius();
+            float32 r = pi.getRadius() + pn.getRadius();
             totalForce += pushForce * (1 -  ((length - r) / (pi.getMinSeparation() - r)));
         }
     }
@@ -233,7 +233,7 @@ b2Vec2 MapController::steeringFromAlignment(int pID, b2Vec2 des)
     for (int i = 0; i < m_iCount; i++) {
         Person &pn = people[i];
         double distance = B2Vec2DHelper::distanceTo(pi.getPosition(), pn.getPosition());
-        if (distance < pi.getMaxCohesion() && pn.getLinearVelocity().Length() > 0)
+        if (distance < pi.getMaxCohesion() && pn.getLinearVelocity().Length() > 0 && pi.getGroupID() == pn.getGroupID())
         {
             neighCount += 1;
             b2Vec2 head(pn.getLinearVelocity());
@@ -256,7 +256,9 @@ b2Vec2 MapController::steeringFromCohesion(int pID, b2Vec2 des)
     
     for (int i = 0; i < m_iCount; i++) {
         if (i == pID) continue;
+        
         Person &pn = people[i];
+        if (pn.getGroupID() != pi.getGroupID()) continue;
         
         double distance = B2Vec2DHelper::distanceTo(pi.getPosition(), pn.getPosition());
         if (distance < pi.getMaxCohesion())
@@ -267,9 +269,13 @@ b2Vec2 MapController::steeringFromCohesion(int pID, b2Vec2 des)
     }
     
     if (neighCount == 0) return b2Vec2();
-    
     centerOfMass *=  1 / neighCount;
     return steeringFromSeek(pID, centerOfMass);
+}
+
+b2Vec2 MapController::steeringFromAvoidance(int pID, b2Vec2 des)
+{
+    return b2Vec2_zero;
 }
 
 b2Vec2 MapController::steeringFromLowestCost(int pID, b2Vec2 des)

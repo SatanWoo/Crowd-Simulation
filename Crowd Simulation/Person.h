@@ -11,7 +11,7 @@ typedef b2Vec2 (MapController::*calculatorV)(int, int);
 typedef void (MapController::*collision)(int);
 
 typedef b2Vec2 (MapController::*steering)(int);
-typedef b2Vec2 (MapController::*flock)(int);
+typedef b2Vec2 (MapController::*flock)(int, int);
 
 class Person {
 public:
@@ -28,7 +28,7 @@ public:
     b2Vec2 getPosition()const{return body->GetPosition();}
 
     //
-	void init(int pID, b2Vec2 pos = b2Vec2_zero, b2Vec2 vel = b2Vec2_zero, double mass = 1.0);
+	void init(int pID, int gID = 0, b2Vec2 pos = b2Vec2_zero, b2Vec2 vel = b2Vec2_zero, double mass = 1.0);
 	void applyAndPredict();
 	void updateNeighbours();
 	void computeConstraint(calculatorD d);
@@ -59,6 +59,8 @@ public:
     
     void render();
     void initBodyDef();
+    
+    int getGroupID()const{return m_iGID;}
     
 protected:
     void initFixtureDef();
@@ -91,6 +93,7 @@ private:
 	MapController *m_mMap;
 
 	int m_iID;
+    int m_iGID;
 
 	std::vector<int> neighboursIndex;
 };
