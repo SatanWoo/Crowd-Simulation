@@ -58,10 +58,11 @@ public:
     double getMinSeparation()const{return m_minSeparation;}
     
     void render();
+    void initBodyDef();
     
 protected:
     void initFixtureDef();
-    void initBodyDef();
+
 	
 private:
     b2FixtureDef *fixtureDef;

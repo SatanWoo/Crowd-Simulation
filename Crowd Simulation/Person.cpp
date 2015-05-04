@@ -67,21 +67,19 @@ void Person::init(int pID, b2Vec2 pos, b2Vec2 vel, double mass)
 	m_vVelocity = vel;
 	m_vPosTmp = b2Vec2_zero;
 	m_dMass = mass;
-    
-    initBodyDef();
 }
 
 void Person::steer()
 {
     b2Vec2 force = m_vForce;
-//    m_vVelocity += force * m_mMap->getTimeStep();
-//    double curSpeed = m_vVelocity.squaredLength();
-//    if (curSpeed > m_dMaxSpeed) {
-//        m_vVelocity *= m_dMaxSpeed / curSpeed;
-//    }
+    m_vVelocity += force * m_mMap->getTimeStep();
+    double curSpeed = m_vVelocity.Length();
+    if (curSpeed > m_dMaxSpeed) {
+        m_vVelocity *= m_dMaxSpeed / curSpeed;
+    }
     
-    this->body->ApplyLinearImpulse(force * m_mMap->getTimeStep(), m_vPos);
-    //m_vPos += m_vVelocity * m_mMap->getTimeStep();
+    this->body->ApplyLinearImpulse(m_vVelocity, m_vPos);
+    m_vPos += m_vVelocity * m_mMap->getTimeStep();
 }
 
 void Person::flock(::flock f)

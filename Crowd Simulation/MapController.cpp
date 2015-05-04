@@ -28,6 +28,7 @@ MapController::MapController(int width, int height, int count, double timeStep)
         b2Vec2 pos = b2Vec2(rand() % m_iWidth * MapGridSize, rand()% m_iHeight * MapGridSize);
         people[i].setMap(this);
         people[i].init(i, pos);
+        people[i].initBodyDef();
 	}
     
     flow = new b2Vec2*[width];
@@ -410,10 +411,10 @@ b2Vec2 MapController::flock(int pID)
     //Vector2D lowCostForce = steeringFromFlowFleid(pID, destinationPoint);
     b2Vec2 appliedForce = flowForce + separationForce * 1.0 + alignForce * 0.9 + cohesionForce * 0.05;
     
-    float32 l = appliedForce.LengthSquared();
+    float32 l = appliedForce.Length();
     if (l > people[pID].getMaxForce())
     {
-        appliedForce = appliedForce * (people[pID].getMaxForce() / sqrt(l));
+        appliedForce = appliedForce * (people[pID].getMaxForce() / l);
     }
     
     return appliedForce;
@@ -433,7 +434,6 @@ void MapController::update()
     
     world->Step(m_dTimeStep, 10, 10);
     world->ClearForces();
-
 }
 
 ///////////
@@ -625,7 +625,7 @@ void MapController::render()
     }
     glEnd();
     
-    glPointSize(3);
+    glPointSize(10);
     glColor3f(1.0f, 1.0f, 1.0f);
     glBegin(GL_POINTS);
     for (int i = 0; i < m_iCount; i++) {
