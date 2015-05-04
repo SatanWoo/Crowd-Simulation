@@ -78,8 +78,8 @@ void Person::steer()
         m_vVelocity *= m_dMaxSpeed / curSpeed;
     }
     
-    this->body->ApplyLinearImpulse(m_vVelocity, m_vPos);
-    m_vPos += m_vVelocity * m_mMap->getTimeStep();
+    this->body->ApplyLinearImpulse(force * m_mMap->getTimeStep(), m_vPos);
+    //m_vPos += m_vVelocity * m_mMap->getTimeStep();
 }
 
 void Person::flock(::flock f)
@@ -127,7 +127,7 @@ void Person::updateNeighbours()
 void Person::render()
 {
 //    glColor3f(1.0, (m_dConstraint + 1) * MapController::restDensity / 2.0, 0.5);
-    glVertex2f(m_vPos.x, m_vPos.y);
+    glVertex2f(this->body->GetPosition().x, this->body->GetPosition().y);
 }
 
 void Person::computeLambda(calculatorV d)

@@ -5,7 +5,6 @@
 #include "Person.h"
 #include <iostream>
 #include <vector>
-#include "Vector.h"
 #include "Box2D.h"
 
 //typedef void (*callback)(Person *p);
