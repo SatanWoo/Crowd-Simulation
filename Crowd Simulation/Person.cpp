@@ -46,10 +46,10 @@ void Person::initBodyDef()
 void Person::initFixtureDef()
 {
     fixtureDef = new b2FixtureDef();
-    fixtureDef->density = 10.0;
-    fixtureDef->friction = 0.5;
-    fixtureDef->restitution = 0.2;
-    fixtureDef->shape = new b2CircleShape();
+    fixtureDef->density = 20.0;
+    fixtureDef->friction = 0.0;
+    fixtureDef->restitution = 0.0;
+    fixtureDef->shape = new b2CircleShape(m_dRadius);
     
     fixture = body->CreateFixture(fixtureDef);
 }
