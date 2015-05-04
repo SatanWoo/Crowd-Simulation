@@ -23,13 +23,21 @@ MapController::MapController(int width, int height, int count, double timeStep)
 	people = new Person[count];
     srand( (unsigned)time(NULL));
     
-	for (int i = 0; i < count; i++)
+	for (int i = 0; i < count / 2; i++)
 	{
         b2Vec2 pos = b2Vec2(rand() % m_iWidth * MapGridSize, rand()% m_iHeight * MapGridSize);
         people[i].setMap(this);
         people[i].init(i, 0, pos);
         people[i].initBodyDef();
 	}
+    
+    for (int i = count / 2; i < count; i++)
+    {
+        b2Vec2 pos = b2Vec2(rand() % m_iWidth * MapGridSize, rand()% m_iHeight * MapGridSize);
+        people[i].setMap(this);
+        people[i].init(i, 1, pos);
+        people[i].initBodyDef();
+    }
     
     flow = new b2Vec2*[width];
 	terrain = new Terrain *[width];
@@ -421,7 +429,7 @@ b2Vec2 MapController::flock(int pID)
     b2Vec2 cohesionForce = steeringFromCohesion(pID, destinationPoint);
     
     //Vector2D lowCostForce = steeringFromFlowFleid(pID, destinationPoint);
-    b2Vec2 appliedForce = flowForce + separationForce * 1.2 + alignForce * 0.3 + cohesionForce * 0.05;
+    b2Vec2 appliedForce = flowForce + separationForce * 1.2 + alignForce * 0.05 + cohesionForce * 0.05;
     
     float32 l = appliedForce.Length();
     if (l > people[pID].getMaxForce())
@@ -637,10 +645,15 @@ void MapController::render()
     glEnd();
     
     glPointSize(5);
-    glColor3f(1.0f, 1.0f, 1.0f);
     glBegin(GL_POINTS);
     for (int i = 0; i < m_iCount; i++) {
+        
         Person &p = people[i];
+        if (p.getGroupID() == 0) {
+            glColor3f(1.0f, 0.0f, 1.0f);
+        } else {
+            glColor3f(1.0f, 1.0f, 1.0f);
+        }
         p.render();
     }
     glEnd();

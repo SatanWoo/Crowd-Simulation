@@ -11,7 +11,7 @@ typedef b2Vec2 (MapController::*calculatorV)(int, int);
 typedef void (MapController::*collision)(int);
 
 typedef b2Vec2 (MapController::*steering)(int);
-typedef b2Vec2 (MapController::*flock)(int, int);
+typedef b2Vec2 (MapController::*flock)(int);
 
 class Person {
 public:
