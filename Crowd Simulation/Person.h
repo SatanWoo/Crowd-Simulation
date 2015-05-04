@@ -51,9 +51,11 @@ public:
     double getMaxSpeed()const{return m_dMaxSpeed;}
     double getMaxForce()const{return m_dMaxForce;}
     double getRadius()const{return m_dRadius;}
+    double getMaxCohesion()const{return m_cohesion;}
 	
 	double getLambda()const {return m_dLambda;}
 	double getMass()const{return m_dMass;}
+    double getMinSeparation()const{return m_minSeparation;}
     
     void render();
     
@@ -77,6 +79,8 @@ private:
     double m_dMaxSpeed;
     double m_dMaxForce;
     double m_dRadius;
+    double m_minSeparation;
+    double m_cohesion;
 
 	double m_dLambda;
 	double m_dMass;

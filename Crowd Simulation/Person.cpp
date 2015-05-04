@@ -59,6 +59,8 @@ void Person::init(int pID, b2Vec2 pos, b2Vec2 vel, double mass)
     m_dMaxForce = 20;
     m_dMaxSpeed = 4;
     m_dRadius = 0.4;
+    m_minSeparation = 0.8;
+    m_cohesion = 2;
     
 	m_iID = pID;
 	m_vPos = pos;
@@ -118,10 +120,10 @@ void Person::applyAndPredict()
 
 void Person::updateNeighbours()
 {
-	neighboursIndex.clear();
-    
-	std::vector<int> neighbours = m_mMap->findNeighbours(m_iID);
-	neighboursIndex.assign(neighbours.begin(), neighbours.end());
+//	neighboursIndex.clear();
+//    
+//	std::vector<int> neighbours = m_mMap->findNeighbours(m_iID);
+//	neighboursIndex.assign(neighbours.begin(), neighbours.end());
 }
 
 void Person::render()

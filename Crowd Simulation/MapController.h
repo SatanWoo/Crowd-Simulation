@@ -34,17 +34,13 @@ protected:
     bool isAccessible(int x, int y);
     
     b2Vec2 steeringFromFlowFleid(int pID, b2Vec2 des);
+    b2Vec2 steeringFromSeek(int pID, b2Vec2 des);
     b2Vec2 steeringFromSeparation(int pID, b2Vec2 des);
     b2Vec2 steeringFromAlignment(int pID, b2Vec2 des);
     b2Vec2 steeringFromCohesion(int pID, b2Vec2 des);
     b2Vec2 steeringFromLowestCost(int pID, b2Vec2 des);
     b2Vec2 steeringTowards(int pID, b2Vec2 desiredDirection);
-    
-    b2Vec2 seek(int pID, b2Vec2 des);
-    b2Vec2 separation(int pID, int nID, int &);
-    b2Vec2 cohesion(int pID, int nID, int &);
-    b2Vec2 alignment(int pID, int nID, int &);
-    
+        
     void buildDijkstra();
     void buildFlowField();
     
@@ -65,15 +61,15 @@ public:
    
     b2Vec2 flock(int pID);
   
-	std::vector<int> findNeighbours(int pID);
-
-	double density(int neighbourID, int pID);
-	b2Vec2 lamda(int neighbourID, int pID);
-	b2Vec2 deltaP(int neighbourID, int pID);
-    void collision(int pID);
-    
-	bool filterNeightbours(int neighborID, int pID);
-	void movePerson(b2Vec2 old, b2Vec2 cur, int pID);
+//	std::vector<int> findNeighbours(int pID);
+//
+//	double density(int neighbourID, int pID);
+//	b2Vec2 lamda(int neighbourID, int pID);
+//	b2Vec2 deltaP(int neighbourID, int pID);
+//    void collision(int pID);
+//    
+//	bool filterNeightbours(int neighborID, int pID);
+//	void movePerson(b2Vec2 old, b2Vec2 cur, int pID);
 
 	static const double MapGridSize;
 	static const double restDensity;

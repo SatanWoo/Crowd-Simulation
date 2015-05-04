@@ -2,6 +2,7 @@
 #include "Terrain.h"
 #include "TerrainFactory.h"
 #include "MathLib.h"
+#include "B2Vec2DHelper.h"
 
 #include <GLUT/GLUT.h>
 #include <math.h>
@@ -25,16 +26,16 @@ MapController::MapController(int width, int height, int count, double timeStep)
 	for (int i = 0; i < count; i++)
 	{
         b2Vec2 pos = b2Vec2(rand() % m_iWidth * MapGridSize, rand()% m_iHeight * MapGridSize);
+        people[i].setMap(this);
         people[i].init(i, pos);
-		people[i].setMap(this);
 	}
     
-    flow = new Vector2D*[width];
+    flow = new b2Vec2*[width];
 	terrain = new Terrain *[width];
 	for (int i = 0; i < width; i++)
     {
 		terrain[i] = new Terrain [height];
-        flow[i] = new Vector2D[height];
+        flow[i] = new b2Vec2[height];
 	}
     
     for (int i = 0; i < width; i++)
@@ -146,7 +147,8 @@ void MapController::buildFlowField()
             
             if (isMinFound)
             {
-                flow[i][j] = (min - pos).normalize();
+                flow[i][j] = min - pos;
+                flow[i][j].Normalize();
             }
         }
     }
@@ -158,36 +160,121 @@ b2Vec2 MapController::steeringFromFlowFleid(int pID, b2Vec2 des)
     
     if (isnan(pi.getPosition().x) || isnan(pi.getPosition().y)) return b2Vec2_zero;
     
-    Vector2D floor = pi.getPosition().floorV ;
+    b2Vec2 floor = pi.getPosition();
     
-    int fx = floor.getX() / MapGridSize;
-    int fy = floor.getY() / MapGridSize;
+    int fx = floor.x / MapGridSize;
+    int fy = floor.y / MapGridSize;
     
-    Vector2D f00 = isAccessible(fx, fy) ? flow[fx][fy] : Vector2D::vec2Zero;
-    Vector2D f01 = isAccessible(fx, fy + 1) ? flow[fx][fy + 1] : Vector2D::vec2Zero;
-    Vector2D f10 = isAccessible(fx + 1, fy) ? flow[fx + 1][fy] : Vector2D::vec2Zero;
-    Vector2D f11 = isAccessible(fx + 1, fy + 1) ? flow[fx + 1][fy + 1] : Vector2D::vec2Zero;
+    b2Vec2 f00 = isAccessible(fx, fy) ? flow[fx][fy] : b2Vec2_zero;
+    b2Vec2 f01 = isAccessible(fx, fy + 1) ? flow[fx][fy + 1] : b2Vec2_zero;
+    b2Vec2 f10 = isAccessible(fx + 1, fy) ? flow[fx + 1][fy] : b2Vec2_zero;
+    b2Vec2 f11 = isAccessible(fx + 1, fy + 1) ? flow[fx + 1][fy + 1] : b2Vec2_zero;
     
-    double xWeight = pi.getPos().x - floor.getX();
-    Vector2D top = f00 * (1 - xWeight) + f10 *xWeight;
-    Vector2D bottom = f01 * (1 - xWeight) + f11 * xWeight;
+    double xWeight = pi.getPos().x - floor.x;
+    b2Vec2 top = f00 * (1 - xWeight) + f10 *xWeight;
+    b2Vec2 bottom = f01 * (1 - xWeight) + f11 * xWeight;
     
-    double yWeight = pi.getPos().getY() - floor.getY();
-    Vector2D direction = top * (1 - yWeight) + (bottom * yWeight).normalize();
+    double yWeight = pi.getPos().y - floor.y;
+    b2Vec2 direction = top * (1 - yWeight) + (bottom * yWeight);
+    direction.Normalize();
     
     return steeringTowards(pID, direction);
 }
 
-Vector2D MapController::steeringFromLowestCost(int pID, Vector2D des)
+b2Vec2 MapController::steeringFromSeek(int pID, b2Vec2 des)
+{
+    Person &pi = people[pID];
+    if (des.x == pi.getPos().x && des.y == pi.getPos().y) return b2Vec2();
+    
+    b2Vec2 distance = des - pi.getPos();
+    b2Vec2 desiredSpeed = distance * (pi.getMaxSpeed() / distance.Length());
+    b2Vec2 velocityChange = desiredSpeed - pi.getVelocity();
+    
+    return velocityChange * (pi.getMaxForce() / pi.getMaxSpeed());
+}
+
+b2Vec2 MapController::steeringFromSeparation(int pID, b2Vec2 des)
 {
     Person &pi = people[pID];
     
-    if (isnan(pi.getPos().getX()) || isnan(pi.getPos().getY())) return Vector2D::vec2Zero;
-    if (pi.getVelocity().squaredLength() == 0) return Vector2D::vec2Zero;
+    int neighCount = 0;
+    b2Vec2 totalForce = b2Vec2_zero;
     
-    Vector2D floor = pi.getPos().floorV();
-    int fx = floor.getX() / MapGridSize;
-    int fy = floor.getY() / MapGridSize;
+    for (int i = 0; i < m_iCount; i++) {
+        if (i == pID) continue;
+        
+        Person &pn = people[i];
+        double distance = B2Vec2DHelper::distanceTo(pi.getPos(), pn.getPos());
+        if (distance > 0 && distance < pi.getMinSeparation())
+        {
+            neighCount += 1;
+            b2Vec2 pushForce = pi.getPos() - pn.getPos();
+            totalForce += pushForce * (1 / pi.getRadius());
+        }
+    }
+    
+    if (neighCount == 0) return totalForce;
+    
+    return totalForce * (pi.getMaxForce() / neighCount);
+}
+
+b2Vec2 MapController::steeringFromAlignment(int pID, b2Vec2 des)
+{
+    Person &pi = people[pID];
+    int neighCount = 0;
+    b2Vec2 avergaeHeading = b2Vec2_zero;
+    
+    for (int i = 0; i < m_iCount; i++) {
+        Person &pn = people[i];
+        double distance = B2Vec2DHelper::distanceTo(pi.getPos(), pn.getPos());
+        if (distance < pi.getMaxCohesion() && pn.getVelocity().Length() > 0)
+        {
+            neighCount += 1;
+            b2Vec2 head(pn.getVelocity());
+            head.Normalize();
+            
+            avergaeHeading += head;
+        }
+    }
+    
+    if (neighCount == 0) return avergaeHeading;
+
+    return steeringTowards(pID, avergaeHeading);
+}
+
+b2Vec2 MapController::steeringFromCohesion(int pID, b2Vec2 des)
+{
+    Person &pi = people[pID];
+    b2Vec2 centerOfMass = pi.getPos();
+    int neighCount = 1;
+    
+    for (int i = 0; i < m_iCount; i++) {
+        if (i == pID) continue;
+        Person &pn = people[i];
+        
+        double distance = B2Vec2DHelper::distanceTo(pi.getPos(), pn.getPos());
+        if (distance < pi.getMaxCohesion())
+        {
+            centerOfMass += pn.getPos();
+        }
+    }
+    
+    if (neighCount == 1) return b2Vec2();
+    centerOfMass *=  1 / neighCount;
+    
+    return steeringFromSeek(pID, centerOfMass);
+}
+
+b2Vec2 MapController::steeringFromLowestCost(int pID, b2Vec2 des)
+{
+    Person &pi = people[pID];
+    
+    if (isnan(pi.getPos().x) || isnan(pi.getPos().y)) return b2Vec2_zero;
+    if (pi.getVelocity().Length() == 0) return b2Vec2_zero;
+    
+    b2Vec2 floor = pi.getPos();
+    int fx = floor.x / MapGridSize;
+    int fy = floor.y / MapGridSize;
     
     float f00 = isAccessible(fx, fy) ? terrain[fx][fy].getDistance() : INT_MAX;
     float f01 = isAccessible(fx, fy + 1) ? terrain[fx][fy + 1].getDistance() : INT_MAX;
@@ -214,61 +301,60 @@ Vector2D MapController::steeringFromLowestCost(int pID, Vector2D des)
         minCoords.push_back(Vector2D(fx + 1, fy + 1));
     }
     
-    Vector2D currentDirection = pi.getVelocity(). Normalize();
-    Vector2D desireDirection;
+    b2Vec2 currentDirection = pi.getVelocity();
+    b2Vec2  desireDirection;
     minVal = INT_MAX;
     
-    for (int i = 0; i < minCoords.size(); i++)
-    {
-        Vector2D directionTo = (minCoords[i] - pi.getPos()).normalize();
-        float length = (directionTo - currentDirection).squaredLength();
-        if (length < minVal)
-        {
-            minVal = length;
-            desireDirection = directionTo;
-        }
-    }
+//    for (int i = 0; i < minCoords.size(); i++)
+//    {
+//        b2Vec2 directionTo = (minCoords[i] - pi.getPos()).normalize();
+//        float length = (directionTo - currentDirection).squaredLength();
+//        if (length < minVal)
+//        {
+//            minVal = length;
+//            desireDirection = directionTo;
+//        }
+//    }
     
     return steeringTowards(pID, desireDirection);
 }
 
-Vector2D MapController::steeringTowards(int pID, Vector2D desiredDirection)
+b2Vec2 MapController::steeringTowards(int pID, b2Vec2 desiredDirection)
 {
     Person &pi = people[pID];
-    Vector2D desiredVelocity = desiredDirection * pi.getMaxSpeed();
-    Vector2D velocityChange = desiredVelocity - pi.getVelocity();
+    b2Vec2 desiredVelocity = desiredDirection * pi.getMaxSpeed();
+    b2Vec2 velocityChange = desiredVelocity - pi.getVelocity();
     
     return velocityChange * (pi.getMaxForce() / pi.getMaxSpeed());
 }
 
-vector<Vector2D> MapController::fourAdjacentNeighbours(const Vector2D &vec)
+vector<b2Vec2> MapController::fourAdjacentNeighbours(const b2Vec2 &vec)
 {
-    
-    vector<Vector2D> result;
+    vector<b2Vec2> result;
     
     static int dir[4][2] = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
     
-    int x = vec.getX();
-    int y = vec.getY();
+    int x = vec.x;
+    int y = vec.y;
     for (int i = 0; i < 4; i++) {
         int dx = x + dir[i][0];
         int dy = y + dir[i][1];
         
-        if (isInMap(dx, dy)) result.push_back(Vector2D(dx, dy));
+        if (isInMap(dx, dy)) result.push_back(b2Vec2(dx, dy));
     }
     
     return result;
 }
 
-vector<Vector2D> MapController::eightAdjacentNeighbours(const Vector2D &vec)
+vector<b2Vec2> MapController::eightAdjacentNeighbours(const b2Vec2 &vec)
 {
     // 参数 Vec 已经是基于索引得了
-    vector<Vector2D> result;
+    vector<b2Vec2> result;
     
     //static int dir[8][2] = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}, {-1, -1}, {-1, 1}, {1, -1}, {1, 1}};
     
-    int x = vec.getX();
-    int y = vec.getY();
+    int x = vec.x;
+    int y = vec.y;
     
     bool up = isAccessible(x, y - 1);
     bool down = isAccessible(x, y + 1);
@@ -277,37 +363,37 @@ vector<Vector2D> MapController::eightAdjacentNeighbours(const Vector2D &vec)
     
     if (left)
     {
-        result.push_back(Vector2D(x - 1, y));
+        result.push_back(b2Vec2(x - 1, y));
         if (up && isAccessible(x - 1, y - 1))
         {
-            result.push_back(Vector2D(x - 1, y - 1));
+            result.push_back(b2Vec2(x - 1, y - 1));
         }
     }
     
     if (right)
     {
-        result.push_back(Vector2D(x + 1, y));
+        result.push_back(b2Vec2(x + 1, y));
         if (down && isAccessible(x + 1, y + 1))
         {
-            result.push_back(Vector2D(x + 1, y + 1));
+            result.push_back(b2Vec2(x + 1, y + 1));
         }
     }
     
     if (up)
     {
-        result.push_back(Vector2D(x, y - 1));
+        result.push_back(b2Vec2(x, y - 1));
         if (right && isAccessible(x + 1, y - 1))
         {
-            result.push_back(Vector2D(x + 1, y - 1));
+            result.push_back(b2Vec2(x + 1, y - 1));
         }
     }
     
     if (down)
     {
-        result.push_back(Vector2D(x, y + 1));
+        result.push_back(b2Vec2(x, y + 1));
         if (left && isAccessible(x - 1, y + 1))
         {
-            result.push_back(Vector2D(x - 1, y + 1));
+            result.push_back(b2Vec2(x - 1, y + 1));
         }
     }
     
@@ -331,101 +417,6 @@ b2Vec2 MapController::flock(int pID)
     }
     
     return appliedForce;
-//
-//    Vector2D allForce = Vector2D::vec2Zero;
-////    
-//    Vector2D seekForce = seek(pID, destinationPoint);
-//    Vector2D sepForce = Vector2D::vec2Zero, cohForce = pi.getPos(), alignForce = Vector2D::vec2Zero;
-//    int sepNeighbour = 1, cohNeighbour = 1, alignNeighbour = 1;
-//    for (int i = 0; i < m_iCount; i++) {
-//        if (i == pID) continue;
-//        
-//        sepForce += separation(pID, i, sepNeighbour);
-//        cohForce += cohesion(pID, i, cohNeighbour);
-//        //alignForce += alignment(pID, i, alignNeighbour);
-//    }
-//    
-//    sepForce /= sepNeighbour;
-//    sepForce *= pi.getMaxForce();
-//    
-//    cohForce /= cohNeighbour;
-//    cohForce = seek(pID, cohForce);
-//    cohForce = cohNeighbour == 1 ? Vector2D::vec2Zero : cohForce ;
-//    
-//    alignForce /= alignNeighbour;
-//    alignForce *= pi.getMaxSpeed();
-//    alignForce -= pi.getVelocity();
-//    alignForce *= (pi.getMaxForce() / pi.getMaxSpeed());
-//    
-//    allForce = seekForce + (sepForce * 2) + (cohForce * 0.2) + alignForce * 0.5;
-//    
-//    if (allForce.squaredLength() > pi.getMaxForce())
-//    {
-//        allForce = allForce.normalize() * pi.getMaxForce();
-//    }
-//    
-//    return allForce;
-}
-
-Vector2D MapController::seek(int pID, Vector2D des)
-{
-    Person &pi = people[pID];
-    Vector2D distance = des - pi.getPos();
-    Vector2D desiredSpeed = distance * (pi.getMaxSpeed() / distance.squaredLength());
-    Vector2D velocityChange = desiredSpeed - pi.getVelocity();
-    
-    return velocityChange * (pi.getMaxForce() / pi.getMaxSpeed());
-}
-
-Vector2D MapController::separation(int pID, int nID, int& count)
-{
-    Person &pi = people[pID];
-    Person &pn = people[nID];
-    
-    double distance = pi.getPos().distanceTo(pn.getPos());
-    
-    Vector2D pushForce = Vector2D::vec2Zero;
-    
-    if (distance > 0 && distance < pi.getRadius())
-    {
-        count = count + 1;
-        Vector2D dis = pi.getPos() - pn.getPos();
-        pushForce += dis.normalize() * (1 - dis.squaredLength() / pi.getRadius());
-    }
-
-    return pushForce;
-}
-
-Vector2D MapController::cohesion(int pID, int nID, int& count)
-{
-    Person &pi = people[pID];
-    Person &pn = people[nID];
-    
-    double distance = pi.getPos().distanceTo(pn.getPos());
-    
-    if (distance < pi.getRadius())
-    {
-        count = count + 1;
-        return pn.getPos();
-    }
-    
-    return Vector2D::vec2Zero;
-}
-
-Vector2D MapController::alignment(int pID, int nID, int &count)
-{
-    Person &pi = people[pID];
-    Person &pn = people[nID];
-    
-    double distance = pi.getPos().distanceTo(pn.getPos());
-    
-    if (distance < pi.getRadius() && pn.getVelocity().squaredLength() > 0)
-    {
-        count = count + 1;
-        return pn.getVelocity().normalize();
-    }
-    
-    return Vector2D::vec2Zero;
 }
 
 void MapController::update()
@@ -442,178 +433,132 @@ void MapController::update()
     
     world->Step(m_dTimeStep, 10, 10);
     world->ClearForces();
-//
-//	for (int i = 0; i < m_iCount; i++)
-//	{
-//		Person &p = people[i];
-//		p.applyAndPredict();
-//	}
-//
-//	for (int i = 0; i < m_iCount; i++)
-//	{
-//		Person &p = people[i];
-//		p.updateNeighbours();
-//	}
-//    
-//    static int iteration = 3;
-//    
-//    for (int w = 0; w < iteration; w++) {
-//        for (int i = 0; i < m_iCount; i++)
-//        {
-//            Person &p = people[i];
-//            p.computeConstraint(&MapController::density);
-//        }
-//        
-//        for (int i = 0; i < m_iCount; i++)
-//        {
-//            Person &p = people[i];
-//            p.computeLambda(&MapController::lamda);
-//        }
-//        
-//        for (int i = 0; i < m_iCount; i++)
-//        {
-//            Person &p = people[i];
-//            p.computeDeltaP(&MapController::deltaP, &MapController::collision);
-//        }
-//        
-//        for (int i = 0; i < m_iCount; i++)
-//        {
-//            Person &p = people[i];
-//            p.setTmpPos(p.getTmpPos() + p.getDeltaP());
-//        }
-//    }
-//
-//	for (int i = 0; i < m_iCount; i++)
-//	{
-//		Person &p = people[i];
-//		p.setVelocity((p.getTmpPos() - p.getPos())/m_dTimeStep);
-//        p.setPos(p.getTmpPos());
-//	}
+
 }
 
 ///////////
-void MapController::movePerson(Vector2D old, Vector2D cur, int pID)
-{
-	int oldX = old.getX() / MapGridSize;
-	int oldY = old.getY() / MapGridSize;
-    if (isInMap(oldX, oldY))
-        terrain[oldX][oldY].removePerson(pID);
+//void MapController::movePerson(b2Vec2 old, b2Vec2 cur, int pID)
+//{
+//	int oldX = old.x / MapGridSize;
+//	int oldY = old.y / MapGridSize;
+//    if (isInMap(oldX, oldY))
+//        terrain[oldX][oldY].removePerson(pID);
+//
+//	int curX = cur.x / MapGridSize;
+//	int curY = cur.y / MapGridSize;
+//    if (isInMap(curX, curY))
+//        terrain[curX][curY].addPerson(pID);
+//}
+//
+//std::vector<int> MapController::findNeighbours(int pID)
+//{
+//	static int direction[9][2] = 
+//	{
+//		{-1,1}, {-1, 0}, {-1, -1}, 
+//		{0, 1}, {0, 0}, {0, -1}, 
+//		{1, 1}, {1, 0}, {1, -1}
+//	};
+//    
+//	Person &p = people[pID];
+//	int cellX = p.getTmpPos().x / MapGridSize;
+//	int cellY = p.getTmpPos().y / MapGridSize;
+//
+//	std::vector<int> result;
+//	for (int i = 0; i < 9; i++)
+//	{
+//		int curX = cellX + direction[i][0];
+//        int curY = cellY + direction[i][1];
+//        
+//        if (!isInMap(curX, curY)) continue;
+//        
+//		Terrain &curUnit = terrain[curX][curY];
+//
+//		std::vector<int> temp = curUnit.filterPeople(&MapController::filterNeightbours, pID);
+//        result.insert(result.end(), temp.begin(), temp.end());
+//	}
+//
+//	return result;
+//}
 
-	int curX = cur.getX() / MapGridSize;
-	int curY = cur.getY() / MapGridSize;
-    if (isInMap(curX, curY))
-        terrain[curX][curY].addPerson(pID);
-}
-
-std::vector<int> MapController::findNeighbours(int pID)
-{
-	static int direction[9][2] = 
-	{
-		{-1,1}, {-1, 0}, {-1, -1}, 
-		{0, 1}, {0, 0}, {0, -1}, 
-		{1, 1}, {1, 0}, {1, -1}
-	};
-    
-	Person &p = people[pID];
-	int cellX = p.getTmpPos().getX() / MapGridSize;
-	int cellY = p.getTmpPos().getY() / MapGridSize;
-
-	std::vector<int> result;
-	for (int i = 0; i < 9; i++)
-	{
-		int curX = cellX + direction[i][0];
-        int curY = cellY + direction[i][1];
-        
-        if (!isInMap(curX, curY)) continue;
-        
-		Terrain &curUnit = terrain[curX][curY];
-
-		std::vector<int> temp = curUnit.filterPeople(&MapController::filterNeightbours, pID);
-        result.insert(result.end(), temp.begin(), temp.end());
-	}
-
-	return result;
-}
-
-bool MapController::filterNeightbours(int neighborID, int pID)
-{
-	Person &n = people[neighborID];
-	Person &p = people[pID];
-	double distance = (p.getTmpPos() - n.getTmpPos()).squaredLength();
-    
-	return distance < MapGridSize * MapGridSize;
-}
-
-double MapController::density(int neighbourID, int pID)
-{
-	Person &pj = people[neighbourID];
-	Person &pi = people[pID];
-
-	return pj.getMass() * helper->poly6(pi.getTmpPos() - pj.getTmpPos());
-}
-
-Vector2D MapController::lamda(int neighbourID, int pID)
-{
-	Person &pj = people[neighbourID];
-	Person &pi = people[pID];
-
-	return helper->spikyGrad(pi.getTmpPos() - pj.getTmpPos());
-}
-
-Vector2D MapController::deltaP(int neighbourID, int pID)
-{
-	Person &pj = people[neighbourID];
-	Person &pi = people[pID];
-    double factor = (pi.getLambda() + pj.getLambda());
-    Vector2D temp = helper->spikyGrad(pi.getTmpPos() - pj.getTmpPos());
-	Vector2D result =  temp * factor;
-
-	return result;
-}
-
-void MapController::collision(int pID)
-{
-    static double BEDDING = 0.5 * MapGridSize;
-    static double REBOUND = -0.5;
-    
-    Person &pi = people[pID];
-
-    if (pi.getTmpPos().getX() < 0.0 + BEDDING)
-    {
-        pi.setTmpPos(Vector2D(BEDDING, pi.getTmpPos().getY()));
-        if (pi.getVelocity().getX() < 0.0)
-        {
-            pi.setVelocity(Vector2D(pi.getVelocity().getX() * REBOUND, pi.getVelocity().getY()));
-        }
-    }
-
-    if (pi.getTmpPos().getY() < 0.0 + BEDDING)
-    {
-        pi.setTmpPos(Vector2D(pi.getTmpPos().getX(), BEDDING));
-        if (pi.getVelocity().getY() < 0.0)
-        {
-            pi.setVelocity(Vector2D(pi.getVelocity().getX(), pi.getVelocity().getY() * REBOUND));
-        }
-    }
-
-    if (pi.getTmpPos().getX() > m_iWidth - BEDDING)
-    {
-        pi.setTmpPos(Vector2D(m_iWidth  - BEDDING, pi.getTmpPos().getY()));
-        if (pi.getVelocity().getX() > 0.0)
-        {
-            pi.setVelocity(Vector2D(pi.getVelocity().getX() * REBOUND, pi.getVelocity().getY()));
-        }
-    }
-
-    if (pi.getTmpPos().getY() > m_iHeight  - BEDDING)
-    {
-        pi.setTmpPos(Vector2D(pi.getTmpPos().getX(), m_iHeight - BEDDING));
-        if (pi.getVelocity().getY() > 0.0)
-        {
-            pi.setVelocity(Vector2D(pi.getVelocity().getX(), pi.getVelocity().getY() * REBOUND));
-        }
-    }
-}
+//bool MapController::filterNeightbours(int neighborID, int pID)
+//{
+//	Person &n = people[neighborID];
+//	Person &p = people[pID];
+//	double distance = (p.getTmpPos() - n.getTmpPos()).Length();
+//    
+//	return distance < MapGridSize * MapGridSize;
+//}
+//
+//double MapController::density(int neighbourID, int pID)
+//{
+//	Person &pj = people[neighbourID];
+//	Person &pi = people[pID];
+//
+//	return pj.getMass() * helper->poly6(pi.getTmpPos() - pj.getTmpPos());
+//}
+//
+//Vector2D MapController::lamda(int neighbourID, int pID)
+//{
+//	Person &pj = people[neighbourID];
+//	Person &pi = people[pID];
+//
+//	return helper->spikyGrad(pi.getTmpPos() - pj.getTmpPos());
+//}
+//
+//Vector2D MapController::deltaP(int neighbourID, int pID)
+//{
+//	Person &pj = people[neighbourID];
+//	Person &pi = people[pID];
+//    double factor = (pi.getLambda() + pj.getLambda());
+//    Vector2D temp = helper->spikyGrad(pi.getTmpPos() - pj.getTmpPos());
+//	Vector2D result =  temp * factor;
+//
+//	return result;
+//}
+//
+//void MapController::collision(int pID)
+//{
+//    static double BEDDING = 0.5 * MapGridSize;
+//    static double REBOUND = -0.5;
+//    
+//    Person &pi = people[pID];
+//
+//    if (pi.getTmpPos().getX() < 0.0 + BEDDING)
+//    {
+//        pi.setTmpPos(Vector2D(BEDDING, pi.getTmpPos().getY()));
+//        if (pi.getVelocity().getX() < 0.0)
+//        {
+//            pi.setVelocity(Vector2D(pi.getVelocity().getX() * REBOUND, pi.getVelocity().getY()));
+//        }
+//    }
+//
+//    if (pi.getTmpPos().getY() < 0.0 + BEDDING)
+//    {
+//        pi.setTmpPos(Vector2D(pi.getTmpPos().getX(), BEDDING));
+//        if (pi.getVelocity().getY() < 0.0)
+//        {
+//            pi.setVelocity(Vector2D(pi.getVelocity().getX(), pi.getVelocity().getY() * REBOUND));
+//        }
+//    }
+//
+//    if (pi.getTmpPos().getX() > m_iWidth - BEDDING)
+//    {
+//        pi.setTmpPos(Vector2D(m_iWidth  - BEDDING, pi.getTmpPos().getY()));
+//        if (pi.getVelocity().getX() > 0.0)
+//        {
+//            pi.setVelocity(Vector2D(pi.getVelocity().getX() * REBOUND, pi.getVelocity().getY()));
+//        }
+//    }
+//
+//    if (pi.getTmpPos().getY() > m_iHeight  - BEDDING)
+//    {
+//        pi.setTmpPos(Vector2D(pi.getTmpPos().getX(), m_iHeight - BEDDING));
+//        if (pi.getVelocity().getY() > 0.0)
+//        {
+//            pi.setVelocity(Vector2D(pi.getVelocity().getX(), pi.getVelocity().getY() * REBOUND));
+//        }
+//    }
+//}
 
 bool MapController::isInMap(int x, int y)
 {
@@ -635,7 +580,7 @@ void MapController::render()
     glPointSize(10);
     glBegin(GL_POINTS);
     glColor4f(0.0, 1.0, 0.0, 1.0);
-    glVertex2d(destinationPoint.getX(), destinationPoint.getY());
+    glVertex2d(destinationPoint.x, destinationPoint.y);
     glEnd();
     
     glLineWidth(1);
