@@ -25,6 +25,8 @@ private:
 	int m_iCount;
     
     b2Vec2 destinationPoint;
+    
+    //std::vector<b2Vec2> des;
 
 	double m_dTimeStep;
     

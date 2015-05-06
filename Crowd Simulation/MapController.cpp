@@ -23,9 +23,9 @@ MapController::MapController(int width, int height, int count, double timeStep)
 	people = new Person[count];
     srand( (unsigned)time(NULL));
     
-	for (int i = 0; i < count / 2; i++)
+	for (int i = 0; i < count; i++)
 	{
-        b2Vec2 pos = b2Vec2(rand() % m_iWidth * MapGridSize, rand()% m_iHeight * MapGridSize);
+        b2Vec2 pos = b2Vec2(MapGridSize, rand()% m_iHeight * MapGridSize);
         people[i].setMap(this);
         people[i].init(i, 0, pos);
         people[i].initBodyDef();
@@ -33,7 +33,7 @@ MapController::MapController(int width, int height, int count, double timeStep)
     
     for (int i = count / 2; i < count; i++)
     {
-        b2Vec2 pos = b2Vec2(rand() % m_iWidth * MapGridSize, rand()% m_iHeight * MapGridSize);
+        b2Vec2 pos = b2Vec2((m_iWidth - 1) * MapGridSize, rand()% m_iHeight * MapGridSize);
         people[i].setMap(this);
         people[i].init(i, 1, pos);
         people[i].initBodyDef();
@@ -52,17 +52,18 @@ MapController::MapController(int width, int height, int count, double timeStep)
         for (int j = 0; j < height; j++)
         {
             terrain[i][j].setMap(this);
-            
-            if (rand() % 10 < 1)
-            {
-                terrain[i][j].init(INT_MAX);
-                terrain[i][j].setDistance(INT_MAX);
-            }
+//            if (rand() % 10 < 1)
+//            {
+//                terrain[i][j].init(INT_MAX);
+//                terrain[i][j].setDistance(INT_MAX);
+//            }
         }
     }
     
-    destinationPoint.x =  rand() % m_iWidth * MapGridSize;
-    destinationPoint.y = rand() % m_iHeight * MapGridSize;
+    destinationPoint = b2Vec2(rand() % m_iWidth * MapGridSize, rand() % m_iHeight * MapGridSize);
+    
+//    des.push_back(b2Vec2(rand() % m_iWidth * MapGridSize, rand() % m_iHeight * MapGridSize));
+//    des.push_back(b2Vec2(rand() % m_iWidth * MapGridSize, rand() % m_iHeight * MapGridSize));
 
 	helper = new MathHelper(MapGridSize);
     
@@ -196,7 +197,7 @@ b2Vec2 MapController::steeringFromFlowFleid(int pID, b2Vec2 des)
 b2Vec2 MapController::steeringFromSeek(int pID, b2Vec2 des)
 {
     Person &pi = people[pID];
-    if (des.x == pi.getPosition().x && des.y == pi.getPosition().y) return b2Vec2();
+    if (des.x == pi.getPosition().x && des.y == pi.getPosition().y) return b2Vec2_zero;
     
     b2Vec2 distance = des - pi.getPosition();
     b2Vec2 desiredSpeed = distance * (pi.getMaxSpeed() / distance.Length());
@@ -210,7 +211,7 @@ b2Vec2 MapController::steeringFromSeparation(int pID, b2Vec2 des)
     Person &pi = people[pID];
     
     int neighCount = 0;
-    b2Vec2 totalForce = b2Vec2();
+    b2Vec2 totalForce = b2Vec2_zero;
     
     for (int i = 0; i < m_iCount; i++) {
         if (i == pID) continue;
@@ -236,7 +237,7 @@ b2Vec2 MapController::steeringFromAlignment(int pID, b2Vec2 des)
 {
     Person &pi = people[pID];
     int neighCount = 0;
-    b2Vec2 avergaeHeading = b2Vec2();
+    b2Vec2 avergaeHeading = b2Vec2_zero;
     
     for (int i = 0; i < m_iCount; i++) {
         Person &pn = people[i];
@@ -259,7 +260,7 @@ b2Vec2 MapController::steeringFromAlignment(int pID, b2Vec2 des)
 b2Vec2 MapController::steeringFromCohesion(int pID, b2Vec2 des)
 {
     Person &pi = people[pID];
-    b2Vec2 centerOfMass = b2Vec2();
+    b2Vec2 centerOfMass = b2Vec2_zero;
     int neighCount = 0;
     
     for (int i = 0; i < m_iCount; i++) {
@@ -276,7 +277,7 @@ b2Vec2 MapController::steeringFromCohesion(int pID, b2Vec2 des)
         }
     }
     
-    if (neighCount == 0) return b2Vec2();
+    if (neighCount == 0) return b2Vec2_zero;
     centerOfMass *=  1 / neighCount;
     return steeringFromSeek(pID, centerOfMass);
 }
@@ -423,13 +424,15 @@ vector<b2Vec2> MapController::eightAdjacentNeighbours(const b2Vec2 &vec)
 
 b2Vec2 MapController::flock(int pID)
 {
-    b2Vec2 flowForce = steeringFromFlowFleid(pID, destinationPoint);
+    //b2Vec2 flowForce = steeringFromFlowFleid(pID, destinationPoint);
+    b2Vec2 flowForce = b2Vec2_zero;
+    b2Vec2 seekForce = steeringFromSeek(pID, destinationPoint);
     b2Vec2 separationForce = steeringFromSeparation(pID, destinationPoint);
     b2Vec2 alignForce = steeringFromAlignment(pID, destinationPoint);
     b2Vec2 cohesionForce = steeringFromCohesion(pID, destinationPoint);
     
     //Vector2D lowCostForce = steeringFromFlowFleid(pID, destinationPoint);
-    b2Vec2 appliedForce = flowForce + separationForce * 1.2 + alignForce * 0.05 + cohesionForce * 0.05;
+    b2Vec2 appliedForce = flowForce + seekForce + separationForce * 1.2 + alignForce * 0.05 + cohesionForce * 0.05;
     
     float32 l = appliedForce.Length();
     if (l > people[pID].getMaxForce())
@@ -644,7 +647,7 @@ void MapController::render()
     }
     glEnd();
     
-    glPointSize(5);
+    glPointSize(10);
     glBegin(GL_POINTS);
     for (int i = 0; i < m_iCount; i++) {
         
