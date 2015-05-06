@@ -16,6 +16,14 @@ private:
 	Terrain **terrain;
 	Person *people;
     b2Vec2 **flow;
+    
+    b2Vec2 **potentialField;
+    b2Vec2 **costField;
+    b2Vec2 **speedField;
+    b2Vec2 **discomfortField;
+    b2Vec2 **avgVelocityField;
+    b2Vec2 **densityField;
+    
     MathHelper *helper;
     
     b2World *world;
@@ -33,6 +41,9 @@ private:
 protected:
     bool isInMap(int x, int y);
     bool isAccessible(int x, int y);
+    
+    void initializeField(b2Vec2 **field);
+    void deinitializeField(b2Vec2 **field);
     
     b2Vec2 steeringFromFlowFleid(int pID, b2Vec2 des);
     b2Vec2 steeringFromSeek(int pID, b2Vec2 des);

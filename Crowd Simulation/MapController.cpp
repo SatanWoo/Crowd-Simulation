@@ -11,6 +11,9 @@
 const double MapController::restDensity = 1.0;
 const double MapController::MapGridSize = 1.5;
 
+static int fourDir[4][2] = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+static int eightDir[8][2] = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}, {-1, -1}, {-1, 1}, {1, -1}, {1, 1}};
+
 MapController::MapController(int width, int height, int count, double timeStep)
 {
 	m_iWidth = width;
@@ -39,12 +42,17 @@ MapController::MapController(int width, int height, int count, double timeStep)
         people[i].initBodyDef();
     }
     
-    flow = new b2Vec2*[width];
+    initializeField(flow);
+    initializeField(potentialField);
+    initializeField(costField);
+    initializeField(discomfortField);
+    initializeField(speedField);
+    initializeField(avgVelocityField);
+    
 	terrain = new Terrain *[width];
 	for (int i = 0; i < width; i++)
     {
 		terrain[i] = new Terrain [height];
-        flow[i] = new b2Vec2[height];
 	}
     
     for (int i = 0; i < width; i++)
@@ -71,23 +79,44 @@ MapController::MapController(int width, int height, int count, double timeStep)
     buildFlowField();
 }
 
+void MapController::initializeField(b2Vec2 **field)
+{
+    field = new b2Vec2*[m_iWidth];
+    for (int i = 0; i < m_iWidth; i++)
+    {
+        field[i] = new b2Vec2[m_iHeight];
+    }
+}
+
+void MapController::deinitializeField(b2Vec2 **field)
+{
+    for (int i = 0; i < m_iWidth; i++) {
+        delete [] field[i];
+        field[i] = NULL;
+    }
+    
+    delete [] field;
+    field = NULL;
+}
+
 MapController::~MapController()
 {
+    deinitializeField(flow);
+    deinitializeField(potentialField);
+    deinitializeField(costField);
+    deinitializeField(discomfortField);
+    deinitializeField(speedField);
+    deinitializeField(avgVelocityField);
+    
 	for (int i = 0; i < m_iWidth; i++)
 	{
 		delete [] terrain[i];
-        delete [] flow[i];
-        
 		terrain[i] = NULL;
-        flow[i] = NULL;
 	}
 
 	delete [] terrain;
 	terrain = NULL;
     
-    delete [] flow;
-    flow = NULL;
-
 	delete [] people;
 	people = NULL;
 
@@ -354,13 +383,12 @@ vector<b2Vec2> MapController::fourAdjacentNeighbours(const b2Vec2 &vec)
 {
     vector<b2Vec2> result;
     
-    static int dir[4][2] = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
     
     int x = vec.x;
     int y = vec.y;
     for (int i = 0; i < 4; i++) {
-        int dx = x + dir[i][0];
-        int dy = y + dir[i][1];
+        int dx = x + fourDir[i][0];
+        int dy = y + fourDir[i][1];
         
         if (isInMap(dx, dy)) result.push_back(b2Vec2(dx, dy));
     }
@@ -372,8 +400,6 @@ vector<b2Vec2> MapController::eightAdjacentNeighbours(const b2Vec2 &vec)
 {
     // 参数 Vec 已经是基于索引得了
     vector<b2Vec2> result;
-    
-    //static int dir[8][2] = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}, {-1, -1}, {-1, 1}, {1, -1}, {1, 1}};
     
     int x = vec.x;
     int y = vec.y;
@@ -432,7 +458,7 @@ b2Vec2 MapController::flock(int pID)
     b2Vec2 cohesionForce = steeringFromCohesion(pID, destinationPoint);
     
     //Vector2D lowCostForce = steeringFromFlowFleid(pID, destinationPoint);
-    b2Vec2 appliedForce = flowForce + seekForce + separationForce * 1.2 + alignForce * 0.05 + cohesionForce * 0.05;
+    b2Vec2 appliedForce = flowForce + seekForce + separationForce * 0.3 + alignForce * 0.05 + cohesionForce * 0.05;
     
     float32 l = appliedForce.Length();
     if (l > people[pID].getMaxForce())
@@ -609,7 +635,6 @@ void MapController::render()
     glLineWidth(1);
     glBegin(GL_LINES);
     
-    static int fourDir[4][2] = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
     glColor4f(1.0f, 1.0f, 1.0f, 0.1);
     
     for (int i = 0; i < m_iWidth; i++) {
@@ -647,7 +672,7 @@ void MapController::render()
     }
     glEnd();
     
-    glPointSize(10);
+    glPointSize(5);
     glBegin(GL_POINTS);
     for (int i = 0; i < m_iCount; i++) {
         
