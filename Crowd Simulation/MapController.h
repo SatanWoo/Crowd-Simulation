@@ -6,6 +6,7 @@
 #include <iostream>
 #include <vector>
 #include "Box2D.h"
+#include "CostNode.h"
 
 //typedef void (*callback)(Person *p);
 
@@ -21,8 +22,10 @@ private:
     float32 **potentialField;
     float32 **densityField;
     float32 **discomfortField;
-    float32 **speedField;
-    float32 **costField;
+    FourGrid **speedField;
+    FourGrid **costField;
+    
+    bool **visited;
     
     MathHelper *helper;
     
@@ -61,10 +64,10 @@ protected:
     
     b2Vec2 steeringFromFlowFleid(int pID, b2Vec2 des);
     b2Vec2 steeringFromSeek(int pID, b2Vec2 des);
-    b2Vec2 steeringFromSeparation(int pID, b2Vec2 des);
-    b2Vec2 steeringFromAlignment(int pID, b2Vec2 des);
-    b2Vec2 steeringFromCohesion(int pID, b2Vec2 des);
-    b2Vec2 steeringFromAvoidance(int pID, b2Vec2 des);
+    b2Vec2 steeringFromSeparation(int pID);
+    b2Vec2 steeringFromAlignment(int pID);
+    b2Vec2 steeringFromCohesion(int pID);
+    b2Vec2 steeringFromAvoidance(int pID);
     b2Vec2 steeringFromLowestCost(int pID, b2Vec2 des);
     b2Vec2 steeringTowards(int pID, b2Vec2 desiredDirection);
             

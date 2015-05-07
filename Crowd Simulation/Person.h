@@ -62,6 +62,8 @@ public:
     
     int getGroupID()const{return m_iGID;}
     
+    b2Vec2 flowForce;
+    
 protected:
     void initFixtureDef();
 

@@ -49,14 +49,18 @@ MapController::MapController(int width, int height, int count, double timeStep)
     
     densityField = initializeFloatField();
     potentialField = initializeFloatField();
-    costField = initializeFloatField();
     discomfortField = initializeFloatField();
-    speedField = initializeFloatField();
     
 	terrain = new Terrain *[width];
+    visited = new bool*[width];
+    costField = new FourGrid*[width];
+    speedField = new FourGrid*[width];
 	for (int i = 0; i < width; i++)
     {
 		terrain[i] = new Terrain [height];
+        visited[i] = new bool [height];
+        costField[i] = new FourGrid[height];
+        speedField[i] = new FourGrid[height];
 	}
     
     for (int i = 0; i < width; i++)
@@ -78,9 +82,6 @@ MapController::MapController(int width, int height, int count, double timeStep)
 //    des.push_back(b2Vec2(rand() % m_iWidth * MapGridSize, rand() % m_iHeight * MapGridSize));
 
 	helper = new MathHelper(MapGridSize);
-    
-    buildDijkstra();
-    buildFlowField();
 }
 
 b2Vec2** MapController::initializeVecField()
@@ -129,19 +130,33 @@ MapController::~MapController()
 {
     deinitializeField(flow);
     deinitializeField(potentialField);
-    deinitializeField(costField);
     deinitializeField(discomfortField);
-    deinitializeField(speedField);
     deinitializeField(avgVelocityField);
     
 	for (int i = 0; i < m_iWidth; i++)
 	{
 		delete [] terrain[i];
+        delete [] visited[i];
+        delete [] costField[i];
+        delete [] speedField[i];
+        
 		terrain[i] = NULL;
+        visited[i] = NULL;
+        costField[i] = NULL;
+        speedField[i] = NULL;
 	}
 
 	delete [] terrain;
 	terrain = NULL;
+    
+    delete [] visited;
+    visited = NULL;
+    
+    delete [] costField;
+    costField = NULL;
+    
+    delete [] speedField;
+    speedField = NULL;
     
 	delete [] people;
 	people = NULL;
@@ -225,7 +240,7 @@ b2Vec2 MapController::steeringFromSeek(int pID, b2Vec2 des)
     return velocityChange * (pi.getMaxForce() / pi.getMaxSpeed());
 }
 
-b2Vec2 MapController::steeringFromSeparation(int pID, b2Vec2 des)
+b2Vec2 MapController::steeringFromSeparation(int pID)
 {
     Person &pi = people[pID];
     
@@ -252,7 +267,7 @@ b2Vec2 MapController::steeringFromSeparation(int pID, b2Vec2 des)
     return totalForce * (pi.getMaxForce() / neighCount);
 }
 
-b2Vec2 MapController::steeringFromAlignment(int pID, b2Vec2 des)
+b2Vec2 MapController::steeringFromAlignment(int pID)
 {
     Person &pi = people[pID];
     int neighCount = 0;
@@ -276,7 +291,7 @@ b2Vec2 MapController::steeringFromAlignment(int pID, b2Vec2 des)
     return steeringTowards(pID, avergaeHeading);
 }
 
-b2Vec2 MapController::steeringFromCohesion(int pID, b2Vec2 des)
+b2Vec2 MapController::steeringFromCohesion(int pID)
 {
     Person &pi = people[pID];
     b2Vec2 centerOfMass = b2Vec2_zero;
@@ -301,7 +316,7 @@ b2Vec2 MapController::steeringFromCohesion(int pID, b2Vec2 des)
     return steeringFromSeek(pID, centerOfMass);
 }
 
-b2Vec2 MapController::steeringFromAvoidance(int pID, b2Vec2 des)
+b2Vec2 MapController::steeringFromAvoidance(int pID)
 {
     return b2Vec2_zero;
 }
@@ -440,20 +455,20 @@ vector<b2Vec2> MapController::eightAdjacentNeighbours(const b2Vec2 &vec)
 
 b2Vec2 MapController::flock(int pID)
 {
-    //b2Vec2 flowForce = steeringFromFlowFleid(pID, destinationPoint);
-    b2Vec2 flowForce = b2Vec2_zero;
-    b2Vec2 seekForce = steeringFromSeek(pID, destinationPoint);
-    b2Vec2 separationForce = steeringFromSeparation(pID, destinationPoint);
-    b2Vec2 alignForce = steeringFromAlignment(pID, destinationPoint);
-    b2Vec2 cohesionForce = steeringFromCohesion(pID, destinationPoint);
+    Person &pi = people[pID];
+    b2Vec2 flowForce = pi.flowForce;
+    //b2Vec2 seekForce = steeringFromSeek(pID, destinationPoint);
+    b2Vec2 separationForce = steeringFromSeparation(pID);
+    b2Vec2 alignForce = steeringFromAlignment(pID);
+    b2Vec2 cohesionForce = steeringFromCohesion(pID);
     
     //Vector2D lowCostForce = steeringFromFlowFleid(pID, destinationPoint);
-    b2Vec2 appliedForce = flowForce + seekForce + separationForce * 0.3 + alignForce * 0.03 + cohesionForce * 0.05;
+    b2Vec2 appliedForce = flowForce  + separationForce * 0.3 + alignForce * 0.03 + cohesionForce * 0.05;
     
     float32 l = appliedForce.Length();
-    if (l > people[pID].getMaxForce())
+    if (l > pi.getMaxForce())
     {
-        appliedForce = appliedForce * (people[pID].getMaxForce() / l);
+        appliedForce = appliedForce * (pi.getMaxForce() / l);
     }
     
     return appliedForce;
@@ -461,6 +476,8 @@ b2Vec2 MapController::flock(int pID)
 
 void MapController::update()
 {
+    updateContinuumCrowdData();
+    
     for (int i = 0; i < m_iCount; i++) {
         Person &pi = people[i];
         pi.flock(&MapController::flock);
@@ -681,11 +698,18 @@ void MapController::render()
 void MapController::updateContinuumCrowdData()
 {
     ccClearBuffers();
-    
     ccCalculateDensityAndAverageSpeed();
-    
     ccCalculateUnitCostField();
     
+    
+    ccClearPotentialField();
+    ccPotentialFieldEikonalFill(destinationPoint);
+    ccGenerateFlowField(); //TODO: This does not use the way of calculating described in the paper (I think)
+    
+    for (int i = m_iCount - 1; i >= 0; i--) {
+        Person &pi = people[i];
+        pi.flowForce = steeringFromFlowFleid(i, destinationPoint);;
+    }
 }
 
 void MapController::ccClearBuffers()
@@ -770,7 +794,7 @@ void MapController::ccCalculateUnitCostField()
                 int targetY = j + fourDir[dir][1];
     
                 if (!isInMap(targetX, targetY)) {
-                    speedField[targetX][targetY] = INT_MAX;
+                    speedField[targetX][targetY].value[i] = INT_MAX;
                     continue;
                 }
                 
@@ -779,27 +803,27 @@ void MapController::ccCalculateUnitCostField()
                 
                 //Get the only speed value as one will be zero
                 // this is like speedVecX != 0 ? : speedVecX : speedVecY
-                float32 flowSpeed = veloX;
+                float32 flowSpeed = veloX != 0 ? veloX : veloY;
                 
                 float32 density = densityField[targetX][targetY];
                 float32 discomfort = discomfortField[targetX][targetY];
                 
                 if (density >= densityMax) {
-                    speedField[i][j] = flowSpeed;
+                    speedField[i][j].value[i] = flowSpeed;
                 } else if (density <= densityMin) {
-                    speedField[i][j] = 4;
+                    speedField[i][j].value[i] = 4;
                 } else {
                     //medium speed
-                    speedField[i][j] = 4 - (density - densityMin) / (densityMax - densityMin) * (4 - flowSpeed);
+                    speedField[i][j].value[i] = 4 - (density - densityMin) / (densityMax - densityMin) * (4 - flowSpeed);
                 }
                 
                 //we're going to divide by speed later, so make sure it's not zero
-                float32 speed = speedField[i][j];
+                float32 speed = speedField[i][j].value[i];
                 float32 threshold = 0.001;
-                speedField[i][j] = min(threshold, speed);
+                speedField[i][j].value[i] = min(threshold, speed);
                 
                 //Work out the cost to move in to the destination cell
-                costField[i][j] = (speedField[i][j] * lengthWeight + timeWeight + discomfortWeight * discomfort) / speedField[i][j];
+                costField[i][j].value[dir] = (speedField[i][j].value[dir] * lengthWeight + timeWeight + discomfortWeight * discomfort) / speedField[i][j].value[dir];
             }
         }
     }
@@ -833,23 +857,24 @@ void MapController::ccGenerateFlowField()
             
             bool isMinFound = false;
             b2Vec2 min;
-            int minDist = 0;
-            for (int k = 0; k < neighbours.size(); k++) {
-                int nx = neighbours[k].x;
-                int ny = neighbours[k].y;
-                
-                int dist = terrain[nx][ny].getDistance() - terrain[i][j].getDistance();
-                if (dist < minDist)
-                {
-                    isMinFound = true;
-                    minDist = dist;
-                    min = b2Vec2(nx, ny);
+            int minDist = INT_MAX;
+            
+            for (int d = 0; d < 8; d++) {
+                if (isInMap(i + eightDir[d][0], j + eightDir[d][1])) {
+                    float32 dist = potentialField[i + eightDir[d][0]][j + eightDir[d][1]];
+                    
+                    if (dist < minDist) {
+                        min.x = eightDir[d][0];
+                        min.y = eightDir[d][1];
+                        minDist = dist;
+                        
+                        isMinFound = true;
+                    }
                 }
             }
             
-            if (isMinFound)
-            {
-                flow[i][j] = min - pos;
+            if (isMinFound) {
+                flow[i][j] = min;
                 flow[i][j].Normalize();
             }
         }
@@ -858,5 +883,59 @@ void MapController::ccGenerateFlowField()
 
 void MapController::ccPotentialFieldEikonalFill(b2Vec2 des)
 {
+    for (int i = 0; i < m_iWidth; i++) {
+        for (int j = 0; j < m_iHeight; j++) {
+            visited[i][j] = false;
+        }
+    }
     
+    int candidatesCount = 0;
+    int failedCount = 0;
+    
+    CostNode desNode;
+    desNode.cost = 0;
+    desNode.point = des;
+    
+    priority_queue<CostNode> pQueue;
+    pQueue.push(desNode);
+    
+    while (!pQueue.empty()) {
+        candidatesCount++;
+        CostNode at = pQueue.top();
+        pQueue.pop();
+        
+        int x = at.point.x;
+        int y = at.point.y;
+        
+        //We've got a better path
+        if (potentialField[x][y] >= at.cost && !visited[x][y]) {
+            
+            potentialField[x][y] = at.cost;
+            visited[x][y] = true;
+            
+            for (int i = 0; i < 4; i++) {
+                int toX = x + fourDir[i][0];
+                int toY = y + fourDir[i][1];
+                if (isInMap(toX, toY)) {
+                    //Cost to go from our target cell to the start
+                    //Our cost + cost of moving from the target to us
+                    float32 toCost = at.cost + costField[toX][toY].value[(i + 2) % 4];
+                    
+                    //If we present a better path, overwrite the cost and queue up going to that cell
+                    if (toCost < potentialField[toX][toY]) {
+                        //console.log('Queueing ' + toX + ', ' + toY + ' @ ' + toCost);
+                        potentialField[toX][toY] = toCost;
+                        visited[x][y] = false;
+                        
+                        CostNode toP ;
+                        toP.cost = toCost;
+                        pQueue.push(toP);
+                    }
+                }
+            }
+        } else {
+            failedCount++;
+        }
+
+    }
 }

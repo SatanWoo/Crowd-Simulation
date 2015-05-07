@@ -85,6 +85,7 @@
 		1955D0FD1AC445BC001318C6 /* Terrain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Terrain.h; sourceTree = "<group>"; };
 		1955D1021AC46E4C001318C6 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 		196734C31AEFEEA200765E4F /* MathLib.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MathLib.h; sourceTree = "<group>"; };
+		1970B60C1AFB89F60026A84C /* CostNode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CostNode.h; sourceTree = "<group>"; };
 		1987ECEC1AF136C9007BACE5 /* Box2D.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Box2D.h; sourceTree = "<group>"; };
 		1987ECED1AF136C9007BACE5 /* Box2DConfig.cmake */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Box2DConfig.cmake; sourceTree = "<group>"; };
 		1987ECEE1AF136C9007BACE5 /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
@@ -369,6 +370,7 @@
 			children = (
 				19A802F11AD2844A00CC6FBC /* Path.h */,
 				19A802F21AD2888E00CC6FBC /* Path.cpp */,
+				1970B60C1AFB89F60026A84C /* CostNode.h */,
 			);
 			name = Object;
 			sourceTree = "<group>";
