@@ -16,14 +16,13 @@ private:
 	Terrain **terrain;
 	Person *people;
     b2Vec2 **flow;
-    
-    b2Vec2 **potentialField;
-    b2Vec2 **costField;
-    b2Vec2 **speedField;
     b2Vec2 **avgVelocityField;
     
+    float32 **potentialField;
     float32 **densityField;
     float32 **discomfortField;
+    float32 **speedField;
+    float32 **costField;
     
     MathHelper *helper;
     
@@ -68,10 +67,7 @@ protected:
     b2Vec2 steeringFromAvoidance(int pID, b2Vec2 des);
     b2Vec2 steeringFromLowestCost(int pID, b2Vec2 des);
     b2Vec2 steeringTowards(int pID, b2Vec2 desiredDirection);
-        
-    void buildDijkstra();
-    void buildFlowField();
-    
+            
     std::vector<b2Vec2> fourAdjacentNeighbours(const b2Vec2& vec);
     std::vector<b2Vec2> eightAdjacentNeighbours(const b2Vec2& vec);
     

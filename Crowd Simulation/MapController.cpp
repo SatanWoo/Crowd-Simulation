@@ -7,6 +7,7 @@
 #include <GLUT/GLUT.h>
 #include <math.h>
 #include <deque>
+#include <queue>
 
 const double MapController::restDensity = 1.0;
 const double MapController::MapGridSize = 1.5;
@@ -43,13 +44,14 @@ MapController::MapController(int width, int height, int count, double timeStep)
     }
     
     flow = initializeVecField();
-    potentialField = initializeVecField();
-    costField = initializeVecField();
-    discomfortField = initializeVecField();
-    speedField = initializeVecField();
+    
     avgVelocityField = initializeVecField();
     
     densityField = initializeFloatField();
+    potentialField = initializeFloatField();
+    costField = initializeFloatField();
+    discomfortField = initializeFloatField();
+    speedField = initializeFloatField();
     
 	terrain = new Terrain *[width];
 	for (int i = 0; i < width; i++)
@@ -148,74 +150,38 @@ MapController::~MapController()
 	helper = NULL;
 }
 
-void MapController::buildDijkstra()
-{
-    int desX = destinationPoint.x / MapGridSize;
-    int desY = destinationPoint.y / MapGridSize;
-    
-    deque<b2Vec2> bfs;
-    bfs.push_back(b2Vec2(desX, desY));
-    terrain[desX][desY].setDistance(0);
-    
-    while (!bfs.empty())
-    {
-        b2Vec2 head = bfs.front();
-        vector<b2Vec2> neighbours = fourAdjacentNeighbours(head);
-        
-        int hx = head.x;
-        int hy = head.y;
-        
-        for (int i = 0; i < neighbours.size(); i++)
-        {
-            int nx = neighbours[i].x;
-            int ny = neighbours[i].y;
-            
-            if (terrain[nx][ny].getDistance() == -1)
-            {
-                terrain[nx][ny].setDistance(terrain[hx][hy].getDistance() + 1);
-                bfs.push_back(b2Vec2(nx, ny));
-            }
-        }
-        
-        bfs.pop_front();
-    }
-}
-
-void MapController::buildFlowField()
-{
-    for (int i = 0; i < m_iWidth; i++)
-    {
-        for (int j = 0; j < m_iHeight; j++)
-        {
-            if (terrain[i][j].getDistance() == INT_MAX) continue;
-            
-            b2Vec2 pos = b2Vec2(i, j);
-            vector<b2Vec2> neighbours = eightAdjacentNeighbours(pos);
-            
-            bool isMinFound = false;
-            b2Vec2 min;
-            int minDist = 0;
-            for (int k = 0; k < neighbours.size(); k++) {
-                int nx = neighbours[k].x;
-                int ny = neighbours[k].y;
-                
-                int dist = terrain[nx][ny].getDistance() - terrain[i][j].getDistance();
-                if (dist < minDist)
-                {
-                    isMinFound = true;
-                    minDist = dist;
-                    min = b2Vec2(nx, ny);
-                }
-            }
-            
-            if (isMinFound)
-            {
-                flow[i][j] = min - pos;
-                flow[i][j].Normalize();
-            }
-        }
-    }
-}
+//void MapController::buildDijkstra()
+//{
+//    int desX = destinationPoint.x / MapGridSize;
+//    int desY = destinationPoint.y / MapGridSize;
+//    
+//    deque<b2Vec2> bfs;
+//    bfs.push_back(b2Vec2(desX, desY));
+//    terrain[desX][desY].setDistance(0);
+//    
+//    while (!bfs.empty())
+//    {
+//        b2Vec2 head = bfs.front();
+//        vector<b2Vec2> neighbours = fourAdjacentNeighbours(head);
+//        
+//        int hx = head.x;
+//        int hy = head.y;
+//        
+//        for (int i = 0; i < neighbours.size(); i++)
+//        {
+//            int nx = neighbours[i].x;
+//            int ny = neighbours[i].y;
+//            
+//            if (terrain[nx][ny].getDistance() == -1)
+//            {
+//                terrain[nx][ny].setDistance(terrain[hx][hy].getDistance() + 1);
+//                bfs.push_back(b2Vec2(nx, ny));
+//            }
+//        }
+//        
+//        bfs.pop_front();
+//    }
+//}
 
 b2Vec2 MapController::steeringFromFlowFleid(int pID, b2Vec2 des)
 {
@@ -787,17 +753,107 @@ void MapController::ccAddDensity(int x, int y, const b2Vec2& vec, float32 weight
 
 void MapController::ccCalculateUnitCostField()
 {
+    float32 densityMin = 0.5;
+    float32 densityMax = 0.8;
     
+    //Weights for formula (4) on page 4
+    float32 lengthWeight = 1;
+    float32 timeWeight = 1;
+    float32 discomfortWeight = 1;
+    
+    for (int i = 0; i < m_iWidth; i++) {
+        for (int j = 0; j < m_iHeight; j++) {
+            
+            //foreach direction we can leave that cell
+            for (int dir = 0; dir < 4; dir++) {
+                int targetX = i + fourDir[dir][0];
+                int targetY = j + fourDir[dir][1];
+    
+                if (!isInMap(targetX, targetY)) {
+                    speedField[targetX][targetY] = INT_MAX;
+                    continue;
+                }
+                
+                float32 veloX = fourDir[dir][0] * avgVelocityField[targetX][targetY].x;
+                float32 veloY = fourDir[dir][1] * avgVelocityField[targetX][targetY].y;
+                
+                //Get the only speed value as one will be zero
+                // this is like speedVecX != 0 ? : speedVecX : speedVecY
+                float32 flowSpeed = veloX;
+                
+                float32 density = densityField[targetX][targetY];
+                float32 discomfort = discomfortField[targetX][targetY];
+                
+                if (density >= densityMax) {
+                    speedField[i][j] = flowSpeed;
+                } else if (density <= densityMin) {
+                    speedField[i][j] = 4;
+                } else {
+                    //medium speed
+                    speedField[i][j] = 4 - (density - densityMin) / (densityMax - densityMin) * (4 - flowSpeed);
+                }
+                
+                //we're going to divide by speed later, so make sure it's not zero
+                float32 speed = speedField[i][j];
+                float32 threshold = 0.001;
+                speedField[i][j] = min(threshold, speed);
+                
+                //Work out the cost to move in to the destination cell
+                costField[i][j] = (speedField[i][j] * lengthWeight + timeWeight + discomfortWeight * discomfort) / speedField[i][j];
+            }
+        }
+    }
 }
 
 void MapController::ccClearPotentialField()
 {
-    
+    for (int i = 0; i < m_iWidth; i++) {
+        for (int j = 0; j < m_iHeight; j++) {
+            potentialField[i][j] = INT_MAX;
+        }
+    }
 }
 
 void MapController::ccGenerateFlowField()
 {
+    for (int i = 0; i < m_iWidth; i++) {
+        for (int j = 0; j < m_iHeight; j++) {
+            flow[i][j].SetZero();
+        }
+    }
     
+    for (int i = 0; i < m_iWidth; i++)
+    {
+        for (int j = 0; j < m_iHeight; j++)
+        {
+            if (potentialField[i][j] <= INT_MAX - b2_epsilon || potentialField[i][j] >= INT_MAX + b2_epsilon) continue;
+            
+            b2Vec2 pos = b2Vec2(i, j);
+            vector<b2Vec2> neighbours = eightAdjacentNeighbours(pos);
+            
+            bool isMinFound = false;
+            b2Vec2 min;
+            int minDist = 0;
+            for (int k = 0; k < neighbours.size(); k++) {
+                int nx = neighbours[k].x;
+                int ny = neighbours[k].y;
+                
+                int dist = terrain[nx][ny].getDistance() - terrain[i][j].getDistance();
+                if (dist < minDist)
+                {
+                    isMinFound = true;
+                    minDist = dist;
+                    min = b2Vec2(nx, ny);
+                }
+            }
+            
+            if (isMinFound)
+            {
+                flow[i][j] = min - pos;
+                flow[i][j].Normalize();
+            }
+        }
+    }
 }
 
 void MapController::ccPotentialFieldEikonalFill(b2Vec2 des)
