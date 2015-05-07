@@ -20,9 +20,10 @@ private:
     b2Vec2 **potentialField;
     b2Vec2 **costField;
     b2Vec2 **speedField;
-    b2Vec2 **discomfortField;
     b2Vec2 **avgVelocityField;
-    b2Vec2 **densityField;
+    
+    float32 **densityField;
+    float32 **discomfortField;
     
     MathHelper *helper;
     
@@ -42,8 +43,22 @@ protected:
     bool isInMap(int x, int y);
     bool isAccessible(int x, int y);
     
-    void initializeField(b2Vec2 **field);
+    b2Vec2** initializeVecField();
+    float32** initializeFloatField();
+    
     void deinitializeField(b2Vec2 **field);
+    void deinitializeField(float32 **field);
+    
+    void updateContinuumCrowdData();
+    void ccClearBuffers();
+    void ccCalculateDensityAndAverageSpeed();
+    void ccCalculateUnitCostField();
+    
+    void ccAddDensity(int x, int y, const b2Vec2& vec, float32 weight);
+    void ccGenerateFlowField();
+    void ccClearPotentialField();
+    
+    void ccPotentialFieldEikonalFill(b2Vec2 des);
     
     b2Vec2 steeringFromFlowFleid(int pID, b2Vec2 des);
     b2Vec2 steeringFromSeek(int pID, b2Vec2 des);

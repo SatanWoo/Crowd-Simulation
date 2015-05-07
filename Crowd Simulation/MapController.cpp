@@ -42,12 +42,14 @@ MapController::MapController(int width, int height, int count, double timeStep)
         people[i].initBodyDef();
     }
     
-    initializeField(flow);
-    initializeField(potentialField);
-    initializeField(costField);
-    initializeField(discomfortField);
-    initializeField(speedField);
-    initializeField(avgVelocityField);
+    flow = initializeVecField();
+    potentialField = initializeVecField();
+    costField = initializeVecField();
+    discomfortField = initializeVecField();
+    speedField = initializeVecField();
+    avgVelocityField = initializeVecField();
+    
+    densityField = initializeFloatField();
     
 	terrain = new Terrain *[width];
 	for (int i = 0; i < width; i++)
@@ -79,16 +81,38 @@ MapController::MapController(int width, int height, int count, double timeStep)
     buildFlowField();
 }
 
-void MapController::initializeField(b2Vec2 **field)
+b2Vec2** MapController::initializeVecField()
 {
-    field = new b2Vec2*[m_iWidth];
+    b2Vec2** field = new b2Vec2*[m_iWidth];
     for (int i = 0; i < m_iWidth; i++)
     {
         field[i] = new b2Vec2[m_iHeight];
     }
+    
+    return field;
+}
+
+float32** MapController::initializeFloatField()
+{
+    float32 **field = new float*[m_iWidth];
+    for (int i = 0; i < m_iWidth; i++) {
+        field[i] = new float[m_iHeight];
+    }
+    return field;
 }
 
 void MapController::deinitializeField(b2Vec2 **field)
+{
+    for (int i = 0; i < m_iWidth; i++) {
+        delete [] field[i];
+        field[i] = NULL;
+    }
+    
+    delete [] field;
+    field = NULL;
+}
+
+void MapController::deinitializeField(float32 **field)
 {
     for (int i = 0; i < m_iWidth; i++) {
         delete [] field[i];
@@ -458,7 +482,7 @@ b2Vec2 MapController::flock(int pID)
     b2Vec2 cohesionForce = steeringFromCohesion(pID, destinationPoint);
     
     //Vector2D lowCostForce = steeringFromFlowFleid(pID, destinationPoint);
-    b2Vec2 appliedForce = flowForce + seekForce + separationForce * 0.3 + alignForce * 0.05 + cohesionForce * 0.05;
+    b2Vec2 appliedForce = flowForce + seekForce + separationForce * 0.3 + alignForce * 0.03 + cohesionForce * 0.05;
     
     float32 l = appliedForce.Length();
     if (l > people[pID].getMaxForce())
@@ -685,4 +709,98 @@ void MapController::render()
         p.render();
     }
     glEnd();
+}
+
+// Continnum Crowd
+void MapController::updateContinuumCrowdData()
+{
+    ccClearBuffers();
+    
+    ccCalculateDensityAndAverageSpeed();
+    
+    ccCalculateUnitCostField();
+    
+}
+
+void MapController::ccClearBuffers()
+{
+    for (int i = 0; i < m_iWidth; i++)
+    {
+        for (int j = 0; j < m_iHeight; j++)
+        {
+            densityField[i][j] = 0;
+            discomfortField[i][j] = 0;
+            avgVelocityField[i][j].SetZero();
+        }
+    }
+}
+
+void MapController::ccCalculateDensityAndAverageSpeed()
+{
+    float32 perAgentDensity = 1.0;
+    
+    for (int i = 0; i < m_iCount; i++)
+    {
+        Person &pi = people[i];
+        
+        b2Vec2 floor = B2Vec2DHelper::floorV(pi.getPosition());
+        float32 xWeight = pi.getPosition().x - floor.x;
+        float32 yWeight = pi.getPosition().y - floor.y;
+        
+        //top left
+        if (isInMap(floor.x, floor.y)) {
+            ccAddDensity(floor.x, floor.y, pi.getVelocity(), perAgentDensity * (1 - xWeight) * (1 - yWeight));
+        }
+        //top right
+        if (isInMap(floor.x + 1, floor.y)) {
+            ccAddDensity(floor.x + 1, floor.y, pi.getVelocity(), perAgentDensity * (xWeight) * (1 - yWeight));
+        }
+        //bottom left
+        if (isInMap(floor.x, floor.y + 1)) {
+            ccAddDensity(floor.x, floor.y + 1, pi.getVelocity(), perAgentDensity * (1 - xWeight) * (yWeight));
+        }
+        //bottom right
+        if (isInMap(floor.x + 1, floor.y + 1)) {
+            ccAddDensity(floor.x + 1, floor.y + 1, pi.getVelocity(), perAgentDensity * (xWeight) * (yWeight));
+        }
+    }
+    
+    for (int i = 0; i < m_iWidth; i++)
+    {
+        for (int j = 0; j < m_iHeight; j++)
+        {
+            b2Vec2& velocity = avgVelocityField[i][j];
+            float32 density = densityField[i][j];
+            velocity *= (1/density);
+        }
+    }
+}
+
+void MapController::ccAddDensity(int x, int y, const b2Vec2& vec, float32 weight)
+{
+    densityField[x][y] += weight;
+    
+    b2Vec2& v = avgVelocityField[x][y];
+    v.x += vec.x * weight;
+    v.y += vec.y * weight;
+}
+
+void MapController::ccCalculateUnitCostField()
+{
+    
+}
+
+void MapController::ccClearPotentialField()
+{
+    
+}
+
+void MapController::ccGenerateFlowField()
+{
+    
+}
+
+void MapController::ccPotentialFieldEikonalFill(b2Vec2 des)
+{
+    
 }
