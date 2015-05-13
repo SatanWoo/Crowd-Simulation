@@ -17,10 +17,6 @@ struct CostNode {
     b2Vec2 point;
 
     bool operator< (const CostNode& v) const {
-        return cost < v.cost;
-    }
-    
-    bool operator> (const CostNode& v)const {
         return cost > v.cost;
     }
 };

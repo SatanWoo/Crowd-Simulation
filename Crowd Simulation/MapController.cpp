@@ -77,6 +77,7 @@ MapController::MapController(int width, int height, int count, double timeStep)
     }
     
     destinationPoint = b2Vec2(rand() % m_iWidth * MapGridSize, rand() % m_iHeight * MapGridSize);
+    cout << "Des is " << destinationPoint.x << "::" << destinationPoint.y << endl;
     
 //    des.push_back(b2Vec2(rand() % m_iWidth * MapGridSize, rand() % m_iHeight * MapGridSize));
 //    des.push_back(b2Vec2(rand() % m_iWidth * MapGridSize, rand() % m_iHeight * MapGridSize));
@@ -97,9 +98,9 @@ b2Vec2** MapController::initializeVecField()
 
 float32** MapController::initializeFloatField()
 {
-    float32 **field = new float*[m_iWidth];
+    float32 **field = new float32*[m_iWidth];
     for (int i = 0; i < m_iWidth; i++) {
-        field[i] = new float[m_iHeight];
+        field[i] = new float32[m_iHeight];
     }
     return field;
 }
@@ -477,19 +478,19 @@ b2Vec2 MapController::flock(int pID)
 void MapController::update()
 {
     updateContinuumCrowdData();
-    
+//    
     for (int i = 0; i < m_iCount; i++) {
         Person &pi = people[i];
         pi.flock(&MapController::flock);
     }
-    
+//
     for (int i = 0; i < m_iCount; i++) {
         Person &pi = people[i];
         pi.steer();
     }
     
-    world->Step(m_dTimeStep, 10, 10);
-    world->ClearForces();
+//    world->Step(m_dTimeStep, 10, 10);
+//    world->ClearForces();
 }
 
 ///////////
@@ -700,12 +701,11 @@ void MapController::updateContinuumCrowdData()
     ccClearBuffers();
     ccCalculateDensityAndAverageSpeed();
     ccCalculateUnitCostField();
-    
-    
+//
     ccClearPotentialField();
     ccPotentialFieldEikonalFill(destinationPoint);
     ccGenerateFlowField(); //TODO: This does not use the way of calculating described in the paper (I think)
-    
+//    
     for (int i = m_iCount - 1; i >= 0; i--) {
         Person &pi = people[i];
         pi.flowForce = steeringFromFlowFleid(i, destinationPoint);;
@@ -761,7 +761,9 @@ void MapController::ccCalculateDensityAndAverageSpeed()
         {
             b2Vec2& velocity = avgVelocityField[i][j];
             float32 density = densityField[i][j];
-            velocity *= (1/density);
+            if (density > 0) {
+                velocity *= (1/density);
+            }
         }
     }
 }
@@ -792,9 +794,9 @@ void MapController::ccCalculateUnitCostField()
             for (int dir = 0; dir < 4; dir++) {
                 int targetX = i + fourDir[dir][0];
                 int targetY = j + fourDir[dir][1];
-    
+                
                 if (!isInMap(targetX, targetY)) {
-                    speedField[targetX][targetY].value[i] = INT_MAX;
+                    speedField[i][j].value[dir] = INT_MAX;
                     continue;
                 }
                 
@@ -803,24 +805,24 @@ void MapController::ccCalculateUnitCostField()
                 
                 //Get the only speed value as one will be zero
                 // this is like speedVecX != 0 ? : speedVecX : speedVecY
-                float32 flowSpeed = veloX != 0 ? veloX : veloY;
+                float32 flowSpeed = fourDir[dir][0] != 0 ? veloX : veloY;
                 
                 float32 density = densityField[targetX][targetY];
                 float32 discomfort = discomfortField[targetX][targetY];
                 
                 if (density >= densityMax) {
-                    speedField[i][j].value[i] = flowSpeed;
+                    speedField[i][j].value[dir] = flowSpeed;
                 } else if (density <= densityMin) {
-                    speedField[i][j].value[i] = 4;
+                    speedField[i][j].value[dir] = 4;
                 } else {
                     //medium speed
-                    speedField[i][j].value[i] = 4 - (density - densityMin) / (densityMax - densityMin) * (4 - flowSpeed);
+                    speedField[i][j].value[dir] = 4 - (density - densityMin) / (densityMax - densityMin) * (4 - flowSpeed);
                 }
                 
                 //we're going to divide by speed later, so make sure it's not zero
-                float32 speed = speedField[i][j].value[i];
+                float32 speed = speedField[i][j].value[dir];
                 float32 threshold = 0.001;
-                speedField[i][j].value[i] = min(threshold, speed);
+                speedField[i][j].value[dir] = min(threshold, speed);
                 
                 //Work out the cost to move in to the destination cell
                 costField[i][j].value[dir] = (speedField[i][j].value[dir] * lengthWeight + timeWeight + discomfortWeight * discomfort) / speedField[i][j].value[dir];
@@ -850,10 +852,7 @@ void MapController::ccGenerateFlowField()
     {
         for (int j = 0; j < m_iHeight; j++)
         {
-            if (potentialField[i][j] <= INT_MAX - b2_epsilon || potentialField[i][j] >= INT_MAX + b2_epsilon) continue;
-            
-            b2Vec2 pos = b2Vec2(i, j);
-            vector<b2Vec2> neighbours = eightAdjacentNeighbours(pos);
+            if (potentialField[i][j] == INT_MAX) continue;
             
             bool isMinFound = false;
             b2Vec2 min;
@@ -874,7 +873,7 @@ void MapController::ccGenerateFlowField()
             }
             
             if (isMinFound) {
-                flow[i][j] = min;
+                flow[i][j].Set(min.x, min.y);
                 flow[i][j].Normalize();
             }
         }
@@ -890,14 +889,16 @@ void MapController::ccPotentialFieldEikonalFill(b2Vec2 des)
     }
     
     int candidatesCount = 0;
-    int failedCount = 0;
     
     CostNode desNode;
     desNode.cost = 0;
-    desNode.point = des;
+    desNode.point.x = des.x / MapGridSize;
+    desNode.point.y = des.y / MapGridSize;
     
     priority_queue<CostNode> pQueue;
     pQueue.push(desNode);
+    
+    cout << "Width" << m_iWidth << "Height" << m_iHeight << endl;
     
     while (!pQueue.empty()) {
         candidatesCount++;
@@ -907,7 +908,8 @@ void MapController::ccPotentialFieldEikonalFill(b2Vec2 des)
         int x = at.point.x;
         int y = at.point.y;
         
-        //We've got a better path
+        cout << "Point is " << x << "::" << y << endl;
+        
         if (potentialField[x][y] >= at.cost && !visited[x][y]) {
             
             potentialField[x][y] = at.cost;
@@ -928,14 +930,13 @@ void MapController::ccPotentialFieldEikonalFill(b2Vec2 des)
                         visited[x][y] = false;
                         
                         CostNode toP ;
+                        toP.point.x = toX;
+                        toP.point.y = toY;
                         toP.cost = toCost;
                         pQueue.push(toP);
                     }
                 }
             }
-        } else {
-            failedCount++;
         }
-
     }
 }
