@@ -8,8 +8,6 @@
 #include "Box2D.h"
 #include "CostNode.h"
 
-//typedef void (*callback)(Person *p);
-
 class Terrain;
 class MapController
 {
@@ -36,8 +34,6 @@ private:
 	int m_iCount;
     
     b2Vec2 destinationPoint;
-    
-    //std::vector<b2Vec2> des;
 
 	double m_dTimeStep;
     
@@ -68,12 +64,8 @@ protected:
     b2Vec2 steeringFromAlignment(int pID);
     b2Vec2 steeringFromCohesion(int pID);
     b2Vec2 steeringFromAvoidance(int pID);
-    b2Vec2 steeringFromLowestCost(int pID, b2Vec2 des);
     b2Vec2 steeringTowards(int pID, b2Vec2 desiredDirection);
             
-    std::vector<b2Vec2> fourAdjacentNeighbours(const b2Vec2& vec);
-    std::vector<b2Vec2> eightAdjacentNeighbours(const b2Vec2& vec);
-    
 public:
 	MapController(int width, int height, int count, double timeStep = 0.02);
 	~MapController();

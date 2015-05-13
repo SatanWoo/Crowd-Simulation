@@ -12,8 +12,8 @@
 const double MapController::restDensity = 1.0;
 const double MapController::MapGridSize = 1.5;
 
-static int fourDir[4][2] = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
-static int eightDir[8][2] = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}, {-1, -1}, {-1, 1}, {1, -1}, {1, 1}};
+static int fourDir[4][2] = {{0, -1}, {1, 0}, {0, 1}, {-1, 0}};
+static int eightDir[8][2] = {{0, -1}, {1, 0}, {0, 1}, {-1, 0}, {1, 1}, {1, -1}, {-1, -1}, {-1, 1}};
 
 MapController::MapController(int width, int height, int count, double timeStep)
 {
@@ -68,19 +68,11 @@ MapController::MapController(int width, int height, int count, double timeStep)
         for (int j = 0; j < height; j++)
         {
             terrain[i][j].setMap(this);
-//            if (rand() % 10 < 1)
-//            {
-//                terrain[i][j].init(INT_MAX);
-//                terrain[i][j].setDistance(INT_MAX);
-//            }
         }
     }
     
     destinationPoint = b2Vec2(rand() % m_iWidth * MapGridSize, rand() % m_iHeight * MapGridSize);
     cout << "Des is " << destinationPoint.x << "::" << destinationPoint.y << endl;
-    
-//    des.push_back(b2Vec2(rand() % m_iWidth * MapGridSize, rand() % m_iHeight * MapGridSize));
-//    des.push_back(b2Vec2(rand() % m_iWidth * MapGridSize, rand() % m_iHeight * MapGridSize));
 
 	helper = new MathHelper(MapGridSize);
 }
@@ -322,60 +314,6 @@ b2Vec2 MapController::steeringFromAvoidance(int pID)
     return b2Vec2_zero;
 }
 
-b2Vec2 MapController::steeringFromLowestCost(int pID, b2Vec2 des)
-{
-    Person &pi = people[pID];
-    
-    if (isnan(pi.getPosition().x) || isnan(pi.getPosition().y)) return b2Vec2_zero;
-    if (pi.getLinearVelocity().Length() == 0) return b2Vec2_zero;
-    
-    b2Vec2 floor = pi.getPosition();
-    int fx = floor.x / MapGridSize;
-    int fy = floor.y / MapGridSize;
-    
-    float f00 = isAccessible(fx, fy) ? terrain[fx][fy].getDistance() : INT_MAX;
-    float f01 = isAccessible(fx, fy + 1) ? terrain[fx][fy + 1].getDistance() : INT_MAX;
-    float f10 = isAccessible(fx + 1, fy) ? terrain[fx + 1][fy].getDistance() : INT_MAX;
-    float f11 = isAccessible(fx + 1, fy + 1) ? terrain[fx + 1][fy + 1].getDistance() : INT_MAX;
-    
-    float minVal = MathLib::min4(f00, f01, f10, f11);
-    vector<Vector2D> minCoords;
-    
-    if (minVal == f00)
-    {
-        minCoords.push_back(Vector2D(fx, fy));
-    }
-    if (minVal == f01)
-    {
-        minCoords.push_back(Vector2D(fx, fy+1));
-    }
-    if (minVal == f10)
-    {
-        minCoords.push_back(Vector2D(fx + 1, fy));
-    }
-    if (minVal == f11)
-    {
-        minCoords.push_back(Vector2D(fx + 1, fy + 1));
-    }
-    
-    b2Vec2 currentDirection = pi.getLinearVelocity();
-    b2Vec2  desireDirection;
-    minVal = INT_MAX;
-    
-//    for (int i = 0; i < minCoords.size(); i++)
-//    {
-//        b2Vec2 directionTo = (minCoords[i] - pi.getPos()).normalize();
-//        float length = (directionTo - currentDirection).squaredLength();
-//        if (length < minVal)
-//        {
-//            minVal = length;
-//            desireDirection = directionTo;
-//        }
-//    }
-    
-    return steeringTowards(pID, desireDirection);
-}
-
 b2Vec2 MapController::steeringTowards(int pID, b2Vec2 desiredDirection)
 {
     Person &pi = people[pID];
@@ -385,85 +323,14 @@ b2Vec2 MapController::steeringTowards(int pID, b2Vec2 desiredDirection)
     return velocityChange * (pi.getMaxForce() / pi.getMaxSpeed());
 }
 
-vector<b2Vec2> MapController::fourAdjacentNeighbours(const b2Vec2 &vec)
-{
-    vector<b2Vec2> result;
-    
-    
-    int x = vec.x;
-    int y = vec.y;
-    for (int i = 0; i < 4; i++) {
-        int dx = x + fourDir[i][0];
-        int dy = y + fourDir[i][1];
-        
-        if (isInMap(dx, dy)) result.push_back(b2Vec2(dx, dy));
-    }
-    
-    return result;
-}
-
-vector<b2Vec2> MapController::eightAdjacentNeighbours(const b2Vec2 &vec)
-{
-    // 参数 Vec 已经是基于索引得了
-    vector<b2Vec2> result;
-    
-    int x = vec.x;
-    int y = vec.y;
-    
-    bool up = isAccessible(x, y - 1);
-    bool down = isAccessible(x, y + 1);
-    bool left = isAccessible(x - 1, y);
-    bool right = isAccessible(x + 1, y);
-    
-    if (left)
-    {
-        result.push_back(b2Vec2(x - 1, y));
-        if (up && isAccessible(x - 1, y - 1))
-        {
-            result.push_back(b2Vec2(x - 1, y - 1));
-        }
-    }
-    
-    if (right)
-    {
-        result.push_back(b2Vec2(x + 1, y));
-        if (down && isAccessible(x + 1, y + 1))
-        {
-            result.push_back(b2Vec2(x + 1, y + 1));
-        }
-    }
-    
-    if (up)
-    {
-        result.push_back(b2Vec2(x, y - 1));
-        if (right && isAccessible(x + 1, y - 1))
-        {
-            result.push_back(b2Vec2(x + 1, y - 1));
-        }
-    }
-    
-    if (down)
-    {
-        result.push_back(b2Vec2(x, y + 1));
-        if (left && isAccessible(x - 1, y + 1))
-        {
-            result.push_back(b2Vec2(x - 1, y + 1));
-        }
-    }
-    
-    return result;
-}
-
 b2Vec2 MapController::flock(int pID)
 {
     Person &pi = people[pID];
     b2Vec2 flowForce = pi.flowForce;
-    //b2Vec2 seekForce = steeringFromSeek(pID, destinationPoint);
     b2Vec2 separationForce = steeringFromSeparation(pID);
     b2Vec2 alignForce = steeringFromAlignment(pID);
     b2Vec2 cohesionForce = steeringFromCohesion(pID);
     
-    //Vector2D lowCostForce = steeringFromFlowFleid(pID, destinationPoint);
     b2Vec2 appliedForce = flowForce  + separationForce * 0.3 + alignForce * 0.03 + cohesionForce * 0.05;
     
     float32 l = appliedForce.Length();
@@ -489,8 +356,8 @@ void MapController::update()
         pi.steer();
     }
     
-//    world->Step(m_dTimeStep, 10, 10);
-//    world->ClearForces();
+    world->Step(m_dTimeStep, 10, 10);
+    world->ClearForces();
 }
 
 ///////////
@@ -661,6 +528,7 @@ void MapController::render()
             }
         }
     }
+    
     glEnd();
     glBegin(GL_QUADS);
     glColor3f(1.0f, 0.0f, 0.0f);
@@ -898,7 +766,7 @@ void MapController::ccPotentialFieldEikonalFill(b2Vec2 des)
     priority_queue<CostNode> pQueue;
     pQueue.push(desNode);
     
-    cout << "Width" << m_iWidth << "Height" << m_iHeight << endl;
+    //cout << "Width" << m_iWidth << "Height" << m_iHeight << endl;
     
     while (!pQueue.empty()) {
         candidatesCount++;
@@ -908,7 +776,7 @@ void MapController::ccPotentialFieldEikonalFill(b2Vec2 des)
         int x = at.point.x;
         int y = at.point.y;
         
-        cout << "Point is " << x << "::" << y << endl;
+        //cout << "Point is " << x << "::" << y <<  "::" <<  at.cost << endl;
         
         if (potentialField[x][y] >= at.cost && !visited[x][y]) {
             
@@ -925,7 +793,6 @@ void MapController::ccPotentialFieldEikonalFill(b2Vec2 des)
                     
                     //If we present a better path, overwrite the cost and queue up going to that cell
                     if (toCost < potentialField[toX][toY]) {
-                        //console.log('Queueing ' + toX + ', ' + toY + ' @ ' + toCost);
                         potentialField[toX][toY] = toCost;
                         visited[x][y] = false;
                         

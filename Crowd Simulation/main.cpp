@@ -14,10 +14,10 @@
 
 using namespace std;
 
-const double ScreenWidth = 1200;
-const double ScreenHeight = 800;
-const double MapWidth = 50;
-const double MapHeight = 50;
+const double ScreenWidth = 800;
+const double ScreenHeight = 448;
+const double MapWidth = 25;
+const double MapHeight = 14;
 
 MapController *mapController = NULL;
 
