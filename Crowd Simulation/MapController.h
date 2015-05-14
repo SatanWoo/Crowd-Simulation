@@ -14,6 +14,7 @@ private:
     
     std::vector<Agent> agents;
     std::vector<b2Vec2> destinationPoints;
+    std::vector<b2Vec2> obstacles;
     
     b2Vec2 **flow;
     b2Vec2 **avgVelocityField;

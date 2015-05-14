@@ -58,6 +58,37 @@ MapController::MapController(int width, int height, int count, double timeStep)
         agents.push_back(p3);
     }
     
+    for (int i = 0; i < m_iHeight; i++) {
+        if (i >= m_iHeight / 2 - 2 && i < m_iHeight / 2 + 2) {
+            continue;
+        }
+        for (int y = 6; y < m_iWidth - 6; y++) {
+            obstacles.push_back(b2Vec2(y, i));
+        }
+    }
+    
+    for (int i = 0; i < obstacles.size(); i++) {
+        b2Vec2 pos = obstacles[i];
+        
+        //Create a physics body for the agent
+        b2FixtureDef *fixDef = new b2FixtureDef();
+        b2BodyDef *bodyDef = new b2BodyDef();
+        
+        fixDef->density = 1.0;
+        fixDef->friction = 0.5;
+        fixDef->restitution = 0.2;
+        fixDef->shape = new b2PolygonShape();
+        
+        b2PolygonShape *shape = (b2PolygonShape *)fixDef->shape;
+        shape->SetAsBox(0.5, 0.5);
+
+        
+        bodyDef->type = b2_staticBody;
+        bodyDef->position.Set(pos.x, pos.y);
+        
+        world->CreateBody(bodyDef)->CreateFixture(fixDef);
+    }
+    
     flow = initializeVecField();
     
     avgVelocityField = initializeVecField();
@@ -413,6 +444,12 @@ void MapController::ccClearBuffers()
             avgVelocityField[i][j].SetZero();
         }
     }
+    
+    for (int i = obstacles.size() - 1; i >= 0; i--) {
+        b2Vec2 o = obstacles[i];
+        int x = o.x, y = o.y;
+        discomfortField[x][y] = INT_MAX;
+    }
 }
 
 void MapController::ccCalculateDensityAndAverageSpeed()
@@ -453,8 +490,6 @@ void MapController::ccCalculateDensityAndAverageSpeed()
             float32 density = densityField[i][j];
             if (density > 0) {
                 velocity *= (1/density);
-                
-                //cout << avgVelocityField[i][j].x << "||" << avgVelocityField[i][j].y << endl;
             }
         }
     }
