@@ -16,8 +16,8 @@ using namespace std;
 
 const double ScreenWidth = 800;
 const double ScreenHeight = 448;
-const double MapWidth = 30;
-const double MapHeight = 30;
+const double MapWidth = 25;
+const double MapHeight = 14;
 
 MapController *mapController = NULL;
 
@@ -42,14 +42,17 @@ void glIdle()
 
 void glMouse(int button, int state, int x, int y)
 {
-//    switch (button)
-//    {
-//        case GLUT_LEFT_BUTTON:
-//            double xPos = (double)x * MapWidth / ScreenWidth * MapController::MapGridSize;
-//            double yPos = (MapHeight - (double)y * MapHeight / ScreenHeight) * MapController::MapGridSize;
-//            mapController->setDestionationPoint(b2Vec2(xPos, yPos));
-//            break;
-//    }
+    switch (button)
+    {
+        case GLUT_LEFT_BUTTON:
+            int xPos = x / MapController::MapGridSize;
+            int yPos = MapHeight -  y / MapController::MapGridSize;
+            
+            cout << xPos << ":" << yPos << endl;
+            
+            mapController->updateDestinationPoint(b2Vec2(xPos, yPos));
+            break;
+    }
 }
 
 int main(int argc, const char * argv[])

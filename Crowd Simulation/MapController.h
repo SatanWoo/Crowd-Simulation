@@ -65,6 +65,8 @@ protected:
 public:
 	MapController(int width, int height, int count, double timeStep = 0.02);
 	~MapController();
+    
+    void updateDestinationPoint(b2Vec2 newDest);
 
     b2World* getWorld()const{return world;}
     

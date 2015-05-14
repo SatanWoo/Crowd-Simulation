@@ -11,7 +11,7 @@
 using namespace std;
 
 const double MapController::restDensity = 1.0;
-const double MapController::MapGridSize = 2.0;
+const double MapController::MapGridSize = 32;
 
 static int fourDir[4][2] = {{0, -1}, {1, 0}, {0, 1}, {-1, 0}};
 static int eightDir[8][2] = {{0, -1}, {1, 0}, {0, 1}, {-1, 0}, {1, 1}, {1, -1}, {-1, -1}, {-1, 1}};
@@ -190,9 +190,7 @@ void MapController::render()
     
     glLineWidth(1);
     glBegin(GL_LINES);
-    
     glColor4f(1.0f, 1.0f, 1.0f, 0.1);
-    
     for (int i = 0; i < m_iWidth; i++) {
         for (int j = 0; j < m_iHeight; j++) {
             double xPos = i * MapGridSize;
@@ -210,6 +208,23 @@ void MapController::render()
         }
     }
     glEnd();
+    
+    glBegin(GL_QUADS);
+    glColor3f(1.0f, 0.0f, 0.0f);
+    
+    for (int i = 0 ; i < obstacles.size(); i++) {
+        b2Vec2 o = obstacles[i];
+        
+        int x = o.x;
+        int y = o.y;
+        
+        glVertex2d(x * MapGridSize, y * MapGridSize);
+        glVertex2d((x + 1) * MapGridSize, y * MapGridSize);
+        glVertex2d((x + 1) * MapGridSize, (y + 1) * MapGridSize);
+        glVertex2d(x * MapGridSize, (y + 1) * MapGridSize);
+    }
+    glEnd();
+
     
     glPointSize(5);
     glBegin(GL_POINTS);
@@ -641,7 +656,6 @@ void MapController::ccPotentialFieldEikonalFill(b2Vec2 des)
         int y = at.point.y;
         
         if (potentialField[x][y] >= at.cost && !visited[x][y]) {
-            
             potentialField[x][y] = at.cost;
             visited[x][y] = true;
             
@@ -668,6 +682,15 @@ void MapController::ccPotentialFieldEikonalFill(b2Vec2 des)
             }
         }
     }
+}
+
+void MapController::updateDestinationPoint(b2Vec2 newDest)
+{
+    destinationPoints[0].x = newDest.x;
+    destinationPoints[0].y = newDest.y;
+    
+    destinationPoints[1].x = m_iWidth - destinationPoints[0].x - 1;
+    destinationPoints[1].y = m_iHeight - destinationPoints[0].y - 1;
 }
 
 bool MapController::isValid(int x, int y)
