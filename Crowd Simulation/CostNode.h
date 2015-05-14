@@ -23,7 +23,7 @@ struct CostNode {
     }
 
     bool operator< (const CostNode& v) const {
-        return cost > v.cost;
+        return cost - v.cost;
     }
 };
 

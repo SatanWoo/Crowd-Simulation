@@ -39,7 +39,6 @@ private:
     
 protected:
     bool isInMap(int x, int y);
-    bool isAccessible(int x, int y);
     
     b2Vec2** initializeVecField();
     float32** initializeFloatField();
@@ -63,7 +62,6 @@ protected:
     b2Vec2 steeringFromSeparation(int pID);
     b2Vec2 steeringFromAlignment(int pID);
     b2Vec2 steeringFromCohesion(int pID);
-    b2Vec2 steeringFromAvoidance(int pID);
     b2Vec2 steeringTowards(int pID, b2Vec2 desiredDirection);
             
 public:

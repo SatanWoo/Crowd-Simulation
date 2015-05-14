@@ -10,7 +10,7 @@
 #include <queue>
 
 const double MapController::restDensity = 1.0;
-const double MapController::MapGridSize = 1.5;
+const double MapController::MapGridSize = 32;
 
 static int fourDir[4][2] = {{0, -1}, {1, 0}, {0, 1}, {-1, 0}};
 static int eightDir[8][2] = {{0, -1}, {1, 0}, {0, 1}, {-1, 0}, {1, 1}, {1, -1}, {-1, -1}, {-1, 1}};
@@ -26,6 +26,7 @@ MapController::MapController(int width, int height, int count, double timeStep)
 
 	people = new Person[count];
     srand( (unsigned)time(NULL));
+    
     
 	for (int i = 0; i < count; i++)
 	{
@@ -72,7 +73,6 @@ MapController::MapController(int width, int height, int count, double timeStep)
     }
     
     destinationPoint = b2Vec2(rand() % m_iWidth * MapGridSize, rand() % m_iHeight * MapGridSize);
-    cout << "Des is " << destinationPoint.x << "::" << destinationPoint.y << endl;
 
 	helper = new MathHelper(MapGridSize);
 }
@@ -158,39 +158,6 @@ MapController::~MapController()
 	helper = NULL;
 }
 
-//void MapController::buildDijkstra()
-//{
-//    int desX = destinationPoint.x / MapGridSize;
-//    int desY = destinationPoint.y / MapGridSize;
-//    
-//    deque<b2Vec2> bfs;
-//    bfs.push_back(b2Vec2(desX, desY));
-//    terrain[desX][desY].setDistance(0);
-//    
-//    while (!bfs.empty())
-//    {
-//        b2Vec2 head = bfs.front();
-//        vector<b2Vec2> neighbours = fourAdjacentNeighbours(head);
-//        
-//        int hx = head.x;
-//        int hy = head.y;
-//        
-//        for (int i = 0; i < neighbours.size(); i++)
-//        {
-//            int nx = neighbours[i].x;
-//            int ny = neighbours[i].y;
-//            
-//            if (terrain[nx][ny].getDistance() == -1)
-//            {
-//                terrain[nx][ny].setDistance(terrain[hx][hy].getDistance() + 1);
-//                bfs.push_back(b2Vec2(nx, ny));
-//            }
-//        }
-//        
-//        bfs.pop_front();
-//    }
-//}
-
 b2Vec2 MapController::steeringFromFlowFleid(int pID, b2Vec2 des)
 {
     Person &pi = people[pID];
@@ -200,10 +167,10 @@ b2Vec2 MapController::steeringFromFlowFleid(int pID, b2Vec2 des)
     int fx = floor.x / MapGridSize;
     int fy = floor.y / MapGridSize;
     
-    b2Vec2 f00 = isAccessible(fx, fy) ? flow[fx][fy] : b2Vec2_zero;
-    b2Vec2 f01 = isAccessible(fx, fy + 1) ? flow[fx][fy + 1] : b2Vec2_zero;
-    b2Vec2 f10 = isAccessible(fx + 1, fy) ? flow[fx + 1][fy] : b2Vec2_zero;
-    b2Vec2 f11 = isAccessible(fx + 1, fy + 1) ? flow[fx + 1][fy + 1] : b2Vec2_zero;
+    b2Vec2 f00 = isInMap(fx, fy) ? flow[fx][fy] : b2Vec2_zero;
+    b2Vec2 f01 = isInMap(fx, fy + 1) ? flow[fx][fy + 1] : b2Vec2_zero;
+    b2Vec2 f10 = isInMap(fx + 1, fy) ? flow[fx + 1][fy] : b2Vec2_zero;
+    b2Vec2 f11 = isInMap(fx + 1, fy + 1) ? flow[fx + 1][fy + 1] : b2Vec2_zero;
     
     double xWeight = pi.getPosition().x - floor.x;
     b2Vec2 top = f00 * (1 - xWeight) + f10 * xWeight;
@@ -309,11 +276,6 @@ b2Vec2 MapController::steeringFromCohesion(int pID)
     return steeringFromSeek(pID, centerOfMass);
 }
 
-b2Vec2 MapController::steeringFromAvoidance(int pID)
-{
-    return b2Vec2_zero;
-}
-
 b2Vec2 MapController::steeringTowards(int pID, b2Vec2 desiredDirection)
 {
     Person &pi = people[pID];
@@ -360,142 +322,10 @@ void MapController::update()
     world->ClearForces();
 }
 
-///////////
-//void MapController::movePerson(b2Vec2 old, b2Vec2 cur, int pID)
-//{
-//	int oldX = old.x / MapGridSize;
-//	int oldY = old.y / MapGridSize;
-//    if (isInMap(oldX, oldY))
-//        terrain[oldX][oldY].removePerson(pID);
-//
-//	int curX = cur.x / MapGridSize;
-//	int curY = cur.y / MapGridSize;
-//    if (isInMap(curX, curY))
-//        terrain[curX][curY].addPerson(pID);
-//}
-//
-//std::vector<int> MapController::findNeighbours(int pID)
-//{
-//	static int direction[9][2] = 
-//	{
-//		{-1,1}, {-1, 0}, {-1, -1}, 
-//		{0, 1}, {0, 0}, {0, -1}, 
-//		{1, 1}, {1, 0}, {1, -1}
-//	};
-//    
-//	Person &p = people[pID];
-//	int cellX = p.getTmpPos().x / MapGridSize;
-//	int cellY = p.getTmpPos().y / MapGridSize;
-//
-//	std::vector<int> result;
-//	for (int i = 0; i < 9; i++)
-//	{
-//		int curX = cellX + direction[i][0];
-//        int curY = cellY + direction[i][1];
-//        
-//        if (!isInMap(curX, curY)) continue;
-//        
-//		Terrain &curUnit = terrain[curX][curY];
-//
-//		std::vector<int> temp = curUnit.filterPeople(&MapController::filterNeightbours, pID);
-//        result.insert(result.end(), temp.begin(), temp.end());
-//	}
-//
-//	return result;
-//}
-
-//bool MapController::filterNeightbours(int neighborID, int pID)
-//{
-//	Person &n = people[neighborID];
-//	Person &p = people[pID];
-//	double distance = (p.getTmpPos() - n.getTmpPos()).Length();
-//    
-//	return distance < MapGridSize * MapGridSize;
-//}
-//
-//double MapController::density(int neighbourID, int pID)
-//{
-//	Person &pj = people[neighbourID];
-//	Person &pi = people[pID];
-//
-//	return pj.getMass() * helper->poly6(pi.getTmpPos() - pj.getTmpPos());
-//}
-//
-//Vector2D MapController::lamda(int neighbourID, int pID)
-//{
-//	Person &pj = people[neighbourID];
-//	Person &pi = people[pID];
-//
-//	return helper->spikyGrad(pi.getTmpPos() - pj.getTmpPos());
-//}
-//
-//Vector2D MapController::deltaP(int neighbourID, int pID)
-//{
-//	Person &pj = people[neighbourID];
-//	Person &pi = people[pID];
-//    double factor = (pi.getLambda() + pj.getLambda());
-//    Vector2D temp = helper->spikyGrad(pi.getTmpPos() - pj.getTmpPos());
-//	Vector2D result =  temp * factor;
-//
-//	return result;
-//}
-//
-//void MapController::collision(int pID)
-//{
-//    static double BEDDING = 0.5 * MapGridSize;
-//    static double REBOUND = -0.5;
-//    
-//    Person &pi = people[pID];
-//
-//    if (pi.getTmpPos().getX() < 0.0 + BEDDING)
-//    {
-//        pi.setTmpPos(Vector2D(BEDDING, pi.getTmpPos().getY()));
-//        if (pi.getVelocity().getX() < 0.0)
-//        {
-//            pi.setVelocity(Vector2D(pi.getVelocity().getX() * REBOUND, pi.getVelocity().getY()));
-//        }
-//    }
-//
-//    if (pi.getTmpPos().getY() < 0.0 + BEDDING)
-//    {
-//        pi.setTmpPos(Vector2D(pi.getTmpPos().getX(), BEDDING));
-//        if (pi.getVelocity().getY() < 0.0)
-//        {
-//            pi.setVelocity(Vector2D(pi.getVelocity().getX(), pi.getVelocity().getY() * REBOUND));
-//        }
-//    }
-//
-//    if (pi.getTmpPos().getX() > m_iWidth - BEDDING)
-//    {
-//        pi.setTmpPos(Vector2D(m_iWidth  - BEDDING, pi.getTmpPos().getY()));
-//        if (pi.getVelocity().getX() > 0.0)
-//        {
-//            pi.setVelocity(Vector2D(pi.getVelocity().getX() * REBOUND, pi.getVelocity().getY()));
-//        }
-//    }
-//
-//    if (pi.getTmpPos().getY() > m_iHeight  - BEDDING)
-//    {
-//        pi.setTmpPos(Vector2D(pi.getTmpPos().getX(), m_iHeight - BEDDING));
-//        if (pi.getVelocity().getY() > 0.0)
-//        {
-//            pi.setVelocity(Vector2D(pi.getVelocity().getX(), pi.getVelocity().getY() * REBOUND));
-//        }
-//    }
-//}
-
 bool MapController::isInMap(int x, int y)
 {
     if (x < 0 || x >= m_iWidth) return false;
     if (y < 0 || y >= m_iHeight) return false;
-    return true;
-}
-
-bool MapController::isAccessible(int x, int y)
-{
-    if (!isInMap(x, y)) return false;
-    if (terrain[x][y].getDistance() == INT_MAX) return false;
-    
     return true;
 }
 

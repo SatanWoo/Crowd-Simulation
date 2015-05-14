@@ -71,7 +71,7 @@ int main(int argc, const char * argv[])
     glEnable(GL_POINT_SMOOTH);
     //glEnable(GL_BLEND);
     
-    mapController = new MapController(MapWidth, MapHeight, 200);
+    mapController = new MapController(MapWidth, MapHeight, MapHeight * 2);
 
     glutMainLoop();
 
