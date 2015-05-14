@@ -49,6 +49,7 @@
 		1987ED5C1AF136C9007BACE5 /* b2RevoluteJoint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1987ED371AF136C9007BACE5 /* b2RevoluteJoint.cpp */; };
 		1987ED5D1AF136C9007BACE5 /* b2WeldJoint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1987ED391AF136C9007BACE5 /* b2WeldJoint.cpp */; };
 		19FF13FB1B047AC8008B91F2 /* GlobalConfig.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 19FF13F91B047AC8008B91F2 /* GlobalConfig.cpp */; };
+		19FF13FD1B049C5E008B91F2 /* Agent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 19FF13FC1B049C5E008B91F2 /* Agent.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -153,6 +154,7 @@
 		19FF13F81B0466C0008B91F2 /* Agent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Agent.h; sourceTree = "<group>"; };
 		19FF13F91B047AC8008B91F2 /* GlobalConfig.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GlobalConfig.cpp; sourceTree = "<group>"; };
 		19FF13FA1B047AC8008B91F2 /* GlobalConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GlobalConfig.h; sourceTree = "<group>"; };
+		19FF13FC1B049C5E008B91F2 /* Agent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Agent.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -354,6 +356,7 @@
 			children = (
 				1970B60C1AFB89F60026A84C /* CostNode.h */,
 				19FF13F81B0466C0008B91F2 /* Agent.h */,
+				19FF13FC1B049C5E008B91F2 /* Agent.cpp */,
 				19FF13F91B047AC8008B91F2 /* GlobalConfig.cpp */,
 				19FF13FA1B047AC8008B91F2 /* GlobalConfig.h */,
 			);
@@ -419,6 +422,7 @@
 				19FF13FB1B047AC8008B91F2 /* GlobalConfig.cpp in Sources */,
 				1987ED411AF136C9007BACE5 /* b2TimeOfImpact.cpp in Sources */,
 				1987ED501AF136C9007BACE5 /* b2ContactSolver.cpp in Sources */,
+				19FF13FD1B049C5E008B91F2 /* Agent.cpp in Sources */,
 				1987ED581AF136C9007BACE5 /* b2LineJoint.cpp in Sources */,
 				1987ED3E1AF136C9007BACE5 /* b2Collision.cpp in Sources */,
 				1987ED3B1AF136C9007BACE5 /* b2BroadPhase.cpp in Sources */,

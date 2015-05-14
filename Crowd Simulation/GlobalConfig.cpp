@@ -8,7 +8,7 @@
 
 #include "GlobalConfig.h"
 
-const double ScreenWidth = 800;
-const double ScreenHeight = 448;
-const double MapWidth = 25;
-const double MapHeight = 14;
+//const double ScreenWidth = 800;
+//const double ScreenHeight = 448;
+//const double MapWidth = 25;
+//const double MapHeight = 14;

@@ -11,9 +11,9 @@
 
 #include <stdio.h>
 
-extern const double ScreenWidth;
-extern const double ScreenHeight;
-extern const double MapWidth;
-extern const double MapHeight;
+//extern const double ScreenWidth;
+//extern const double ScreenHeight;
+//extern const double MapWidth;
+//extern const double MapHeight;
 
 #endif /* defined(__Crowd_Simulation__GlobalConfig__) */
