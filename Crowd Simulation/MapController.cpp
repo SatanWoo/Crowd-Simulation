@@ -1,13 +1,14 @@
 #include "MapController.h"
-#include "Terrain.h"
-#include "TerrainFactory.h"
 #include "MathLib.h"
+#include "Agent.h"
 #include "B2Vec2DHelper.h"
 
 #include <GLUT/GLUT.h>
 #include <math.h>
 #include <deque>
 #include <queue>
+
+using namespace std;
 
 const double MapController::restDensity = 1.0;
 const double MapController::MapGridSize = 32;
@@ -19,29 +20,30 @@ MapController::MapController(int width, int height, int count, double timeStep)
 {
 	m_iWidth = width;
 	m_iHeight = height;
-	m_iCount = count;
 	m_dTimeStep = timeStep;
     
     world = new b2World(b2Vec2_zero, true);
 
-	people = new Person[count];
-    srand( (unsigned)time(NULL));
+    srand((unsigned)time(NULL));
     
+    for (int yPos = 1; yPos < m_iHeight - 1; yPos++) {
+        Agent p1(b2Vec2(0, yPos), 0);
+        Agent p2(b2Vec2(1, yPos), 0);
+        Agent p3(b2Vec2(2, yPos), 0);
+        
+        agents.push_back(p1);
+        agents.push_back(p2);
+        agents.push_back(p3);
+    }
     
-	for (int i = 0; i < count; i++)
-	{
-        b2Vec2 pos = b2Vec2(MapGridSize, rand()% m_iHeight * MapGridSize);
-        people[i].setMap(this);
-        people[i].init(i, 0, pos);
-        people[i].initBodyDef();
-	}
-    
-    for (int i = count / 2; i < count; i++)
-    {
-        b2Vec2 pos = b2Vec2((m_iWidth - 1) * MapGridSize, rand()% m_iHeight * MapGridSize);
-        people[i].setMap(this);
-        people[i].init(i, 1, pos);
-        people[i].initBodyDef();
+    for (int yPos = 1; yPos < m_iHeight - 1; yPos++) {
+        Agent p1(b2Vec2(m_iWidth - 1, yPos), 1);
+        Agent p2(b2Vec2(m_iWidth - 2, yPos), 1);
+        Agent p3(b2Vec2(m_iWidth - 3, yPos), 1);
+        
+        agents.push_back(p1);
+        agents.push_back(p2);
+        agents.push_back(p3);
     }
     
     flow = initializeVecField();
@@ -52,29 +54,15 @@ MapController::MapController(int width, int height, int count, double timeStep)
     potentialField = initializeFloatField();
     discomfortField = initializeFloatField();
     
-	terrain = new Terrain *[width];
     visited = new bool*[width];
     costField = new FourGrid*[width];
     speedField = new FourGrid*[width];
 	for (int i = 0; i < width; i++)
     {
-		terrain[i] = new Terrain [height];
         visited[i] = new bool [height];
         costField[i] = new FourGrid[height];
         speedField[i] = new FourGrid[height];
 	}
-    
-    for (int i = 0; i < width; i++)
-    {
-        for (int j = 0; j < height; j++)
-        {
-            terrain[i][j].setMap(this);
-        }
-    }
-    
-    destinationPoint = b2Vec2(rand() % m_iWidth * MapGridSize, rand() % m_iHeight * MapGridSize);
-
-	helper = new MathHelper(MapGridSize);
 }
 
 b2Vec2** MapController::initializeVecField()
@@ -128,20 +116,15 @@ MapController::~MapController()
     
 	for (int i = 0; i < m_iWidth; i++)
 	{
-		delete [] terrain[i];
         delete [] visited[i];
         delete [] costField[i];
         delete [] speedField[i];
         
-		terrain[i] = NULL;
         visited[i] = NULL;
         costField[i] = NULL;
         speedField[i] = NULL;
 	}
 
-	delete [] terrain;
-	terrain = NULL;
-    
     delete [] visited;
     visited = NULL;
     
@@ -150,179 +133,29 @@ MapController::~MapController()
     
     delete [] speedField;
     speedField = NULL;
-    
-	delete [] people;
-	people = NULL;
 
-	delete helper;
-	helper = NULL;
 }
 
-b2Vec2 MapController::steeringFromFlowFleid(int pID, b2Vec2 des)
-{
-    Person &pi = people[pID];
-    
-    b2Vec2 floor = B2Vec2DHelper::floorV(pi.getPosition());
-    
-    int fx = floor.x / MapGridSize;
-    int fy = floor.y / MapGridSize;
-    
-    b2Vec2 f00 = isInMap(fx, fy) ? flow[fx][fy] : b2Vec2_zero;
-    b2Vec2 f01 = isInMap(fx, fy + 1) ? flow[fx][fy + 1] : b2Vec2_zero;
-    b2Vec2 f10 = isInMap(fx + 1, fy) ? flow[fx + 1][fy] : b2Vec2_zero;
-    b2Vec2 f11 = isInMap(fx + 1, fy + 1) ? flow[fx + 1][fy + 1] : b2Vec2_zero;
-    
-    double xWeight = pi.getPosition().x - floor.x;
-    b2Vec2 top = f00 * (1 - xWeight) + f10 * xWeight;
-    b2Vec2 bottom = f01 * (1 - xWeight) + f11 * xWeight;
-    
-    double yWeight = pi.getPosition().y - floor.y;
-    b2Vec2 direction = top * (1 - yWeight) + (bottom * yWeight);
-    direction.Normalize();
-    
-    if (isnan(direction.LengthSquared())) {
-        direction.SetZero();
-        return direction;
-    }
-    
-    return steeringTowards(pID, direction);
-}
 
-b2Vec2 MapController::steeringFromSeek(int pID, b2Vec2 des)
-{
-    Person &pi = people[pID];
-    if (des.x == pi.getPosition().x && des.y == pi.getPosition().y) return b2Vec2_zero;
-    
-    b2Vec2 distance = des - pi.getPosition();
-    b2Vec2 desiredSpeed = distance * (pi.getMaxSpeed() / distance.Length());
-    b2Vec2 velocityChange = desiredSpeed - pi.getLinearVelocity();
-    
-    return velocityChange * (pi.getMaxForce() / pi.getMaxSpeed());
-}
-
-b2Vec2 MapController::steeringFromSeparation(int pID)
-{
-    Person &pi = people[pID];
-    
-    int neighCount = 0;
-    b2Vec2 totalForce = b2Vec2_zero;
-    
-    for (int i = 0; i < m_iCount; i++) {
-        if (i == pID) continue;
-        
-        Person &pn = people[i];
-        double distance = B2Vec2DHelper::distanceTo(pi.getPosition(), pn.getPosition());
-        if (distance > 0 && distance < pi.getMinSeparation())
-        {
-            neighCount += 1;
-            b2Vec2 pushForce = pi.getPosition() - pn.getPosition();
-            float32 length = pushForce.Normalize();
-            float32 r = pi.getRadius() + pn.getRadius();
-            totalForce += pushForce * (1 -  ((length - r) / (pi.getMinSeparation() - r)));
-        }
-    }
-    
-    if (neighCount == 0) return totalForce;
-    
-    return totalForce * (pi.getMaxForce() / neighCount);
-}
-
-b2Vec2 MapController::steeringFromAlignment(int pID)
-{
-    Person &pi = people[pID];
-    int neighCount = 0;
-    b2Vec2 avergaeHeading = b2Vec2_zero;
-    
-    for (int i = 0; i < m_iCount; i++) {
-        Person &pn = people[i];
-        double distance = B2Vec2DHelper::distanceTo(pi.getPosition(), pn.getPosition());
-        if (distance < pi.getMaxCohesion() && pn.getLinearVelocity().Length() > 0 && pi.getGroupID() == pn.getGroupID())
-        {
-            neighCount += 1;
-            b2Vec2 head(pn.getLinearVelocity());
-            head.Normalize();
-            
-            avergaeHeading += head;
-        }
-    }
-    
-    if (neighCount == 0) return avergaeHeading;
-
-    return steeringTowards(pID, avergaeHeading);
-}
-
-b2Vec2 MapController::steeringFromCohesion(int pID)
-{
-    Person &pi = people[pID];
-    b2Vec2 centerOfMass = b2Vec2_zero;
-    int neighCount = 0;
-    
-    for (int i = 0; i < m_iCount; i++) {
-        if (i == pID) continue;
-        
-        Person &pn = people[i];
-        if (pn.getGroupID() != pi.getGroupID()) continue;
-        
-        double distance = B2Vec2DHelper::distanceTo(pi.getPosition(), pn.getPosition());
-        if (distance < pi.getMaxCohesion())
-        {
-            centerOfMass += pn.getPosition();
-            neighCount++;
-        }
-    }
-    
-    if (neighCount == 0) return b2Vec2_zero;
-    centerOfMass *=  1 / neighCount;
-    return steeringFromSeek(pID, centerOfMass);
-}
-
-b2Vec2 MapController::steeringTowards(int pID, b2Vec2 desiredDirection)
-{
-    Person &pi = people[pID];
-    b2Vec2 desiredVelocity = desiredDirection * pi.getMaxSpeed();
-    b2Vec2 velocityChange = desiredVelocity - pi.getLinearVelocity();
-    
-    return velocityChange * (pi.getMaxForce() / pi.getMaxSpeed());
-}
-
-b2Vec2 MapController::flock(int pID)
-{
-    Person &pi = people[pID];
-    b2Vec2 flowForce = pi.flowForce;
-    b2Vec2 separationForce = steeringFromSeparation(pID);
-    b2Vec2 alignForce = steeringFromAlignment(pID);
-    b2Vec2 cohesionForce = steeringFromCohesion(pID);
-    
-    b2Vec2 appliedForce = flowForce  + separationForce * 0.3 + alignForce * 0.03 + cohesionForce * 0.05;
-    
-    float32 l = appliedForce.Length();
-    if (l > pi.getMaxForce())
-    {
-        appliedForce = appliedForce * (pi.getMaxForce() / l);
-    }
-    
-    return appliedForce;
-}
+//b2Vec2 MapController::steeringTowards(int pID, b2Vec2 desiredDirection)
+//{
+//    Person &pi = people[pID];
+//    b2Vec2 desiredVelocity = desiredDirection * pi.getMaxSpeed();
+//    b2Vec2 velocityChange = desiredVelocity - pi.getLinearVelocity();
+//    
+//    return velocityChange * (pi.getMaxForce() / pi.getMaxSpeed());
+//}
 
 void MapController::update()
 {
     updateContinuumCrowdData();
-//    
-    for (int i = 0; i < m_iCount; i++) {
-        Person &pi = people[i];
-        pi.flock(&MapController::flock);
-    }
-//
-    for (int i = 0; i < m_iCount; i++) {
-        Person &pi = people[i];
-        pi.steer();
-    }
+
     
     world->Step(m_dTimeStep, 10, 10);
     world->ClearForces();
 }
 
-bool MapController::isInMap(int x, int y)
+bool MapController::isValid(int x, int y)
 {
     if (x < 0 || x >= m_iWidth) return false;
     if (y < 0 || y >= m_iHeight) return false;
@@ -334,7 +167,7 @@ void MapController::render()
     glPointSize(10);
     glBegin(GL_POINTS);
     glColor4f(0.0, 1.0, 0.0, 1.0);
-    glVertex2d(destinationPoint.x, destinationPoint.y);
+    //glVertex2d(destinationPoint.x, destinationPoint.y);
     glEnd();
     
     glLineWidth(1);
@@ -351,44 +184,26 @@ void MapController::render()
                 int kx = i + fourDir[k][0];
                 int ky = j + fourDir[k][1];
                 
-                if (isInMap(kx, ky)) {
+                if (isValid(kx, ky)) {
                     glVertex2d(xPos, yPos);
                     glVertex2d(kx * MapGridSize, ky * MapGridSize);
                 }
             }
         }
     }
-    
     glEnd();
-    glBegin(GL_QUADS);
-    glColor3f(1.0f, 0.0f, 0.0f);
-    for (int i = 0; i < m_iWidth; i++) {
-        for (int j = 0; j < m_iHeight; j++) {
-            double xPos = i * MapGridSize;
-            double yPos = j * MapGridSize;
-            
-            if (terrain[i][j].obstacleCoefficient() == INT_MAX)
-            {
-                glVertex2d(xPos, yPos);
-                glVertex2d(xPos + MapGridSize, yPos);
-                glVertex2d(xPos + MapGridSize, yPos + MapGridSize);
-                glVertex2d(xPos, yPos + MapGridSize);
-            }
-        }
-    }
-    glEnd();
-    
+   
     glPointSize(5);
     glBegin(GL_POINTS);
-    for (int i = 0; i < m_iCount; i++) {
+    for (int i = 0; i < agents.size(); i++) {
         
-        Person &p = people[i];
-        if (p.getGroupID() == 0) {
+        Agent &agent = agents[i];
+        if (agent.group == 0) {
             glColor3f(1.0f, 0.0f, 1.0f);
         } else {
             glColor3f(1.0f, 1.0f, 1.0f);
         }
-        p.render();
+        //p.render();
     }
     glEnd();
 }
@@ -401,13 +216,13 @@ void MapController::updateContinuumCrowdData()
     ccCalculateUnitCostField();
 //
     ccClearPotentialField();
-    ccPotentialFieldEikonalFill(destinationPoint);
+    //ccPotentialFieldEikonalFill(destinationPoint);
     ccGenerateFlowField(); //TODO: This does not use the way of calculating described in the paper (I think)
 //    
-    for (int i = m_iCount - 1; i >= 0; i--) {
-        Person &pi = people[i];
-        pi.flowForce = steeringFromFlowFleid(i, destinationPoint);;
-    }
+//    for (int i = m_iCount - 1; i >= 0; i--) {
+//        Person &pi = people[i];
+//        pi.flowForce = steeringFromFlowFleid(i, destinationPoint);;
+//    }
 }
 
 void MapController::ccClearBuffers()
@@ -427,28 +242,28 @@ void MapController::ccCalculateDensityAndAverageSpeed()
 {
     float32 perAgentDensity = 1.0;
     
-    for (int i = 0; i < m_iCount; i++)
+    for (int i = 0; i < agents.size(); i++)
     {
-        Person &pi = people[i];
+        Agent &pi = agents[i];
         
         b2Vec2 floor = B2Vec2DHelper::floorV(pi.getPosition());
         float32 xWeight = pi.getPosition().x - floor.x;
         float32 yWeight = pi.getPosition().y - floor.y;
         
         //top left
-        if (isInMap(floor.x, floor.y)) {
+        if (isValid(floor.x, floor.y)) {
             ccAddDensity(floor.x, floor.y, pi.getVelocity(), perAgentDensity * (1 - xWeight) * (1 - yWeight));
         }
         //top right
-        if (isInMap(floor.x + 1, floor.y)) {
+        if (isValid(floor.x + 1, floor.y)) {
             ccAddDensity(floor.x + 1, floor.y, pi.getVelocity(), perAgentDensity * (xWeight) * (1 - yWeight));
         }
         //bottom left
-        if (isInMap(floor.x, floor.y + 1)) {
+        if (isValid(floor.x, floor.y + 1)) {
             ccAddDensity(floor.x, floor.y + 1, pi.getVelocity(), perAgentDensity * (1 - xWeight) * (yWeight));
         }
         //bottom right
-        if (isInMap(floor.x + 1, floor.y + 1)) {
+        if (isValid(floor.x + 1, floor.y + 1)) {
             ccAddDensity(floor.x + 1, floor.y + 1, pi.getVelocity(), perAgentDensity * (xWeight) * (yWeight));
         }
     }
@@ -493,7 +308,7 @@ void MapController::ccCalculateUnitCostField()
                 int targetX = i + fourDir[dir][0];
                 int targetY = j + fourDir[dir][1];
                 
-                if (!isInMap(targetX, targetY)) {
+                if (!isValid(targetX, targetY)) {
                     speedField[i][j].value[dir] = INT_MAX;
                     continue;
                 }
@@ -557,7 +372,7 @@ void MapController::ccGenerateFlowField()
             int minDist = INT_MAX;
             
             for (int d = 0; d < 8; d++) {
-                if (isInMap(i + eightDir[d][0], j + eightDir[d][1])) {
+                if (isValid(i + eightDir[d][0], j + eightDir[d][1])) {
                     float32 dist = potentialField[i + eightDir[d][0]][j + eightDir[d][1]];
                     
                     if (dist < minDist) {
@@ -616,7 +431,7 @@ void MapController::ccPotentialFieldEikonalFill(b2Vec2 des)
             for (int i = 0; i < 4; i++) {
                 int toX = x + fourDir[i][0];
                 int toY = y + fourDir[i][1];
-                if (isInMap(toX, toY)) {
+                if (isValid(toX, toY)) {
                     //Cost to go from our target cell to the start
                     //Our cost + cost of moving from the target to us
                     float32 toCost = at.cost + costField[toX][toY].value[(i + 2) % 4];

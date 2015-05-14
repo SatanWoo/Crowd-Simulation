@@ -42,14 +42,14 @@ void glIdle()
 
 void glMouse(int button, int state, int x, int y)
 {
-    switch (button)
-    {
-        case GLUT_LEFT_BUTTON:
-            double xPos = (double)x * MapWidth / ScreenWidth * MapController::MapGridSize;
-            double yPos = (MapHeight - (double)y * MapHeight / ScreenHeight) * MapController::MapGridSize;
-            mapController->setDestionationPoint(b2Vec2(xPos, yPos));
-            break;
-    }
+//    switch (button)
+//    {
+//        case GLUT_LEFT_BUTTON:
+//            double xPos = (double)x * MapWidth / ScreenWidth * MapController::MapGridSize;
+//            double yPos = (MapHeight - (double)y * MapHeight / ScreenHeight) * MapController::MapGridSize;
+//            mapController->setDestionationPoint(b2Vec2(xPos, yPos));
+//            break;
+//    }
 }
 
 int main(int argc, const char * argv[])

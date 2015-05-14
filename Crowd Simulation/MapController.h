@@ -1,8 +1,7 @@
 #ifndef _WZTERRAINMAP_H
 #define _WZTERRAINMAP_H
 
-#include "MathHelper.h"
-#include "Person.h"
+#include "Agent.h"
 #include <iostream>
 #include <vector>
 #include "Box2D.h"
@@ -12,8 +11,10 @@ class Terrain;
 class MapController
 {
 private:
-	Terrain **terrain;
-	Person *people;
+    
+    std::vector<Agent> agents;
+    std::vector<b2Vec2> destinationPoints;
+    
     b2Vec2 **flow;
     b2Vec2 **avgVelocityField;
     
@@ -24,21 +25,17 @@ private:
     FourGrid **costField;
     
     bool **visited;
-    
-    MathHelper *helper;
-    
+        
     b2World *world;
 
 	int m_iWidth;
 	int m_iHeight;
-	int m_iCount;
     
-    b2Vec2 destinationPoint;
-
+    
 	double m_dTimeStep;
     
 protected:
-    bool isInMap(int x, int y);
+    bool isValid(int x, int y);
     
     b2Vec2** initializeVecField();
     float32** initializeFloatField();
@@ -57,13 +54,13 @@ protected:
     
     void ccPotentialFieldEikonalFill(b2Vec2 des);
     
-    b2Vec2 steeringFromFlowFleid(int pID, b2Vec2 des);
-    b2Vec2 steeringFromSeek(int pID, b2Vec2 des);
-    b2Vec2 steeringFromSeparation(int pID);
-    b2Vec2 steeringFromAlignment(int pID);
-    b2Vec2 steeringFromCohesion(int pID);
-    b2Vec2 steeringTowards(int pID, b2Vec2 desiredDirection);
-            
+    b2Vec2 steeringBehaviourFlowField(Agent &agent);
+    b2Vec2 steeringBehaviourSeek(Agent &agent);
+    b2Vec2 steeringBehaviourSeparation(Agent &agent);
+    b2Vec2 steeringBehaviourAlignment(Agent &agent);
+    b2Vec2 steeringBehaviourCohesion(Agent &agent);
+    b2Vec2 steerTowards(Agent &agent);
+    
 public:
 	MapController(int width, int height, int count, double timeStep = 0.02);
 	~MapController();
@@ -72,21 +69,9 @@ public:
     
 	void render();
 	void update();
-    void setDestionationPoint(b2Vec2 point){destinationPoint = point;}
+    
 	double getTimeStep()const{return m_dTimeStep;}
-
-   
     b2Vec2 flock(int pID);
-  
-//	std::vector<int> findNeighbours(int pID);
-//
-//	double density(int neighbourID, int pID);
-//	b2Vec2 lamda(int neighbourID, int pID);
-//	b2Vec2 deltaP(int neighbourID, int pID);
-//    void collision(int pID);
-//    
-//	bool filterNeightbours(int neighborID, int pID);
-//	void movePerson(b2Vec2 old, b2Vec2 cur, int pID);
 
 	static const double MapGridSize;
 	static const double restDensity;

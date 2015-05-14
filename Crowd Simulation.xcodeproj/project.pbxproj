@@ -7,14 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		191B3B1B1ADD84A10035D157 /* Obstacle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 191B3B1A1ADD84A10035D157 /* Obstacle.cpp */; };
 		1955D0E91AC44362001318C6 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1955D0E81AC44362001318C6 /* main.cpp */; };
 		1955D0F01AC44379001318C6 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1955D0EF1AC44379001318C6 /* GLUT.framework */; };
 		1955D0F41AC443D4001318C6 /* Vector.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1955D0F21AC443D4001318C6 /* Vector.cpp */; };
-		1955D0F71AC443E7001318C6 /* MathHelper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1955D0F51AC443E7001318C6 /* MathHelper.cpp */; };
 		1955D0FE1AC445BC001318C6 /* MapController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1955D0F81AC445BC001318C6 /* MapController.cpp */; };
 		1955D0FF1AC445BC001318C6 /* Person.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1955D0FA1AC445BC001318C6 /* Person.cpp */; };
-		1955D1001AC445BC001318C6 /* Terrain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1955D0FC1AC445BC001318C6 /* Terrain.cpp */; };
 		1955D1031AC46E4C001318C6 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1955D1021AC46E4C001318C6 /* OpenGL.framework */; };
 		1987ED3B1AF136C9007BACE5 /* b2BroadPhase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1987ECF01AF136C9007BACE5 /* b2BroadPhase.cpp */; };
 		1987ED3C1AF136C9007BACE5 /* b2CollideCircle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1987ECF21AF136C9007BACE5 /* b2CollideCircle.cpp */; };
@@ -51,7 +48,7 @@
 		1987ED5B1AF136C9007BACE5 /* b2PulleyJoint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1987ED351AF136C9007BACE5 /* b2PulleyJoint.cpp */; };
 		1987ED5C1AF136C9007BACE5 /* b2RevoluteJoint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1987ED371AF136C9007BACE5 /* b2RevoluteJoint.cpp */; };
 		1987ED5D1AF136C9007BACE5 /* b2WeldJoint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1987ED391AF136C9007BACE5 /* b2WeldJoint.cpp */; };
-		19A802F31AD2888E00CC6FBC /* Path.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 19A802F21AD2888E00CC6FBC /* Path.cpp */; };
+		19FF13FB1B047AC8008B91F2 /* GlobalConfig.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 19FF13F91B047AC8008B91F2 /* GlobalConfig.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -67,22 +64,15 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		191B3B191ADD824E0035D157 /* Obstacle.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Obstacle.h; sourceTree = "<group>"; };
-		191B3B1A1ADD84A10035D157 /* Obstacle.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Obstacle.cpp; sourceTree = "<group>"; };
-		191B3B1C1ADD86D40035D157 /* TerrainFactory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TerrainFactory.h; sourceTree = "<group>"; };
 		1955D0E51AC44362001318C6 /* Crowd Simulation */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "Crowd Simulation"; sourceTree = BUILT_PRODUCTS_DIR; };
 		1955D0E81AC44362001318C6 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		1955D0EF1AC44379001318C6 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = System/Library/Frameworks/GLUT.framework; sourceTree = SDKROOT; };
 		1955D0F21AC443D4001318C6 /* Vector.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Vector.cpp; sourceTree = "<group>"; };
 		1955D0F31AC443D4001318C6 /* Vector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Vector.h; sourceTree = "<group>"; };
-		1955D0F51AC443E7001318C6 /* MathHelper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MathHelper.cpp; sourceTree = "<group>"; };
-		1955D0F61AC443E7001318C6 /* MathHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MathHelper.h; sourceTree = "<group>"; };
 		1955D0F81AC445BC001318C6 /* MapController.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MapController.cpp; sourceTree = "<group>"; };
 		1955D0F91AC445BC001318C6 /* MapController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MapController.h; sourceTree = "<group>"; };
 		1955D0FA1AC445BC001318C6 /* Person.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Person.cpp; sourceTree = "<group>"; };
 		1955D0FB1AC445BC001318C6 /* Person.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Person.h; sourceTree = "<group>"; };
-		1955D0FC1AC445BC001318C6 /* Terrain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Terrain.cpp; sourceTree = "<group>"; };
-		1955D0FD1AC445BC001318C6 /* Terrain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Terrain.h; sourceTree = "<group>"; };
 		1955D1021AC46E4C001318C6 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 		196734C31AEFEEA200765E4F /* MathLib.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MathLib.h; sourceTree = "<group>"; };
 		1970B60C1AFB89F60026A84C /* CostNode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CostNode.h; sourceTree = "<group>"; };
@@ -159,9 +149,10 @@
 		1987ED381AF136C9007BACE5 /* b2RevoluteJoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = b2RevoluteJoint.h; sourceTree = "<group>"; };
 		1987ED391AF136C9007BACE5 /* b2WeldJoint.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = b2WeldJoint.cpp; sourceTree = "<group>"; };
 		1987ED3A1AF136C9007BACE5 /* b2WeldJoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = b2WeldJoint.h; sourceTree = "<group>"; };
-		19A802F11AD2844A00CC6FBC /* Path.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Path.h; sourceTree = "<group>"; };
-		19A802F21AD2888E00CC6FBC /* Path.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Path.cpp; sourceTree = "<group>"; };
 		19AC4BD81AF67B9E009831BA /* B2Vec2DHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = B2Vec2DHelper.h; sourceTree = "<group>"; };
+		19FF13F81B0466C0008B91F2 /* Agent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Agent.h; sourceTree = "<group>"; };
+		19FF13F91B047AC8008B91F2 /* GlobalConfig.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GlobalConfig.cpp; sourceTree = "<group>"; };
+		19FF13FA1B047AC8008B91F2 /* GlobalConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GlobalConfig.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -210,8 +201,6 @@
 		1955D0F11AC443C5001318C6 /* Foundation */ = {
 			isa = PBXGroup;
 			children = (
-				1955D0F51AC443E7001318C6 /* MathHelper.cpp */,
-				1955D0F61AC443E7001318C6 /* MathHelper.h */,
 				1955D0F21AC443D4001318C6 /* Vector.cpp */,
 				1955D0F31AC443D4001318C6 /* Vector.h */,
 				196734C31AEFEEA200765E4F /* MathLib.h */,
@@ -226,11 +215,6 @@
 				1955D0F91AC445BC001318C6 /* MapController.h */,
 				1955D0FA1AC445BC001318C6 /* Person.cpp */,
 				1955D0FB1AC445BC001318C6 /* Person.h */,
-				191B3B1A1ADD84A10035D157 /* Obstacle.cpp */,
-				191B3B191ADD824E0035D157 /* Obstacle.h */,
-				1955D0FC1AC445BC001318C6 /* Terrain.cpp */,
-				1955D0FD1AC445BC001318C6 /* Terrain.h */,
-				191B3B1C1ADD86D40035D157 /* TerrainFactory.h */,
 			);
 			name = App;
 			sourceTree = "<group>";
@@ -368,9 +352,10 @@
 		19A802F41AD29B5400CC6FBC /* Object */ = {
 			isa = PBXGroup;
 			children = (
-				19A802F11AD2844A00CC6FBC /* Path.h */,
-				19A802F21AD2888E00CC6FBC /* Path.cpp */,
 				1970B60C1AFB89F60026A84C /* CostNode.h */,
+				19FF13F81B0466C0008B91F2 /* Agent.h */,
+				19FF13F91B047AC8008B91F2 /* GlobalConfig.cpp */,
+				19FF13FA1B047AC8008B91F2 /* GlobalConfig.h */,
 			);
 			name = Object;
 			sourceTree = "<group>";
@@ -431,6 +416,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				19FF13FB1B047AC8008B91F2 /* GlobalConfig.cpp in Sources */,
 				1987ED411AF136C9007BACE5 /* b2TimeOfImpact.cpp in Sources */,
 				1987ED501AF136C9007BACE5 /* b2ContactSolver.cpp in Sources */,
 				1987ED581AF136C9007BACE5 /* b2LineJoint.cpp in Sources */,
@@ -445,16 +431,13 @@
 				1987ED4B1AF136C9007BACE5 /* b2Island.cpp in Sources */,
 				1987ED4D1AF136C9007BACE5 /* b2WorldCallbacks.cpp in Sources */,
 				1987ED3D1AF136C9007BACE5 /* b2CollidePolygon.cpp in Sources */,
-				1955D0F71AC443E7001318C6 /* MathHelper.cpp in Sources */,
 				1987ED4E1AF136C9007BACE5 /* b2CircleContact.cpp in Sources */,
 				1987ED521AF136C9007BACE5 /* b2PolygonContact.cpp in Sources */,
-				191B3B1B1ADD84A10035D157 /* Obstacle.cpp in Sources */,
 				1987ED451AF136C9007BACE5 /* b2Math.cpp in Sources */,
 				1955D0F41AC443D4001318C6 /* Vector.cpp in Sources */,
 				1987ED441AF136C9007BACE5 /* b2BlockAllocator.cpp in Sources */,
 				1987ED591AF136C9007BACE5 /* b2MouseJoint.cpp in Sources */,
 				1987ED421AF136C9007BACE5 /* b2CircleShape.cpp in Sources */,
-				19A802F31AD2888E00CC6FBC /* Path.cpp in Sources */,
 				1987ED481AF136C9007BACE5 /* b2Body.cpp in Sources */,
 				1987ED5B1AF136C9007BACE5 /* b2PulleyJoint.cpp in Sources */,
 				1987ED531AF136C9007BACE5 /* b2TOISolver.cpp in Sources */,
@@ -473,7 +456,6 @@
 				1987ED571AF136C9007BACE5 /* b2Joint.cpp in Sources */,
 				1987ED5D1AF136C9007BACE5 /* b2WeldJoint.cpp in Sources */,
 				1987ED431AF136C9007BACE5 /* b2PolygonShape.cpp in Sources */,
-				1955D1001AC445BC001318C6 /* Terrain.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -45,13 +45,7 @@ void Person::initBodyDef()
 
 void Person::initFixtureDef()
 {
-    fixtureDef = new b2FixtureDef();
-    fixtureDef->density = 20.0;
-    fixtureDef->friction = 0.0;
-    fixtureDef->restitution = 0.0;
-    fixtureDef->shape = new b2CircleShape(m_dRadius);
     
-    fixture = body->CreateFixture(fixtureDef);
 }
 
 void Person::init(int pID, int gID, b2Vec2 pos, b2Vec2 vel, double mass)

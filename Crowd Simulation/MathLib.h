@@ -15,9 +15,9 @@ class MathLib
 public:
     static float min4(float a, float b, float c, float d)
     {
-        float minVal = min(a, b);
-        minVal = min(minVal, c);
-        minVal = min(minVal, d);
+        float minVal = std::min(a, b);
+        minVal = std::min(minVal, c);
+        minVal = std::min(minVal, d);
         
         return minVal;
     }
