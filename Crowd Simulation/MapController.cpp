@@ -11,7 +11,7 @@
 using namespace std;
 
 const double MapController::restDensity = 1.0;
-const double MapController::MapGridSize = 32;
+const double MapController::MapGridSize = 2.0;
 
 static int fourDir[4][2] = {{0, -1}, {1, 0}, {0, 1}, {-1, 0}};
 static int eightDir[8][2] = {{0, -1}, {1, 0}, {0, 1}, {-1, 0}, {1, 1}, {1, -1}, {-1, -1}, {-1, 1}};
