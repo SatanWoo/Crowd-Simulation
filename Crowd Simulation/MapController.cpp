@@ -26,7 +26,7 @@ MapController::MapController(int width, int height, int count, double timeStep)
 
     srand((unsigned)time(NULL));
     
-    b2Vec2 v1(m_iHeight - 2, m_iHeight / 2);
+    b2Vec2 v1(m_iWidth - 2, m_iHeight / 2);
     b2Vec2 v2(1, m_iHeight / 2);
     
     destinationPoints.push_back(v1);
@@ -203,11 +203,13 @@ void MapController::update()
     for (int i = size - 1; i >= 0; i--) {
         Agent &agent = agents[i];
         
-        b2Vec2 ff = agent.ff;//steeringBehaviourSeek(agent, destinations[agent.group]);
+        b2Vec2 ff = agent.ff;
+        
+        //cout << "Agent" << i << " " << ff.x << ":" << ff.y << endl;
         b2Vec2 sep = steeringBehaviourSeparation(agent);
         b2Vec2 alg = steeringBehaviourAlignment(agent);
         b2Vec2 coh = steeringBehaviourCohesion(agent);
-    
+        
         agent.force = ff + sep * 1.2 + alg * 0.3 + coh * 0.05;
         
         float32 lengthSquared =  agent.force.LengthSquared();
@@ -451,6 +453,8 @@ void MapController::ccCalculateDensityAndAverageSpeed()
             float32 density = densityField[i][j];
             if (density > 0) {
                 velocity *= (1/density);
+                
+                //cout << avgVelocityField[i][j].x << "||" << avgVelocityField[i][j].y << endl;
             }
         }
     }
@@ -484,7 +488,7 @@ void MapController::ccCalculateUnitCostField()
                 int targetY = j + fourDir[dir][1];
                 
                 if (!isValid(targetX, targetY)) {
-                    speedField[i][j].value[dir] = INT_MAX;
+                    speedField[i][j].value[dir] = FLT_MAX;
                     continue;
                 }
                 
@@ -496,24 +500,32 @@ void MapController::ccCalculateUnitCostField()
                 float32 flowSpeed = fourDir[dir][0] != 0 ? veloX : veloY;
                 
                 float32 density = densityField[targetX][targetY];
+                
+                //cout << "X " << targetX << " Y " << targetY << " " << densityField[targetX][targetY] << endl;
+                
                 float32 discomfort = discomfortField[targetX][targetY];
                 
                 if (density >= densityMax) {
                     speedField[i][j].value[dir] = flowSpeed;
                 } else if (density <= densityMin) {
-                    speedField[i][j].value[dir] = 4;
+                    speedField[i][j].value[dir] = Agent::maxSpeed;
                 } else {
                     //medium speed
-                    speedField[i][j].value[dir] = 4 - (density - densityMin) / (densityMax - densityMin) * (4 - flowSpeed);
+                    speedField[i][j].value[dir] = Agent::maxSpeed - (density - densityMin) / (densityMax - densityMin) * (4 - flowSpeed);
                 }
                 
                 //we're going to divide by speed later, so make sure it's not zero
                 float32 speed = speedField[i][j].value[dir];
                 float32 threshold = 0.001;
-                speedField[i][j].value[dir] = min(threshold, speed);
+                speedField[i][j].value[dir] = max(threshold, speed);
+                
+               
                 
                 //Work out the cost to move in to the destination cell
                 costField[i][j].value[dir] = (speedField[i][j].value[dir] * lengthWeight + timeWeight + discomfortWeight * discomfort) / speedField[i][j].value[dir];
+                
+                
+                //cout << "X:" << i << "Y:" << j << "I:" << dir << " " <<costField[i][j].value[dir] << endl;
             }
         }
     }
@@ -523,7 +535,7 @@ void MapController::ccClearPotentialField()
 {
     for (int i = 0; i < m_iWidth; i++) {
         for (int j = 0; j < m_iHeight; j++) {
-            potentialField[i][j] = INT_MAX;
+            potentialField[i][j] = FLT_MAX;
         }
     }
 }
@@ -540,7 +552,7 @@ void MapController::ccGenerateFlowField()
     {
         for (int j = 0; j < m_iHeight; j++)
         {
-            if (potentialField[i][j] == INT_MAX) continue;
+            if (potentialField[i][j] == FLT_MAX) continue;
             
             bool isMinFound = false;
             b2Vec2 min;
@@ -580,8 +592,7 @@ void MapController::ccPotentialFieldEikonalFill(b2Vec2 des)
     
     CostNode desNode;
     desNode.cost = 0;
-    desNode.point.x = des.x / MapGridSize;
-    desNode.point.y = des.y / MapGridSize;
+    desNode.point = des;
     
     priority_queue<CostNode> pQueue;
     pQueue.push(desNode);
