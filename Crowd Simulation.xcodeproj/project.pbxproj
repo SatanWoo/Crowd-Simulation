@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		19252F591B0B264B0098959E /* libIrrlicht.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 19252F581B0B264B0098959E /* libIrrlicht.a */; };
+		192530131B0B4E560098959E /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 192530121B0B4E560098959E /* IOKit.framework */; };
+		192530151B0B4E610098959E /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 192530141B0B4E610098959E /* Carbon.framework */; };
+		192530171B0B4E740098959E /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 192530161B0B4E740098959E /* Cocoa.framework */; };
 		1955D0E91AC44362001318C6 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1955D0E81AC44362001318C6 /* main.cpp */; };
 		1955D0F01AC44379001318C6 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1955D0EF1AC44379001318C6 /* GLUT.framework */; };
 		1955D0F41AC443D4001318C6 /* Vector.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1955D0F21AC443D4001318C6 /* Vector.cpp */; };
@@ -249,6 +252,9 @@
 		1925300F1B0B48440098959E /* triangle3d.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = triangle3d.h; sourceTree = "<group>"; };
 		192530101B0B48440098959E /* vector2d.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = vector2d.h; sourceTree = "<group>"; };
 		192530111B0B48440098959E /* vector3d.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = vector3d.h; sourceTree = "<group>"; };
+		192530121B0B4E560098959E /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
+		192530141B0B4E610098959E /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = System/Library/Frameworks/Carbon.framework; sourceTree = SDKROOT; };
+		192530161B0B4E740098959E /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		1955D0E51AC44362001318C6 /* Crowd Simulation */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "Crowd Simulation"; sourceTree = BUILT_PRODUCTS_DIR; };
 		1955D0E81AC44362001318C6 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		1955D0EF1AC44379001318C6 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = System/Library/Frameworks/GLUT.framework; sourceTree = SDKROOT; };
@@ -346,6 +352,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				192530171B0B4E740098959E /* Cocoa.framework in Frameworks */,
+				192530151B0B4E610098959E /* Carbon.framework in Frameworks */,
+				192530131B0B4E560098959E /* IOKit.framework in Frameworks */,
 				19252F591B0B264B0098959E /* libIrrlicht.a in Frameworks */,
 				1955D1031AC46E4C001318C6 /* OpenGL.framework in Frameworks */,
 				1955D0F01AC44379001318C6 /* GLUT.framework in Frameworks */,
@@ -547,6 +556,9 @@
 		1955D0DC1AC44362001318C6 = {
 			isa = PBXGroup;
 			children = (
+				192530161B0B4E740098959E /* Cocoa.framework */,
+				192530141B0B4E610098959E /* Carbon.framework */,
+				192530121B0B4E560098959E /* IOKit.framework */,
 				19252F581B0B264B0098959E /* libIrrlicht.a */,
 				19252F5B1B0B48440098959E /* include */,
 				1987ECEB1AF136C9007BACE5 /* Box2D */,
