@@ -7,6 +7,12 @@
 #include "Box2D.h"
 #include "CostNode.h"
 
+#include "irrlicht.h"
+
+using namespace irr;
+using namespace scene;
+using namespace video;
+
 class Terrain;
 class MapController
 {
@@ -32,6 +38,7 @@ private:
 	int m_iWidth;
 	int m_iHeight;
     
+    IrrlichtDevice *device;
     
 	double m_dTimeStep;
     
@@ -69,9 +76,11 @@ public:
     void updateDestinationPoint(b2Vec2 newDest);
 
     b2World* getWorld()const{return world;}
-    
+        
 	void render();
 	void update();
+    
+    void setDevice(IrrlichtDevice *device);
     
 	double getTimeStep()const{return m_dTimeStep;}
     b2Vec2 flock(int pID);

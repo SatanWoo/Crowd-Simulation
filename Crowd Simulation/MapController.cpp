@@ -32,30 +32,24 @@ MapController::MapController(int width, int height, int count, double timeStep)
     destinationPoints.push_back(v1);
     destinationPoints.push_back(v2);
 
-    for (int yPos = 1; yPos < m_iHeight - 1; yPos++) {
-        Agent p1(b2Vec2(0, yPos), 0);
-        Agent p2(b2Vec2(1, yPos), 0);
-        Agent p3(b2Vec2(2, yPos), 0);
-        p1.initBodyDef(world);
-        p2.initBodyDef(world);
-        p3.initBodyDef(world);
-        
-        agents.push_back(p1);
-        agents.push_back(p2);
-        agents.push_back(p3);
+    for (int yPos = 1; yPos < m_iHeight - 1; yPos++)
+    {
+        for (int i = 0; i < 3; i ++)
+        {
+            Agent p(b2Vec2(i, yPos), 0);
+            p.initBodyDef(world);
+            agents.push_back(p);
+        }
     }
     
-    for (int yPos = 1; yPos < m_iHeight - 1; yPos++) {
-        Agent p1(b2Vec2(m_iWidth - 1, yPos), 1);
-        Agent p2(b2Vec2(m_iWidth - 2, yPos), 1);
-        Agent p3(b2Vec2(m_iWidth - 3, yPos), 1);
-        p1.initBodyDef(world);
-        p2.initBodyDef(world);
-        p3.initBodyDef(world);
-        
-        agents.push_back(p1);
-        agents.push_back(p2);
-        agents.push_back(p3);
+    for (int yPos = 1; yPos < m_iHeight - 1; yPos++)
+    {
+        for (int i = 0; i < 3; i++)
+        {
+            Agent p(b2Vec2(m_iWidth - i - 1, yPos), 1);
+            p.initBodyDef(world);
+            agents.push_back(p);
+        }
     }
     
     for (int i = 0; i < m_iHeight; i++) {
@@ -82,7 +76,6 @@ MapController::MapController(int width, int height, int count, double timeStep)
         b2PolygonShape *shape = (b2PolygonShape *)fixDef->shape;
         shape->SetAsBox(0.5, 0.5);
 
-        
         bodyDef->type = b2_staticBody;
         bodyDef->position.Set(pos.x, pos.y);
         
@@ -178,67 +171,22 @@ MapController::~MapController()
     speedField = NULL;
 }
 
-void MapController::render()
+void MapController::setDevice(irr::IrrlichtDevice *device)
 {
-    glPointSize(10);
-    glBegin(GL_POINTS);
-    glColor4f(0.0, 1.0, 0.0, 1.0);
-    glVertex2d(destinationPoints[0].x * MapGridSize + 0.5 * MapGridSize, destinationPoints[0].y * MapGridSize + 0.5 * MapGridSize);
-    glColor4f(0.0, 1.0, 1.0, 1.0);
-    glVertex2d(destinationPoints[1].x * MapGridSize + 0.5 * MapGridSize, destinationPoints[1].y * MapGridSize + 0.5 * MapGridSize);
-    glEnd();
+    device = device;
+    int size = agents.size();
     
-    glLineWidth(1);
-    glBegin(GL_LINES);
-    glColor4f(1.0f, 1.0f, 1.0f, 0.1);
-    for (int i = 0; i < m_iWidth; i++) {
-        for (int j = 0; j < m_iHeight; j++) {
-            double xPos = i * MapGridSize;
-            double yPos = j * MapGridSize;
-            
-            for (int k = 0; k < 4; k++) {
-                int kx = i + fourDir[k][0];
-                int ky = j + fourDir[k][1];
-                
-                if (isValid(kx, ky)) {
-                    glVertex2d(xPos , yPos);
-                    glVertex2d(kx * MapGridSize, ky * MapGridSize);
-                }
-            }
-        }
-    }
-    glEnd();
-    
-    glBegin(GL_QUADS);
-    glColor3f(1.0f, 0.0f, 0.0f);
-    
-    for (int i = 0 ; i < obstacles.size(); i++) {
-        b2Vec2 o = obstacles[i];
+    for (int i = size - 1 ;i >= 0; i--)
+    {
+        Agent &ai = agents[i];
         
-        int x = o.x;
-        int y = o.y;
+        IAnimatedMesh* mesh = device->getSceneManager()->getMesh("/Users/z/Documents/Crowd Simulation/media/sydney.md2");
+        ai.node = device->getSceneManager()->addAnimatedMeshSceneNode( mesh );
         
-        glVertex2d(x * MapGridSize, y * MapGridSize);
-        glVertex2d((x + 1) * MapGridSize, y * MapGridSize);
-        glVertex2d((x + 1) * MapGridSize, (y + 1) * MapGridSize);
-        glVertex2d(x * MapGridSize, (y + 1) * MapGridSize);
+        ai.node->setMaterialFlag(EMF_LIGHTING, false);
+        ai.node->setMD2Animation(scene::EMAT_STAND);
+        ai.node->setMaterialTexture( 0, device->getVideoDriver()->getTexture("/Users/z/Documents/Crowd Simulation/media/sydney.bmp") );
     }
-    glEnd();
-
-    
-    glPointSize(5);
-    glBegin(GL_POINTS);
-    for (int i = 0; i < agents.size(); i++) {
-        
-        Agent &agent = agents[i];
-        if (agent.group == 0) {
-            glColor3f(1.0f, 0.0f, 1.0f);
-        } else {
-            glColor3f(1.0f, 1.0f, 1.0f);
-        }
-        glVertex2f(agent.getPosition().x * MapGridSize + 0.5 * MapGridSize, agent.getPosition().y * MapGridSize + 0.5 * MapGridSize);
-    }
-    glEnd();
 }
 
 void MapController::update()
@@ -250,8 +198,6 @@ void MapController::update()
         Agent &agent = agents[i];
         
         b2Vec2 ff = agent.ff;
-        
-        //cout << "Agent" << i << " " << ff.x << ":" << ff.y << endl;
         b2Vec2 sep = steeringBehaviourSeparation(agent);
         b2Vec2 alg = steeringBehaviourAlignment(agent);
         b2Vec2 coh = steeringBehaviourCohesion(agent);
@@ -268,6 +214,10 @@ void MapController::update()
     for (int i = size - 1; i >= 0; i--) {
         Agent &agent = agents[i];
         agent.body->ApplyLinearImpulse(agent.force * m_dTimeStep, agent.getPosition());
+        
+        b2Vec2 pos = agent.getPosition();
+        agent.node->setScale(irr::core::vector3df(0.15, 0.15, 0.15));
+        agent.node->setPosition(irr::core::vector3df(pos.x, 0, pos.y));
     }
     
     world->Step(m_dTimeStep, 10, 10);

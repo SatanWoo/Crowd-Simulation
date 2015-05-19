@@ -7,15 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		19252F591B0B264B0098959E /* libIrrlicht.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 19252F581B0B264B0098959E /* libIrrlicht.a */; };
 		192530131B0B4E560098959E /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 192530121B0B4E560098959E /* IOKit.framework */; };
 		192530151B0B4E610098959E /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 192530141B0B4E610098959E /* Carbon.framework */; };
 		192530171B0B4E740098959E /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 192530161B0B4E740098959E /* Cocoa.framework */; };
+		19548BE91B0B6DF500D65C02 /* libIrrlicht.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 19252F581B0B264B0098959E /* libIrrlicht.a */; };
 		1955D0E91AC44362001318C6 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1955D0E81AC44362001318C6 /* main.cpp */; };
 		1955D0F01AC44379001318C6 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1955D0EF1AC44379001318C6 /* GLUT.framework */; };
 		1955D0F41AC443D4001318C6 /* Vector.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1955D0F21AC443D4001318C6 /* Vector.cpp */; };
 		1955D0FE1AC445BC001318C6 /* MapController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1955D0F81AC445BC001318C6 /* MapController.cpp */; };
-		1955D0FF1AC445BC001318C6 /* Person.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1955D0FA1AC445BC001318C6 /* Person.cpp */; };
 		1955D1031AC46E4C001318C6 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1955D1021AC46E4C001318C6 /* OpenGL.framework */; };
 		1987ED3B1AF136C9007BACE5 /* b2BroadPhase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1987ECF01AF136C9007BACE5 /* b2BroadPhase.cpp */; };
 		1987ED3C1AF136C9007BACE5 /* b2CollideCircle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1987ECF21AF136C9007BACE5 /* b2CollideCircle.cpp */; };
@@ -262,8 +261,6 @@
 		1955D0F31AC443D4001318C6 /* Vector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Vector.h; sourceTree = "<group>"; };
 		1955D0F81AC445BC001318C6 /* MapController.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MapController.cpp; sourceTree = "<group>"; };
 		1955D0F91AC445BC001318C6 /* MapController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MapController.h; sourceTree = "<group>"; };
-		1955D0FA1AC445BC001318C6 /* Person.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Person.cpp; sourceTree = "<group>"; };
-		1955D0FB1AC445BC001318C6 /* Person.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Person.h; sourceTree = "<group>"; };
 		1955D1021AC46E4C001318C6 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 		196734C31AEFEEA200765E4F /* MathLib.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MathLib.h; sourceTree = "<group>"; };
 		1970B60C1AFB89F60026A84C /* CostNode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CostNode.h; sourceTree = "<group>"; };
@@ -352,10 +349,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				19548BE91B0B6DF500D65C02 /* libIrrlicht.a in Frameworks */,
 				192530171B0B4E740098959E /* Cocoa.framework in Frameworks */,
 				192530151B0B4E610098959E /* Carbon.framework in Frameworks */,
 				192530131B0B4E560098959E /* IOKit.framework in Frameworks */,
-				19252F591B0B264B0098959E /* libIrrlicht.a in Frameworks */,
 				1955D1031AC46E4C001318C6 /* OpenGL.framework in Frameworks */,
 				1955D0F01AC44379001318C6 /* GLUT.framework in Frameworks */,
 			);
@@ -553,17 +550,25 @@
 			path = include;
 			sourceTree = "<group>";
 		};
-		1955D0DC1AC44362001318C6 = {
+		19548BEA1B0B704600D65C02 /* Framework */ = {
 			isa = PBXGroup;
 			children = (
 				192530161B0B4E740098959E /* Cocoa.framework */,
 				192530141B0B4E610098959E /* Carbon.framework */,
 				192530121B0B4E560098959E /* IOKit.framework */,
 				19252F581B0B264B0098959E /* libIrrlicht.a */,
-				19252F5B1B0B48440098959E /* include */,
-				1987ECEB1AF136C9007BACE5 /* Box2D */,
 				1955D1021AC46E4C001318C6 /* OpenGL.framework */,
 				1955D0EF1AC44379001318C6 /* GLUT.framework */,
+			);
+			name = Framework;
+			sourceTree = "<group>";
+		};
+		1955D0DC1AC44362001318C6 = {
+			isa = PBXGroup;
+			children = (
+				19548BEA1B0B704600D65C02 /* Framework */,
+				19252F5B1B0B48440098959E /* include */,
+				1987ECEB1AF136C9007BACE5 /* Box2D */,
 				1955D0E71AC44362001318C6 /* Crowd Simulation */,
 				1955D0E61AC44362001318C6 /* Products */,
 			);
@@ -603,8 +608,6 @@
 			children = (
 				1955D0F81AC445BC001318C6 /* MapController.cpp */,
 				1955D0F91AC445BC001318C6 /* MapController.h */,
-				1955D0FA1AC445BC001318C6 /* Person.cpp */,
-				1955D0FB1AC445BC001318C6 /* Person.h */,
 			);
 			name = App;
 			sourceTree = "<group>";
@@ -836,7 +839,6 @@
 				1987ED5A1AF136C9007BACE5 /* b2PrismaticJoint.cpp in Sources */,
 				1987ED561AF136C9007BACE5 /* b2GearJoint.cpp in Sources */,
 				1987ED4F1AF136C9007BACE5 /* b2Contact.cpp in Sources */,
-				1955D0FF1AC445BC001318C6 /* Person.cpp in Sources */,
 				1987ED471AF136C9007BACE5 /* b2StackAllocator.cpp in Sources */,
 				1987ED4A1AF136C9007BACE5 /* b2Fixture.cpp in Sources */,
 				1987ED3F1AF136C9007BACE5 /* b2Distance.cpp in Sources */,
@@ -940,6 +942,12 @@
 					"$(inherited)",
 					/Users/z/Documents/Crowd,
 					Simulation,
+					/Users/z/Documents/Crowd,
+					Simulation,
+					/Users/z/Documents/Crowd,
+					Simulation,
+					/Users/z/Documents/Crowd,
+					Simulation,
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -955,6 +963,12 @@
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					/Users/z/Documents/Crowd,
+					Simulation,
+					/Users/z/Documents/Crowd,
+					Simulation,
+					/Users/z/Documents/Crowd,
+					Simulation,
 					/Users/z/Documents/Crowd,
 					Simulation,
 				);

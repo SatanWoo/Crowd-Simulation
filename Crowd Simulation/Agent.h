@@ -10,6 +10,10 @@
 #define Crowd_Simulation_Agent_h
 
 #include "Box2D.h"
+#include "irrlicht.h"
+
+using namespace irr;
+using namespace scene;
 
 struct Agent {
     b2Vec2 pos;
@@ -27,6 +31,8 @@ struct Agent {
     
     static int maxForceSquared;
     static int maxSpeedSquared;
+    
+    IAnimatedMeshSceneNode *node;
     
     Agent(b2Vec2 pos, int group){
         this->group = group;
