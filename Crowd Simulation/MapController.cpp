@@ -34,7 +34,7 @@ MapController::MapController(int width, int height, int count, double timeStep)
 
     for (int yPos = 1; yPos < m_iHeight - 1; yPos++)
     {
-        for (int i = 0; i < 3; i ++)
+        for (int i = 0; i < 1; i ++)
         {
             Agent p(b2Vec2(i, yPos), 0);
             p.initBodyDef(world);
@@ -44,7 +44,7 @@ MapController::MapController(int width, int height, int count, double timeStep)
     
     for (int yPos = 1; yPos < m_iHeight - 1; yPos++)
     {
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < 1; i++)
         {
             Agent p(b2Vec2(m_iWidth - i - 1, yPos), 1);
             p.initBodyDef(world);
@@ -216,8 +216,9 @@ void MapController::update()
         agent.body->ApplyLinearImpulse(agent.force * m_dTimeStep, agent.getPosition());
         
         b2Vec2 pos = agent.getPosition();
-        agent.node->setScale(irr::core::vector3df(0.15, 0.15, 0.15));
+        agent.node->setScale(irr::core::vector3df(0.5, 0.5, 0.5));
         agent.node->setPosition(irr::core::vector3df(pos.x, 0, pos.y));
+        agent.node->setRotation(irr::core::vector3df(0, agent.group * 180, 00));
     }
     
     world->Step(m_dTimeStep, 10, 10);
