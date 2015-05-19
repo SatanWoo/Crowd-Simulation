@@ -9,10 +9,13 @@
 
 #include <GLUT/GLUT.h>
 #include <iostream>
+#include "irrlicht.h"
 #include "Vector.h"
 #include "MapController.h"
 
 using namespace std;
+using namespace irr;
+using namespace irr;
 
 const double ScreenWidth = 800;
 const double ScreenHeight = 448;
