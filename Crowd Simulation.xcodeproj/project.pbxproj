@@ -48,6 +48,7 @@
 		1987ED5B1AF136C9007BACE5 /* b2PulleyJoint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1987ED351AF136C9007BACE5 /* b2PulleyJoint.cpp */; };
 		1987ED5C1AF136C9007BACE5 /* b2RevoluteJoint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1987ED371AF136C9007BACE5 /* b2RevoluteJoint.cpp */; };
 		1987ED5D1AF136C9007BACE5 /* b2WeldJoint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1987ED391AF136C9007BACE5 /* b2WeldJoint.cpp */; };
+		19ABB1B01B14988000E7B623 /* KDTree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 19ABB1AF1B14988000E7B623 /* KDTree.cpp */; };
 		19FF13FB1B047AC8008B91F2 /* GlobalConfig.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 19FF13F91B047AC8008B91F2 /* GlobalConfig.cpp */; };
 		19FF13FD1B049C5E008B91F2 /* Agent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 19FF13FC1B049C5E008B91F2 /* Agent.cpp */; };
 /* End PBXBuildFile section */
@@ -65,6 +66,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		191246221B0DC7EB00742914 /* KDNode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KDNode.h; sourceTree = "<group>"; };
 		1955D0E51AC44362001318C6 /* Crowd Simulation */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "Crowd Simulation"; sourceTree = BUILT_PRODUCTS_DIR; };
 		1955D0E81AC44362001318C6 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		1955D0EF1AC44379001318C6 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = System/Library/Frameworks/GLUT.framework; sourceTree = SDKROOT; };
@@ -150,6 +152,9 @@
 		1987ED381AF136C9007BACE5 /* b2RevoluteJoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = b2RevoluteJoint.h; sourceTree = "<group>"; };
 		1987ED391AF136C9007BACE5 /* b2WeldJoint.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = b2WeldJoint.cpp; sourceTree = "<group>"; };
 		1987ED3A1AF136C9007BACE5 /* b2WeldJoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = b2WeldJoint.h; sourceTree = "<group>"; };
+		19ABB1AD1B148B6A00E7B623 /* KDTuple.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KDTuple.h; sourceTree = "<group>"; };
+		19ABB1AE1B1492F200E7B623 /* KDTree.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KDTree.h; sourceTree = "<group>"; };
+		19ABB1AF1B14988000E7B623 /* KDTree.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = KDTree.cpp; sourceTree = "<group>"; };
 		19AC4BD81AF67B9E009831BA /* B2Vec2DHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = B2Vec2DHelper.h; sourceTree = "<group>"; };
 		19FF13F81B0466C0008B91F2 /* Agent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Agent.h; sourceTree = "<group>"; };
 		19FF13F91B047AC8008B91F2 /* GlobalConfig.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GlobalConfig.cpp; sourceTree = "<group>"; };
@@ -203,6 +208,7 @@
 		1955D0F11AC443C5001318C6 /* Foundation */ = {
 			isa = PBXGroup;
 			children = (
+				19ABB1AC1B148B4900E7B623 /* KDTree */,
 				1955D0F21AC443D4001318C6 /* Vector.cpp */,
 				1955D0F31AC443D4001318C6 /* Vector.h */,
 				196734C31AEFEEA200765E4F /* MathLib.h */,
@@ -363,6 +369,17 @@
 			name = Object;
 			sourceTree = "<group>";
 		};
+		19ABB1AC1B148B4900E7B623 /* KDTree */ = {
+			isa = PBXGroup;
+			children = (
+				191246221B0DC7EB00742914 /* KDNode.h */,
+				19ABB1AD1B148B6A00E7B623 /* KDTuple.h */,
+				19ABB1AE1B1492F200E7B623 /* KDTree.h */,
+				19ABB1AF1B14988000E7B623 /* KDTree.cpp */,
+			);
+			name = KDTree;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -441,6 +458,7 @@
 				1955D0F41AC443D4001318C6 /* Vector.cpp in Sources */,
 				1987ED441AF136C9007BACE5 /* b2BlockAllocator.cpp in Sources */,
 				1987ED591AF136C9007BACE5 /* b2MouseJoint.cpp in Sources */,
+				19ABB1B01B14988000E7B623 /* KDTree.cpp in Sources */,
 				1987ED421AF136C9007BACE5 /* b2CircleShape.cpp in Sources */,
 				1987ED481AF136C9007BACE5 /* b2Body.cpp in Sources */,
 				1987ED5B1AF136C9007BACE5 /* b2PulleyJoint.cpp in Sources */,
