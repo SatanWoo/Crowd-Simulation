@@ -18,8 +18,15 @@ typedef enum {
 }KDSplitAxis;
 
 struct KDNode {
+    
+    KDNode(KDSplitAxis axis):splitAxis(axis), left(NULL), right(NULL), parent(NULL)
+    {
+        
+    }
+    
     KDNode *left;
     KDNode *right;
+    KDNode *parent;
     
     std::vector<KDTuple> points;
     KDSplitAxis splitAxis;

@@ -11,6 +11,7 @@
 
 #include "KDNode.h"
 #include <vector>
+#include <deque>
 
 struct KDRange {
     double min;
@@ -35,8 +36,10 @@ struct KDTree {
     
     void searchKNearestNeighbours(const KDTuple& goal, std::vector<KDTuple>& neighbours, KDRange range);
 private:
+    double distance(const KDTuple& a, const KDTuple& b);
     double findMiddleValue(const std::vector<double> values);
     void buildKDTree(KDNode *root, const std::vector<KDTuple> &points, KDSplitAxis axis);
+    void search(const KDTuple& goal, std::vector<KDTuple>& neighbours, KDRange range, std::deque<KDNode *> searchPath, bool isBack);
 };
 
 
