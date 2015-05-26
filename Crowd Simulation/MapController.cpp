@@ -33,33 +33,25 @@ MapController::MapController(int width, int height, int count, double timeStep)
     destinationPoints.push_back(v2);
 
     for (int yPos = 1; yPos < m_iHeight - 1; yPos++) {
-        Agent p1(b2Vec2(0, yPos), 0);
-        Agent p2(b2Vec2(1, yPos), 0);
-        Agent p3(b2Vec2(2, yPos), 0);
-        p1.initBodyDef(world);
-        p2.initBodyDef(world);
-        p3.initBodyDef(world);
         
-        agents.push_back(p1);
-        agents.push_back(p2);
-        agents.push_back(p3);
+        for (int i =0 ; i < 10; i++) {
+            Agent p1(b2Vec2(i % 3, yPos), 0);
+            p1.initBodyDef(world);
+            agents.push_back(p1);
+        }
     }
     
     for (int yPos = 1; yPos < m_iHeight - 1; yPos++) {
-        Agent p1(b2Vec2(m_iWidth - 1, yPos), 1);
-        Agent p2(b2Vec2(m_iWidth - 2, yPos), 1);
-        Agent p3(b2Vec2(m_iWidth - 3, yPos), 1);
-        p1.initBodyDef(world);
-        p2.initBodyDef(world);
-        p3.initBodyDef(world);
         
-        agents.push_back(p1);
-        agents.push_back(p2);
-        agents.push_back(p3);
+        for (int i =0 ; i < 10; i++) {
+            Agent p1(b2Vec2(m_iWidth - (i + 1) % 3, yPos), 1);
+            p1.initBodyDef(world);
+            agents.push_back(p1);
+        }
     }
     
     for (int i = 0; i < m_iHeight; i++) {
-        if (i >= m_iHeight / 2 - 2 && i < m_iHeight / 2 + 2) {
+        if (i >= m_iHeight / 2 - 5 && i < m_iHeight / 2 + 5) {
             continue;
         }
         for (int y = 6; y < m_iWidth - 6; y++) {
