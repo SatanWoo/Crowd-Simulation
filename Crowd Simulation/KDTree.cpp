@@ -34,6 +34,8 @@ void KDTree::searchKNearestNeighbours(const KDTuple &goal, std::vector<KDTuple> 
 
 void KDTree::search(const KDTuple& goal, std::vector<KDTuple>& neighbours, KDRange range, std::deque<KDNode *> searchPath, bool isBack)
 {
+    if (searchPath.empty()) return;
+    
     KDNode *last = searchPath.back();
     KDTuple p = last->points.front();
     KDRange newRange = range;
@@ -42,7 +44,6 @@ void KDTree::search(const KDTuple& goal, std::vector<KDTuple>& neighbours, KDRan
     if (last->isLeaf())
     {
         searchPath.pop_back();
-    
         
         if (range.inRange(dis))
         {
@@ -62,20 +63,18 @@ void KDTree::search(const KDTuple& goal, std::vector<KDTuple>& neighbours, KDRan
         if (range.inRange(planeDiff))
         {
             newRange.max = dis;
-        }
-        
-        if (p[last->splitAxis] < goal[last->splitAxis])
-        {
-            // Go to Left Child;
-            searchPath.push_back(last->left);
-        }
-        else
-        {
-            // Go to Right Child
-            searchPath.push_back(last->right);
+            if (p[last->splitAxis] < goal[last->splitAxis])
+            {
+                // Go to Left Child;
+                searchPath.push_back(last->left);
+            }
+            else
+            {
+                // Go to Right Child
+                searchPath.push_back(last->right);
+            }
         }
     }
-    
     else
     {
         if (p[last->splitAxis] > goal[last->splitAxis])
