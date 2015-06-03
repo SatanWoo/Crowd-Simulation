@@ -34,12 +34,15 @@ struct KDTree {
     KDTree(const std::vector<KDTuple> &points, int k);
     ~KDTree();
     
-    void searchKNearestNeighbours(const KDTuple& goal, std::vector<KDTuple>& neighbours, KDRange range);
+    void searchKNearestNeighbours(const KDTuple& goal, std::vector<KDTuple>& neighbours, double radius);
+    
 private:
+    
     double distance(const KDTuple& a, const KDTuple& b);
     double findMiddleValue(const std::vector<double> values);
     void buildKDTree(KDNode *root, const std::vector<KDTuple> &points, KDSplitAxis axis);
-    void search(const KDTuple& goal, std::vector<KDTuple>& neighbours, KDRange range, std::deque<KDNode *> searchPath, bool isBack);
+    void search(const KDTuple& goal, std::vector<KDTuple>& neighbours, double radius, std::deque<KDNode *> searchPath, bool isBack);
+    void recursiveClearTree(KDNode *node);
 };
 
 

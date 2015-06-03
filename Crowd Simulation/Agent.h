@@ -10,12 +10,15 @@
 #define Crowd_Simulation_Agent_h
 
 #include "Box2D.h"
+#include <vector>
 
 struct Agent {
     b2Vec2 pos;
     b2Vec2 ff;
     b2Vec2 force;
     int group;
+    
+    std::vector<int> neighbours;
     
     static int maxForce; //rate of acceleration
     static int maxSpeed; //grid squares / second
@@ -27,6 +30,9 @@ struct Agent {
     
     static int maxForceSquared;
     static int maxSpeedSquared;
+    
+    static int maxNeighbours;
+    static int preferVelocity;
     
     Agent(b2Vec2 pos, int group){
         this->group = group;

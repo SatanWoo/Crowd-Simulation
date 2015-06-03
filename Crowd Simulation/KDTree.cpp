@@ -19,40 +19,40 @@ KDTree::KDTree(const std::vector<KDTuple> &points, int k)
 
 KDTree::~KDTree()
 {
+    recursiveClearTree(root);
+    
     delete root;
     root = NULL;
 }
 
-void KDTree::searchKNearestNeighbours(const KDTuple &goal, std::vector<KDTuple> &neighbours, KDRange range)
+void KDTree::searchKNearestNeighbours(const KDTuple &goal, std::vector<KDTuple> &neighbours, double radius)
 {
     if (root == NULL) return;
     
     std::deque<KDNode *> path;
     path.push_back(root);
-    search(goal, neighbours, range, path, false);
+    search(goal, neighbours, radius, path, false);
 }
 
-void KDTree::search(const KDTuple& goal, std::vector<KDTuple>& neighbours, KDRange range, std::deque<KDNode *> searchPath, bool isBack)
+void KDTree::search(const KDTuple& goal, std::vector<KDTuple>& neighbours, double radius, std::deque<KDNode *> searchPath, bool isBack)
 {
     if (searchPath.empty()) return;
     
     KDNode *last = searchPath.back();
     KDTuple p = last->points.front();
-    KDRange newRange = range;
     double dis = distance(last->points.front(), goal);
     
     if (last->isLeaf())
     {
         searchPath.pop_back();
         
-        if (range.inRange(dis))
+        if (dis <= radius)
         {
-            newRange.max = dis;
             neighbours.clear();
             neighbours.push_back(last->points.front());
         }
         
-        return search(goal, neighbours, newRange, searchPath, true);
+        return search(goal, neighbours, radius, searchPath, true);
     }
     
     if (isBack)
@@ -60,9 +60,8 @@ void KDTree::search(const KDTuple& goal, std::vector<KDTuple>& neighbours, KDRan
         searchPath.pop_back();
         double plane = p[last->splitAxis];
         double planeDiff = fabs(plane - goal[last->splitAxis]);
-        if (range.inRange(planeDiff))
+        if (planeDiff < radius)
         {
-            newRange.max = dis;
             if (p[last->splitAxis] < goal[last->splitAxis])
             {
                 // Go to Left Child;
@@ -89,7 +88,7 @@ void KDTree::search(const KDTuple& goal, std::vector<KDTuple>& neighbours, KDRan
         }
     }
     
-    search(goal, neighbours, newRange, searchPath, isBack);
+    search(goal, neighbours, radius, searchPath, isBack);
 }
 
 void KDTree::buildKDTree(KDNode *root, const std::vector<KDTuple> &points, KDSplitAxis axis)
@@ -152,4 +151,15 @@ double KDTree::findMiddleValue(const std::vector<double> values)
 {
     size_t size = values.size();
     return values[size/2];
+}
+
+void KDTree::recursiveClearTree(KDNode *node)
+{
+    if (node == NULL) return;
+    
+    if (node->left != NULL) recursiveClearTree(node->left);
+    if (node->right != NULL) recursiveClearTree(node->right);
+    
+    delete node;
+    node = NULL;
 }
