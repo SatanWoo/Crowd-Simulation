@@ -31,7 +31,7 @@ struct KDTree {
     int dimension;
     KDNode *root;
     
-    KDTree(const std::vector<KDTuple> &points, int k);
+    KDTree(std::vector<KDTuple> points, int k);
     ~KDTree();
     
     void searchKNearestNeighbours(const KDTuple& goal, std::vector<KDTuple>& neighbours, double radius);

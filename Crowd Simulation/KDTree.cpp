@@ -10,7 +10,7 @@
 #include "KDTree.h"
 #include <math.h>
 
-KDTree::KDTree(const std::vector<KDTuple> &points, int k)
+KDTree::KDTree(std::vector<KDTuple> points, int k)
 {
     this->dimension = k;
     this->root = new KDNode(KDSplitAxisX);
@@ -39,16 +39,19 @@ void KDTree::search(const KDTuple& goal, std::vector<KDTuple>& neighbours, doubl
     if (searchPath.empty()) return;
     
     KDNode *last = searchPath.back();
+    
     KDTuple p = last->points.front();
+    
     double dis = distance(last->points.front(), goal);
+    
+    //std::cout << last->points.front()[0] << " || " << last->points.front()[1] << std::endl;
     
     if (last->isLeaf())
     {
         searchPath.pop_back();
         
-        if (dis <= radius)
+        if (dis <= radius && last->points.front()._groupID == goal._groupID)
         {
-            neighbours.clear();
             neighbours.push_back(last->points.front());
         }
         
@@ -57,20 +60,34 @@ void KDTree::search(const KDTuple& goal, std::vector<KDTuple>& neighbours, doubl
     
     if (isBack)
     {
+        if (dis <= radius && last->points.front()._groupID == goal._groupID)
+        {
+            neighbours.push_back(last->points.front());
+        }
+        
         searchPath.pop_back();
         double plane = p[last->splitAxis];
         double planeDiff = fabs(plane - goal[last->splitAxis]);
+        
+        //std::cout << planeDiff << std::endl;
+        
         if (planeDiff < radius)
         {
             if (p[last->splitAxis] < goal[last->splitAxis])
             {
                 // Go to Left Child;
-                searchPath.push_back(last->left);
+                if (last->left != NULL)
+                {
+                    searchPath.push_back(last->left);
+                }
             }
             else
             {
                 // Go to Right Child
-                searchPath.push_back(last->right);
+                if (last->right != NULL)
+                {
+                    searchPath.push_back(last->right);
+                }
             }
         }
     }
@@ -79,21 +96,31 @@ void KDTree::search(const KDTuple& goal, std::vector<KDTuple>& neighbours, doubl
         if (p[last->splitAxis] > goal[last->splitAxis])
         {
             // Go to Left Child;
-            searchPath.push_back(last->left);
+            if (last->left != NULL)
+            {
+                searchPath.push_back(last->left);
+                search(goal, neighbours, radius, searchPath, isBack);
+            } else {
+                search(goal, neighbours, radius, searchPath, true);
+            }
         }
         else
         {
-            // Go to Right Child
-            searchPath.push_back(last->right);
+            if (last->right != NULL)
+            {
+                // Go to Right Child
+                searchPath.push_back(last->right);
+                search(goal, neighbours, radius, searchPath, isBack);
+            } else {
+                search(goal, neighbours, radius, searchPath, true);
+            }
         }
     }
-    
-    search(goal, neighbours, radius, searchPath, isBack);
 }
 
 void KDTree::buildKDTree(KDNode *root, const std::vector<KDTuple> &points, KDSplitAxis axis)
 {
-    if (root == NULL) return;
+    if (root == NULL || points.size() <= 0) return;
     if (points.size() == 1)
     {
         root->points.push_back(points[0]);
@@ -111,11 +138,6 @@ void KDTree::buildKDTree(KDNode *root, const std::vector<KDTuple> &points, KDSpl
     
     KDSplitAxis next = (KDSplitAxis)(1 - axis);
     
-    root->left = new KDNode(next);
-    root->left->parent = root;
-    root->right = new KDNode(next);
-    root->right->parent = root;
-    
     std::vector<KDTuple> leftPoints;
     std::vector<KDTuple> rightPoints;
     for (size_t i = 0; i < points.size(); i++)
@@ -131,12 +153,22 @@ void KDTree::buildKDTree(KDNode *root, const std::vector<KDTuple> &points, KDSpl
         }
         else
         {
-             root->points.push_back(points[i]);
+            root->points.push_back(points[i]);
         }
     }
     
-    buildKDTree(root->left, leftPoints, next);
-    buildKDTree(root->right, rightPoints, next);
+    if (leftPoints.size() > 0)
+    {
+        root->left = new KDNode(next);
+        root->left->parent = root;
+        buildKDTree(root->left, leftPoints, next);
+    }
+    
+    if (rightPoints.size() > 0) {
+        root->right = new KDNode(next);
+        root->right->parent = root;
+        buildKDTree(root->right, rightPoints, next);
+    }
 }
 
 double KDTree::distance(const KDTuple &a, const KDTuple &b)

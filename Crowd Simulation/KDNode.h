@@ -23,18 +23,7 @@ struct KDNode {
     {
         
     }
-    
-    size_t _begin;
-    size_t _end;
-    size_t _left;
-    size_t _right;
-    
-    double _maxX;
-    double _minX;
-    
-    double _maxY;
-    double _minY;
-    
+
     KDNode *left;
     KDNode *right;
     KDNode *parent;

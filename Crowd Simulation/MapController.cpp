@@ -33,18 +33,18 @@ MapController::MapController(int width, int height, int count, double timeStep)
     destinationPoints.push_back(v1);
     destinationPoints.push_back(v2);
 
-    for (int yPos = 1; yPos < m_iHeight - 1; yPos++) {
+    for (int yPos = 1; yPos < 2; yPos++) {
         
-        for (int i =0 ; i < 10; i++) {
+        for (int i =0 ; i < 1; i++) {
             Agent p1(b2Vec2(i % 3, yPos), 0);
             p1.initBodyDef(world);
             agents.push_back(p1);
         }
     }
     
-    for (int yPos = 1; yPos < m_iHeight - 1; yPos++) {
+    for (int yPos = 1; yPos < 2; yPos++) {
         
-        for (int i =0 ; i < 10; i++) {
+        for (int i =0 ; i < 1; i++) {
             Agent p1(b2Vec2(m_iWidth - (i + 1) % 3, yPos), 1);
             p1.initBodyDef(world);
             agents.push_back(p1);
@@ -214,6 +214,7 @@ void MapController::computerNearestNeighbours(double radius)
         if (agentMap[i] != 0) continue;
         
         agentMap[i] += 1;
+        cout << i << ":" << agentMap[i] << endl;
         coreNode.push_back(i);
 
         Agent &pi = agents[i];
@@ -224,6 +225,8 @@ void MapController::computerNearestNeighbours(double radius)
         for (int j = 0; j < nSize; j++)
         {
             KDTuple &tuple = points[j];
+            
+            cout << "Neight " << tuple._ID << endl;
             agentMap[tuple._ID] += 1;
             pi.neighbours.push_back(tuple._ID);
         }
@@ -246,12 +249,12 @@ void MapController::mergeNode()
             node.allNodes.push_back(&agents[ai.neighbours[k]]);
         }
         
+        node.build();
         virtualNodes.push_back(node);
     }
 }
 
 #pragma mark - End Of Protected
-
 void MapController::render()
 {
     glPointSize(10);
@@ -318,23 +321,23 @@ void MapController::render()
 void MapController::update()
 {
     buildKDTree();
-    computerNearestNeighbours(Agent::radius * 5);
+    computerNearestNeighbours(Agent::radius * 0);
     mergeNode();
     
     updateContinuumCrowdData();
 
-    size_t size = virtualNodes.size();
-    for (size_t i = size - 1; i >= 0; i--) {
+    int size = virtualNodes.size();
+    for (int i = size - 1; i >= 0; i--) {
         VirtualNode &node = virtualNodes[i];
         
         b2Vec2 ff = node.ff;
         
-        //cout << "Agent" << i << " " << ff.x << ":" << ff.y << endl;
         b2Vec2 sep = steeringBehaviourSeparation(node);
         b2Vec2 alg = steeringBehaviourAlignment(node);
         b2Vec2 coh = steeringBehaviourCohesion(node);
-        
+    
         node.force = ff + sep * 1.2 + alg * 0.3 + coh * 0.05;
+        std::cout << node.force.x << std::endl;
         
         float32 lengthSquared =  node.force.LengthSquared();
         if (lengthSquared > Agent::maxForceSquared) {
@@ -350,8 +353,8 @@ void MapController::update()
         node.center = node.center + node.force * m_dTimeStep;
     }
     
-    world->Step(m_dTimeStep, 10, 10);
-    world->ClearForces();
+    //world->Step(m_dTimeStep, 10, 10);
+    //world->ClearForces();
 }
 
 b2Vec2 MapController::steeringBehaviourFlowField(VirtualNode &node)
