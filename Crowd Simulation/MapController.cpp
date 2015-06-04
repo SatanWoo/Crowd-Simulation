@@ -35,18 +35,18 @@ MapController::MapController(int width, int height, int count, double timeStep)
     destinationPoints.push_back(v1);
     destinationPoints.push_back(v2);
 
-    for (int yPos = 1; yPos < 2; yPos++) {
+    for (int yPos = 1; yPos < m_iHeight - 1; yPos++) {
         
-        for (int i =0 ; i < 1; i++) {
+        for (int i =0 ; i < 50; i++) {
             Agent p1(b2Vec2(i % 3, yPos), 0);
             p1.initBodyDef(world);
             agents.push_back(p1);
         }
     }
     
-    for (int yPos = 1; yPos < 2; yPos++) {
+    for (int yPos = 1; yPos < m_iHeight - 1; yPos++) {
         
-        for (int i =0 ; i < 1; i++) {
+        for (int i =0 ; i < 50; i++) {
             Agent p1(b2Vec2(m_iWidth - (i + 1) % 3, yPos), 1);
             p1.initBodyDef(world);
             agents.push_back(p1);
@@ -216,7 +216,6 @@ void MapController::computerNearestNeighbours(double radius)
         if (agentMap[i] != 0) continue;
         
         agentMap[i] += 1;
-        cout << i << ":" << agentMap[i] << endl;
         coreNode.push_back(i);
 
         Agent &pi = agents[i];
@@ -227,8 +226,6 @@ void MapController::computerNearestNeighbours(double radius)
         for (int j = 0; j < nSize; j++)
         {
             KDTuple &tuple = points[j];
-            
-            cout << "Neight " << tuple._ID << endl;
             agentMap[tuple._ID] += 1;
             pi.neighbours.push_back(tuple._ID);
         }
@@ -323,7 +320,7 @@ void MapController::render()
 void MapController::update()
 {
     buildKDTree();
-    computerNearestNeighbours(Agent::radius * 0);
+    computerNearestNeighbours(Agent::radius * 5);
     mergeNode();
     
     updateContinuumCrowdData();
@@ -339,7 +336,6 @@ void MapController::update()
         b2Vec2 coh = steeringBehaviourCohesion(node);
     
         node.force = ff + sep * 1.2 + alg * 0.3 + coh * 0.05;
-        std::cout << node.force.x << std::endl;
         
         float32 lengthSquared =  node.force.LengthSquared();
         if (lengthSquared > Agent::maxForceSquared) {
@@ -350,9 +346,8 @@ void MapController::update()
     //Move agents based on forces being applied (aka physics)
     for (int i = size - 1; i >= 0; i--) {
         VirtualNode &node = virtualNodes[i];
-        //agent.body->ApplyLinearImpulse(agent.force * m_dTimeStep, agent.getPosition());
-        
         node.center = node.center + node.force * m_dTimeStep;
+        node.dispatch(m_dTimeStep);
     }
     
     world->Step(m_dTimeStep, 10, 10);
