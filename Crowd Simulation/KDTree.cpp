@@ -20,9 +20,6 @@ KDTree::KDTree(std::vector<KDTuple> points, int k)
 KDTree::~KDTree()
 {
     recursiveClearTree(root);
-    
-    delete root;
-    root = NULL;
 }
 
 void KDTree::searchKNearestNeighbours(const KDTuple &goal, std::vector<KDTuple> &neighbours, double radius)

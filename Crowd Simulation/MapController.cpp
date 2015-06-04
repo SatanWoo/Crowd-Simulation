@@ -23,6 +23,8 @@ MapController::MapController(int width, int height, int count, double timeStep)
 	m_iHeight = height;
 	m_dTimeStep = timeStep;
     
+    _tree = NULL;
+    
     world = new b2World(b2Vec2_zero, true);
 
     srand((unsigned)time(NULL));
@@ -182,7 +184,7 @@ MapController::~MapController()
 #pragma mark - Protected
 void MapController::buildKDTree()
 {
-    if (_tree)
+    if (_tree != NULL)
     {
         delete _tree;
         _tree = NULL;
@@ -353,8 +355,8 @@ void MapController::update()
         node.center = node.center + node.force * m_dTimeStep;
     }
     
-    //world->Step(m_dTimeStep, 10, 10);
-    //world->ClearForces();
+    world->Step(m_dTimeStep, 10, 10);
+    world->ClearForces();
 }
 
 b2Vec2 MapController::steeringBehaviourFlowField(VirtualNode &node)
