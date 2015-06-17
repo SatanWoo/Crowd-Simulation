@@ -14,6 +14,8 @@ using namespace std;
 const double MapController::restDensity = 1.0;
 const double MapController::MapGridSize = 32;
 
+static int frame = 0;
+
 static int fourDir[4][2] = {{0, -1}, {1, 0}, {0, 1}, {-1, 0}};
 static int eightDir[8][2] = {{0, -1}, {1, 0}, {0, 1}, {-1, 0}, {1, 1}, {1, -1}, {-1, -1}, {-1, 1}};
 
@@ -37,7 +39,7 @@ MapController::MapController(int width, int height, int count, double timeStep)
 
     for (int yPos = 1; yPos < m_iHeight - 1; yPos++) {
         
-        for (int i =0 ; i < 50; i++) {
+        for (int i =0 ; i < 10; i++) {
             Agent p1(b2Vec2(i % 3, yPos), 0);
             p1.initBodyDef(world);
             agents.push_back(p1);
@@ -46,7 +48,7 @@ MapController::MapController(int width, int height, int count, double timeStep)
     
     for (int yPos = 1; yPos < m_iHeight - 1; yPos++) {
         
-        for (int i =0 ; i < 50; i++) {
+        for (int i =0 ; i < 10; i++) {
             Agent p1(b2Vec2(m_iWidth - (i + 1) % 3, yPos), 1);
             p1.initBodyDef(world);
             agents.push_back(p1);
@@ -290,7 +292,6 @@ void MapController::render()
     
     for (int i = 0 ; i < obstacles.size(); i++) {
         b2Vec2 o = obstacles[i];
-        
         int x = o.x;
         int y = o.y;
         
@@ -319,10 +320,15 @@ void MapController::render()
 
 void MapController::update()
 {
-    buildKDTree();
-    computerNearestNeighbours(Agent::radius * 5);
-    mergeNode();
+    if (frame % 3 == 0)
+    {
+        buildKDTree();
+        computerNearestNeighbours(Agent::radius * 5);
+        mergeNode();
+    }
     
+    frame ++;
+
     updateContinuumCrowdData();
 
     int size = virtualNodes.size();
