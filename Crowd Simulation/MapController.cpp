@@ -39,7 +39,7 @@ MapController::MapController(int width, int height, int count, double timeStep)
 
     for (int yPos = 1; yPos < m_iHeight - 1; yPos++) {
         
-        for (int i =0 ; i < 10; i++) {
+        for (int i =0 ; i < 30; i++) {
             Agent p1(b2Vec2(i % 3, yPos), 0);
             p1.initBodyDef(world);
             agents.push_back(p1);
@@ -48,7 +48,7 @@ MapController::MapController(int width, int height, int count, double timeStep)
     
     for (int yPos = 1; yPos < m_iHeight - 1; yPos++) {
         
-        for (int i =0 ; i < 10; i++) {
+        for (int i =0 ; i < 30; i++) {
             Agent p1(b2Vec2(m_iWidth - (i + 1) % 3, yPos), 1);
             p1.initBodyDef(world);
             agents.push_back(p1);
@@ -305,25 +305,25 @@ void MapController::render()
     
     glPointSize(5);
     glBegin(GL_POINTS);
-    for (int i = 0; i < virtualNodes.size(); i++) {
+    for (int i = 0; i < agents.size(); i++) {
         
-        VirtualNode &node = virtualNodes[i];
+        Agent &node = agents[i];
         if (node.group == 0) {
             glColor3f(1.0f, 0.0f, 1.0f);
         } else {
             glColor3f(1.0f, 1.0f, 1.0f);
         }
-        glVertex2f(node.center.x * MapGridSize + 0.5 * MapGridSize, node.center.y * MapGridSize + 0.5 * MapGridSize);
+        glVertex2f(node.getPosition().x * MapGridSize + 0.5 * MapGridSize, node.getPosition().y * MapGridSize + 0.5 * MapGridSize);
     }
     glEnd();
 }
 
 void MapController::update()
 {
-    if (frame % 3 == 0)
+    if (frame % 30 == 0)
     {
         buildKDTree();
-        computerNearestNeighbours(Agent::radius * 5);
+        computerNearestNeighbours(Agent::radius * 10);
         mergeNode();
     }
     
