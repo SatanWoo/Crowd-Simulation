@@ -188,26 +188,26 @@ void MapController::render()
     glVertex2d(destinationPoints[1].x * MapGridSize + 0.5 * MapGridSize, destinationPoints[1].y * MapGridSize + 0.5 * MapGridSize);
     glEnd();
     
-    glLineWidth(1);
-    glBegin(GL_LINES);
-    glColor4f(1.0f, 1.0f, 1.0f, 0.1);
-    for (int i = 0; i < m_iWidth; i++) {
-        for (int j = 0; j < m_iHeight; j++) {
-            double xPos = i * MapGridSize;
-            double yPos = j * MapGridSize;
-            
-            for (int k = 0; k < 4; k++) {
-                int kx = i + fourDir[k][0];
-                int ky = j + fourDir[k][1];
-                
-                if (isValid(kx, ky)) {
-                    glVertex2d(xPos , yPos);
-                    glVertex2d(kx * MapGridSize, ky * MapGridSize);
-                }
-            }
-        }
-    }
-    glEnd();
+//    glLineWidth(1);
+//    glBegin(GL_LINES);
+//    glColor4f(1.0f, 1.0f, 1.0f, 0.1);
+//    for (int i = 0; i < m_iWidth; i++) {
+//        for (int j = 0; j < m_iHeight; j++) {
+//            double xPos = i * MapGridSize;
+//            double yPos = j * MapGridSize;
+//            
+//            for (int k = 0; k < 4; k++) {
+//                int kx = i + fourDir[k][0];
+//                int ky = j + fourDir[k][1];
+//                
+//                if (isValid(kx, ky)) {
+//                    glVertex2d(xPos , yPos);
+//                    glVertex2d(kx * MapGridSize, ky * MapGridSize);
+//                }
+//            }
+//        }
+//    }
+//    glEnd();
     
     glBegin(GL_QUADS);
     glColor3f(1.0f, 0.0f, 0.0f);
