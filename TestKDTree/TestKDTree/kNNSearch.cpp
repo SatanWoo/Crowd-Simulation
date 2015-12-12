@@ -18,7 +18,7 @@ int main(int argc, const char * argv[])
 
     //query_point
     vector<double> query_point;
-    vector<vector<double>> query_point_dataset;
+    vector<Point> query_point_dataset;
     ReadData rd2("/Users/z/Documents/Crowd\ Simulation/Crowd\ Simulation/TestKDTree/TestKDTree/query_points.txt");
     query_point_dataset = rd2.allPoints;
 
