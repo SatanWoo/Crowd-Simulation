@@ -14,17 +14,16 @@ using namespace std;
 int main(int argc, const char * argv[])
 {
     int K = 3;
-    ReadData rd1("/Users/z/Documents/Day\ Day\ Up/TestKDTree/TestKDTree/sample_data.txt");
+    ReadData rd1("/Users/z/Documents/Crowd\ Simulation/Crowd\ Simulation/TestKDTree/TestKDTree/sample_data.txt");
 
     //query_point
     Point query_point;
     vector<Point> query_point_dataset;
-    ReadData rd2("/Users/z/Documents/Day\ Day\ Up/TestKDTree/TestKDTree/query_points.txt");
+    ReadData rd2("/Users/z/Documents/Crowd\ Simulation/Crowd\ Simulation/TestKDTree/TestKDTree/query_points.txt");
     query_point_dataset = rd2.allPoints;
 
     KDNode* root;
     KDTree tree(rd1.allPoints, 4);
-
 
     vector<int> indices1;
     vector<double> squared_distances1;

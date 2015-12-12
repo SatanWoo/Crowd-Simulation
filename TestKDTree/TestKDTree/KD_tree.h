@@ -336,7 +336,6 @@ Box KDTree::buildBoundingBox(const vector<int> & indices) const
     }
 
     return Box(minP.x, minP.y, maxP.x, maxP.y);
-
 }
 
 const KDNode* KDTree::getLeafNode(const Point &query_point, const KDNode *node)const
