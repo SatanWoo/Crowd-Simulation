@@ -84,7 +84,7 @@ public:
         }
         else
         {
-            sumX = 0;
+            return 0;
         }
         
         if(p.y < y0)
@@ -97,7 +97,7 @@ public:
         }
         else
         {
-            sumY = 0;
+            return 0;
         }
         
         
@@ -149,23 +149,23 @@ public:
 class KDTree
 {
 public:
-    KDTree();
+    KDTree(const vector<Point>& data, unsigned int max_leaf_size);
     ~KDTree();
 
-    bool create_tree(const vector<Point>& data, unsigned int max_leaf_size);
-    bool kNN_query(const Point& query_point, const int K, vector<int>& indices, vector<double>& squared_distances) const;
+    
+    bool KNNQuery(const Point& query_point, const int K, vector<int>& indices, vector<double>& squared_distances) const;
     
     // squared of distance
     static double distancesq(const Point& data0, const Point& data1);
 private:
     // build and store data
     vector<Point> points;
-    size_t dim_;
     unsigned int maxLeafSize;
     unsigned int maxLevel;
     KDNode *root;
     
     // helper function for creating the tree using point indices
+    bool createTree(const vector<Point>& data, unsigned int max_leaf_size);
     bool buildTree(const vector<int>& index, KDNode*& node, unsigned int level);
     
     // query update from current node
@@ -176,7 +176,7 @@ private:
                double& max_distance) const;
     
     // check points in a left node
-    bool explore_leaf_node(const Point& query_point, const int K,
+    bool exploreLeafNode(const Point& query_point, const int K,
                            priority_queue<DistanceIndex> & priority_points,
                            double & max_distance, const KDNode * cur_node) const;
     
@@ -185,9 +185,10 @@ private:
     void recursiveClear(KDNode *node);
 };
 
-KDTree::KDTree()
+KDTree::KDTree(const vector<Point>& data, unsigned int max_leaf_size)
 {
     root = NULL;
+    createTree(data, max_leaf_size);
 }
 
 KDTree::~KDTree()
@@ -195,12 +196,11 @@ KDTree::~KDTree()
     recursiveClear(root);
 }
 
-bool KDTree::create_tree(const vector<Point>& data, unsigned int max_leaf_size)
+bool KDTree::createTree(const vector<Point>& data, unsigned int max_leaf_size)
 {
     points = data;
     maxLeafSize = max_leaf_size;
     maxLevel = ceil(log2(data.size()));
-    dim_ = Point::DIMENSION;
     
     vector<int> indices;
     for(double i = 0; i< points.size(); i++)
@@ -282,7 +282,7 @@ bool KDTree::buildTree(const vector<int> & indices, KDNode* & node, unsigned lev
     return true;
 }
 
-bool KDTree::kNN_query(const Point& query_point, const int K,
+bool KDTree::KNNQuery(const Point& query_point, const int K,
                         vector<int>& indices,
                         vector<double>& squared_distances) const
 {
@@ -354,7 +354,7 @@ bool KDTree::query(const Point& query_point, const int K,
         visited_nodes.insert(cur_node);
         if(cur_node->isLeaf)
         {
-            this->explore_leaf_node(query_point, K, priority_points, max_distance, cur_node);
+            this->exploreLeafNode(query_point, K, priority_points, max_distance, cur_node);
         }
         else
         {
@@ -380,7 +380,7 @@ bool KDTree::query(const Point& query_point, const int K,
     return true;
 }
 
-bool KDTree::explore_leaf_node(const Point& query_point, const int K,
+bool KDTree::exploreLeafNode(const Point& query_point, const int K,
                                 priority_queue<DistanceIndex>& priority_points,
                                 double & max_distance, const KDNode* cur_node) const
 {
@@ -438,7 +438,6 @@ Box KDTree::buildBox(const vector<int>& indices) const
 double KDTree::distancesq(const Point& data0, const Point& data1)
 {
     double diffX = data1.x - data0.x, diffY = data1.y - data1.y;
-    
     return diffX * diffX + diffY * diffY;
 }
 
@@ -450,6 +449,5 @@ void KDTree::recursiveClear(KDNode *node)
     
     delete node;
 }
-
 
 #endif /* KDTree_H */
