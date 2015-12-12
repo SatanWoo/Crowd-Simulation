@@ -18,7 +18,7 @@ using namespace std;
 class ReadData {
 public:
     ReadData(string filename);
-    vector<Point> allPoints;
+    vector<vector<double>> allPoints;
     size_t numOfElements();
     size_t dimension();
     /**
@@ -38,11 +38,15 @@ ReadData::ReadData( string filename )
 
     istringstream istr;
     string str;
+    double one, two;
     while(getline(fin,str))
     {
-        Point data;
+        vector<double>data;
         istr.str(str);
-        istr >> data.x >> data.y;
+        istr >> one >> two;
+        
+        data.push_back(one);
+        data.push_back(two);
         
         allPoints.push_back(data);
         istr.clear();

@@ -18,11 +18,12 @@ int main(int argc, const char * argv[])
 
     //query_point
     vector<double> query_point;
-    vector<Point> query_point_dataset;
+    vector<vector<double>> query_point_dataset;
     ReadData rd2("/Users/z/Documents/Crowd\ Simulation/Crowd\ Simulation/TestKDTree/TestKDTree/query_points.txt");
     query_point_dataset = rd2.allPoints;
 
-    KDTree tree(rd1.allPoints, 4);
+    KD_tree tree;
+    tree.create_tree(rd1.allPoints, 4);
 
     vector<int> indices1;
     vector<double> squared_distances1;
@@ -32,7 +33,7 @@ int main(int argc, const char * argv[])
     cout<<"*********Using Exact k Nearest Neighbor Search, The following are Results******"<<endl;
     for(int i=0; i < query_point_dataset.size(); i++)
     {
-        tree.kNNQuery(query_point_dataset[i], K, indices1, squared_distances1);
+        tree.kNN_query(query_point_dataset[i], K, indices1, squared_distances1);
         for (int j = 0; j < K; j++)
         {
             cout << "For the number row  " << i << "  query point, Using Exact kNN Search 3 Nearest Neigbour : The number "<< j + 1 << " nearest neighbor index is  "<< indices1[j] << endl;
