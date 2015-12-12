@@ -15,13 +15,12 @@
 
 using namespace std;
 
-class ReadData{
+class ReadData {
 public:
-
     ReadData(string filename);
-    vector <vector<double>> allDataPointsVec;
-    int get_num_of_elements();
-    int get_num_of_dimensions();
+    vector<Point> allPoints;
+    size_t numOfElements();
+    size_t dimension();
     /**
      * Print out the ID of point where the ID is the row in the original file (0-based)
      */
@@ -33,56 +32,42 @@ ReadData::ReadData( string filename )
     std::ifstream fin(filename.c_str(),std::ios::in);
     if (!fin.is_open())
     {
-        cout<<"cannot open the file"<<endl;
+        cout << "cannot open the file" << endl;
+        return;
     }
 
     istringstream istr;
     string str;
-    vector <double> dataPointVec;
-    double oneDimension;
+    Point data;
     while(getline(fin,str))
     {
-        cout << str << endl;
         istr.str(str);
-        while(istr>>oneDimension)
-        {
-            dataPointVec.push_back(oneDimension);
-        }
-        allDataPointsVec.push_back(dataPointVec);
-        dataPointVec.clear();
+        istr >> data.x >> data.y;
+        
+        allPoints.push_back(data);
         istr.clear();
         str.clear();
     }
     fin.close();
-
 }
 
-int ReadData::get_num_of_elements(){
-
-    return allDataPointsVec.size();
+size_t ReadData::numOfElements()
+{
+    return allPoints.size();
 }
 
-int ReadData::get_num_of_dimensions(){
-
-return allDataPointsVec[0].size();
+size_t ReadData::dimension()
+{
+    return Point::dimension;
 }
 
-
-void ReadData::printDataID(){
-
-   int numOfDimensions=allDataPointsVec[0].size();
-   int numOfElements=allDataPointsVec.size();
-
-
-   for(int i=0; i<numOfElements; i++)
-   {
-        for(int j=0; j<numOfDimensions; j++)
-        {
-             cout<<"PointID is "<<"A"<<i<<j<<"\t"<<setprecision(20)<<"Value is   "<<allDataPointsVec[i][j]<<endl;
-        }
-   }
-
- }
-
-
+void ReadData::printDataID()
+{
+    size_t numOfElements = allPoints.size();
+    for(int i = 0; i < numOfElements; i++)
+    {
+        Point p = allPoints[i];
+        cout << "PointID is " << "A" << i << "\t" << setprecision(20) << "Value is   " << p.x << ":" << p.y << endl;
+    }
+}
 #endif // READDATA_H
