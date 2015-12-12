@@ -22,7 +22,7 @@ int main(int argc, const char * argv[])
     ReadData rd2("/Users/z/Documents/Crowd\ Simulation/Crowd\ Simulation/TestKDTree/TestKDTree/query_points.txt");
     query_point_dataset = rd2.allPoints;
 
-    KD_tree tree;
+    KDTree tree;
     tree.create_tree(rd1.allPoints, 4);
 
     vector<int> indices1;
