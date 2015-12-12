@@ -129,29 +129,6 @@ struct DistanceIndex
     }
 };
 
-/**For storing the tree node and the distance from node to node **/
-struct TreeNodeDistance
-{
-    KDNode* node;
-    double distance;
-
-    TreeNodeDistance(KDNode* node, double distance)
-    {
-        this->node = node;
-        this->distance = distance;
-    }
-
-    bool operator < (const TreeNodeDistance & other) const
-    {
-        return this->distance < other.distance;
-    }
-
-    bool operator > (const TreeNodeDistance & other) const
-    {
-        return this->distance > other.distance;
-    }
-};
-
 class KDTree
 {
 public:
@@ -164,7 +141,6 @@ public:
     bool kNNQuery(const Point& query, const int K, vector<int>& indices, vector<double>& disSq)const;
 
 private:
-    typedef priority_queue<TreeNodeDistance, vector<TreeNodeDistance>, greater<TreeNodeDistance>> minQueue;
     // build and store data
     vector<Point> data;
     unsigned maxLeafSize;
@@ -239,10 +215,8 @@ bool KDTree::createTree(const vector<Point>& data, unsigned int max_leaf_size)
 }
 
 //// helper function for creating the tree using point indices
-bool KDTree::buildTree(const vector<int> & indices, KDNode* & node, unsigned int level)
+bool KDTree::buildTree(const vector<int>& indices, KDNode* & node, unsigned int level)
 {
-    assert(node != NULL);
-
     if(level >= maxLevel || indices.size() <= maxLeafSize)
     {
         node->isLeaf = true;
@@ -269,6 +243,7 @@ bool KDTree::buildTree(const vector<int> & indices, KDNode* & node, unsigned int
 
     // median value as split value, every value before the meidan is less than the median, every value after the median is larger than the median;
     size_t n = one_dim_values.size() / 2;
+    // get The nth biggest value
     std::nth_element(one_dim_values.begin(), one_dim_values.begin() + n, one_dim_values.end());
 
     node->splitValue = one_dim_values[n];
@@ -466,6 +441,5 @@ bool KDTree::exploreLeafNode(const Point &query, const int K, priority_queue<Dis
     }
     return true;
 }
-
 
 #endif /* KD_TREE_H */
