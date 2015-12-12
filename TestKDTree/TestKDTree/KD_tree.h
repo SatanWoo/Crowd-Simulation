@@ -50,43 +50,62 @@ struct Point {
 
 struct Box
 {
-    double xMin, xMax;
-    double yMin, yMax;
+public:
+    vector<double> min_point_;
+    vector<double> max_point_;
+    Box()
+    {
+    }
     
-    Box():xMin(0), xMax(0), yMin(0), yMax(0)
-    {}
-    
-    Box(double x0, double x1, double y0, double y1):xMin(x0), xMax(x1), yMin(y0), yMax(y1)
-    {}
+    Box(double x0, double x1, double y0, double y1)
+    {
+        min_point_.push_back(x0);
+        min_point_.push_back(y0);
+        max_point_.push_back(x1);
+        max_point_.push_back(y1);
+    }
     
     Box(const vector<double> & min_point, const vector<double> & max_point)
     {
-        xMin = min_point[0], yMin = min_point[1];
-        xMax = min_point[1], yMax = min_point[1];
+        min_point_ = min_point;
+        max_point_ = max_point;
     }
-
+    
     // squared distance from a point to box
-    double distanceSQ(const Point& point) const
+    double distanceSQ(const Point& p)const
     {
-        double sumX = 0, sumY = 0;
+        vector<double> vec;
+        vec.push_back(p.x);
+        vec.push_back(p.y);
         
-        if (point.x > xMax) {
-            sumX = pow(point.x - xMax, 2);
-        } else if (point.x < xMin) {
-            sumX = pow(xMin - point.x, 2);
-        } else {
-            sumX = 0;
+        return distanceSQ(vec);
+    }
+    
+    double distanceSQ(const vector<double>& point) const
+    {
+        double sum_sq = 0;
+        unsigned long dim= point.size();
+        assert(dim ==min_point_.size() && dim == max_point_.size());
+        
+        for(unsigned int i=0; i<dim; ++i)
+        {
+            double x_min = min_point_[i];
+            double x_max = max_point_[i];
+            double x = point[i];
+            if(x < x_min)
+            {
+                sum_sq +=(x_min -x) * (x_min-x);
+            }
+            else if(x > x_max)
+            {
+                sum_sq +=(x_max-x) * (x_max -x);
+            }
+            else
+            {
+                sum_sq = 0;
+            }
         }
-        
-        if (point.y > yMax) {
-            sumY = pow(point.y - yMax, 2);
-        } else if (point.y < yMin) {
-            sumY = pow(yMin - point.y, 2);
-        } else {
-            sumY = 0;
-        }
-        
-        return sumX + sumY;
+        return sum_sq;
     }
 };
 
@@ -208,6 +227,7 @@ bool KDTree::createTree(const vector<Point>& data, unsigned int max_leaf_size)
     }
 
     this->root = new KDNode();
+    this->root->splitDim = KDTreeSplitAxisX;
     this->root->box = this->buildBoundingBox(indices);
     this->buildTree(indices, this->root, 0);
 
@@ -230,8 +250,7 @@ bool KDTree::buildTree(const vector<int>& indices, KDNode* & node, unsigned int 
     node->dataIndex = indices;
 
     // randomly select split dimensions
-    KDTreeSplitAxis splitDim = (KDTreeSplitAxis)(rand() % Point::dimension);
-    node->splitDim = splitDim;
+    KDTreeSplitAxis splitDim = node->splitDim;
     
     vector<double> one_dim_values;
     for(int i = 0; i < indices.size(); i++)
@@ -268,6 +287,7 @@ bool KDTree::buildTree(const vector<int>& indices, KDNode* & node, unsigned int 
     if(leftIndices.size() != 0)
     {
         KDNode* left = new KDNode();
+        left->splitDim = (KDTreeSplitAxis)(1 - node->splitDim);
         this->buildTree(leftIndices, left, level + 1);
         node->left = left;
     }
@@ -275,6 +295,7 @@ bool KDTree::buildTree(const vector<int>& indices, KDNode* & node, unsigned int 
     if(rightIndices.size() != 0)
     {
         KDNode *right = new KDNode();
+        right->splitDim = (KDTreeSplitAxis)(1 - node->splitDim);
         this->buildTree(rightIndices, right, level+1);
         node->right = right;
     }
@@ -310,7 +331,7 @@ Box KDTree::buildBoundingBox(const vector<int> & indices) const
         }
     }
 
-    return Box(minP.x, minP.y, maxP.x, maxP.y);
+    return Box(minP.x, maxP.x, minP.y, maxP.y);
 }
 
 const KDNode* KDTree::getLeafNode(const Point &query_point, const KDNode *node)const
