@@ -40,15 +40,13 @@ int main(int argc, const char * argv[])
         for(int i = 0; i < query_point_dataset.size(); i++)
         {
             tree.KNNQuery(query_point_dataset[i], K, indices1, squared_distances1);
-//            for (int j = 0; j < K; j++)
-//            {
-//                cout << "For the number row  " << i << "  query point, Using Exact kNN Search 3 Nearest Neigbour : The number "<< j + 1 << " nearest neighbor index is  "<< indices1[j] << endl;
-//            }
+            for (int j = 0; j < K; j++)
+            {
+                cout << "For the number row  " << i << "  query point, Using Exact kNN Search 3 Nearest Neigbour : The number "<< j + 1 << " nearest neighbor index is  "<< indices1[j] << endl;
+            }
         }
         clock_t end = clock();
-        
         double time = 1000.0f * (end - start) / CLOCKS_PER_SEC;
-        
         fout << "K: " << K << "  Time: " << time << std::endl;
     }
     
@@ -76,7 +74,7 @@ int main(int argc, const char * argv[])
 //
 //    }
 //
-//    cout<<"The required application 2 has been successful, thank you!"<<endl;
+    cout<< "The required K-KNN relation test has been executed successful, thank you!"<<endl;
 
     return 0;
 }

@@ -10,25 +10,40 @@
 
 int main()
 {
+    /**Load points from a simple text file**/
+    vector<Point> dataset;
+    ReadData rd1("/Users/z/Documents/Crowd\ Simulation/Crowd\ Simulation/TestKDTree/TestKDTree/sample_data.txt");
+    dataset = rd1.allPoints;
+    
+    //query_point
+    vector<double> query_point;
+    vector<Point> query_point_dataset;
+    ReadData rd2("/Users/z/Documents/Crowd\ Simulation/Crowd\ Simulation/TestKDTree/TestKDTree/query_points.txt");
+    query_point_dataset = rd2.allPoints;
+    
+    cout << "size " << rd1.allPoints.size() << endl;
+    
+    vector<int> indices1;
+    vector<double> squared_distances1;
+    int K = 38;
+    ofstream fout("/Users/z/Documents/Crowd\ Simulation/Crowd\ Simulation/Leaf-KD-KNN.txt");
+    
+    for (int leafSize = 1; leafSize <= 50; leafSize++) {
+         /** Build a KD Tree **/
+        KDTree tree(rd1.allPoints, 1);
+        clock_t start = clock();
+        for(int i = 0; i < query_point_dataset.size(); i++)
+        {
+            tree.KNNQuery(query_point_dataset[i], K, indices1, squared_distances1);
+        }
+        clock_t end = clock();
+        double time = 1000.0f * (end - start) / CLOCKS_PER_SEC;
+        fout << "Leaf: " << leafSize << "  Time: " << time << endl;
+    }
+    
+    fout.close();
 
-  /**Load points from a simple text file**/
+    cout << "The requried leaf-knn relation test has been exectued successfully" << endl;
 
-  vector<vector<double> > dataset;
-  ReadData rd1("sample_data.txt");
-  dataset=rd1.allDataPointsVec;
-
-
-  /** Build a KD Tree **/
-  KD_tree kd;
-  int max_leaf_size =1;
-  kd.create_tree(dataset, max_leaf_size);
-
-  /** Save the KD Tree to disk **/
-  //string KDTree_Storage_fileName="KD_tree_storage.txt";
-  kd.save_tree_to_file("KD_tree_storage.txt");
-
-  cout<<"The required application 1 has been successful, thank you! Please check the KD_tree_storage.txt for the KD tree "<<endl;
-
-  return 0;
-
+    return 0;
 }

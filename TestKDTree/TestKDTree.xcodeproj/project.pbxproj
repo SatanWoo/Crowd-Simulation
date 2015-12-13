@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		19BFBAB71C1BE1A30086008A /* kNNSearch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 19BFBAAE1C1BE1A30086008A /* kNNSearch.cpp */; };
+		19B693BD1C1DC7FF00D10E52 /* LoadPointsBuildSaveTree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 19BFBAAF1C1BE1A30086008A /* LoadPointsBuildSaveTree.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -46,6 +46,18 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		19B693BC1C1DC79600D10E52 /* TestCase */ = {
+			isa = PBXGroup;
+			children = (
+				19BFBAAD1C1BE1A30086008A /* KNNKDTreeUnitTest.cpp */,
+				19BFBAAB1C1BE1A30086008A /* BBFRecallAtOne.cpp */,
+				19BFBAAE1C1BE1A30086008A /* kNNSearch.cpp */,
+				19BFBAAF1C1BE1A30086008A /* LoadPointsBuildSaveTree.cpp */,
+				19BFBAB01C1BE1A30086008A /* PrintAllDataID.cpp */,
+			);
+			name = TestCase;
+			sourceTree = "<group>";
+		};
 		19BFBA981C1BE18C0086008A = {
 			isa = PBXGroup;
 			children = (
@@ -65,13 +77,9 @@
 		19BFBAA31C1BE18C0086008A /* TestKDTree */ = {
 			isa = PBXGroup;
 			children = (
-				19BFBAAD1C1BE1A30086008A /* KNNKDTreeUnitTest.cpp */,
-				19BFBAAB1C1BE1A30086008A /* BBFRecallAtOne.cpp */,
-				19BFBAAC1C1BE1A30086008A /* KD_tree.h */,
-				19BFBAAE1C1BE1A30086008A /* kNNSearch.cpp */,
-				19BFBAAF1C1BE1A30086008A /* LoadPointsBuildSaveTree.cpp */,
-				19BFBAB01C1BE1A30086008A /* PrintAllDataID.cpp */,
+				19B693BC1C1DC79600D10E52 /* TestCase */,
 				19BFBAB11C1BE1A30086008A /* query_points.txt */,
+				19BFBAAC1C1BE1A30086008A /* KD_tree.h */,
 				19BFBAB21C1BE1A30086008A /* ReadData1.h */,
 				19BFBAB41C1BE1A30086008A /* sample_data.txt */,
 			);
@@ -134,7 +142,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				19BFBAB71C1BE1A30086008A /* kNNSearch.cpp in Sources */,
+				19B693BD1C1DC7FF00D10E52 /* LoadPointsBuildSaveTree.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -253,6 +261,7 @@
 				19BFBAAA1C1BE18C0086008A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
