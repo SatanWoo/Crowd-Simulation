@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		19B693B51C1DC75800D10E52 /* k-knn.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 19B693B41C1DC75800D10E52 /* k-knn.cpp */; };
+		19B693C11C1DEFC700D10E52 /* leafsize-knn.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 19B693BE1C1DED2500D10E52 /* leafsize-knn.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -27,6 +27,7 @@
 		19B693B41C1DC75800D10E52 /* k-knn.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "k-knn.cpp"; sourceTree = "<group>"; };
 		19B693BB1C1DC76300D10E52 /* QuadTree.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = QuadTree.h; sourceTree = "<group>"; };
 		19B693BE1C1DED2500D10E52 /* leafsize-knn.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "leafsize-knn.cpp"; sourceTree = "<group>"; };
+		19B693C01C1DEE6E00D10E52 /* ReadData1.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReadData1.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -62,6 +63,7 @@
 				19B693B41C1DC75800D10E52 /* k-knn.cpp */,
 				19B693BE1C1DED2500D10E52 /* leafsize-knn.cpp */,
 				19B693BB1C1DC76300D10E52 /* QuadTree.h */,
+				19B693C01C1DEE6E00D10E52 /* ReadData1.h */,
 			);
 			path = TestQuadTree;
 			sourceTree = "<group>";
@@ -122,7 +124,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				19B693B51C1DC75800D10E52 /* k-knn.cpp in Sources */,
+				19B693C11C1DEFC700D10E52 /* leafsize-knn.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -241,6 +243,7 @@
 				19B693BA1C1DC75800D10E52 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

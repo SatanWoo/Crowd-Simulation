@@ -383,7 +383,7 @@ bool KDTree::query(const Point& query_point, const int K,
 
 bool KDTree::exploreLeafNode(const Point& query_point, const int K,
                                 priority_queue<DistanceIndex>& priority_points,
-                                double & max_distance, const KDNode* cur_node) const
+                                double &max_distance, const KDNode* cur_node) const
 {
     for(int i = 0; i < cur_node->dataIndex.size(); ++i)
     {
