@@ -84,7 +84,7 @@ public:
         }
         else
         {
-            return 0;
+            sumY = 0;
         }
         
         if(p.y < y0)
@@ -97,9 +97,8 @@ public:
         }
         else
         {
-            return 0;
+            sumY = 0;
         }
-        
         
         return sumX + sumY;
     }
@@ -209,6 +208,7 @@ bool KDTree::createTree(const vector<Point>& data, unsigned int max_leaf_size)
     }
     
     root = new KDNode();
+    root->splitDim = 0;
     root->box=this->buildBox(indices);
     this->buildTree(indices, root, 0);
     
@@ -231,8 +231,7 @@ bool KDTree::buildTree(const vector<int> & indices, KDNode* & node, unsigned lev
     node->dataIndex = indices;
     
     // randomly select split dimensions
-    int split_dim = rand() % Point::DIMENSION;
-    node->splitDim = split_dim;
+    int split_dim = node->splitDim;
     vector<double> one_dim_values;
     for(int i = 0; i < indices.size(); ++i)
     {
@@ -268,6 +267,7 @@ bool KDTree::buildTree(const vector<int> & indices, KDNode* & node, unsigned lev
     if(left_indices.size() != 0)
     {
         KDNode* left_node = new KDNode();
+        left_node->splitDim = 1 - split_dim;
         this->buildTree(left_indices, left_node, level+1);
         node->left = left_node;
     }
@@ -275,6 +275,7 @@ bool KDTree::buildTree(const vector<int> & indices, KDNode* & node, unsigned lev
     if(right_indices.size() != 0)
     {
         KDNode *right_node = new KDNode();
+        right_node->splitDim = 1 - split_dim;
         this->buildTree(right_indices, right_node, level+1);
         node->right = right_node;
     }

@@ -13,7 +13,7 @@ using namespace std;
 
 int main(int argc, const char * argv[])
 {
-    int K = 3;
+   
     ReadData rd1("/Users/z/Documents/Crowd\ Simulation/Crowd\ Simulation/TestKDTree/TestKDTree/sample_data.txt");
 
     //query_point
@@ -23,21 +23,36 @@ int main(int argc, const char * argv[])
     query_point_dataset = rd2.allPoints;
 
     KDTree tree(rd1.allPoints, 4);
+    
+    cout << "Data Set is " << rd1.allPoints.size() << std::endl;
 
     vector<int> indices1;
     vector<double> squared_distances1;
+    
+    ofstream fout("/Users/z/Documents/Crowd\ Simulation/Crowd\ Simulation/K-Knn.txt");
 
     /** Exact kNN Search **/
     cout<<"-------------------------------------------------------------------------------"<<endl;
     cout<<"*********Using Exact k Nearest Neighbor Search, The following are Results******"<<endl;
-    for(int i=0; i < query_point_dataset.size(); i++)
-    {
-        tree.KNNQuery(query_point_dataset[i], K, indices1, squared_distances1);
-        for (int j = 0; j < K; j++)
+    
+    for (int K = 1; K <= rd1.allPoints.size(); K++) {
+        clock_t start = clock();
+        for(int i = 0; i < query_point_dataset.size(); i++)
         {
-            cout << "For the number row  " << i << "  query point, Using Exact kNN Search 3 Nearest Neigbour : The number "<< j + 1 << " nearest neighbor index is  "<< indices1[j] << endl;
+            tree.KNNQuery(query_point_dataset[i], K, indices1, squared_distances1);
+//            for (int j = 0; j < K; j++)
+//            {
+//                cout << "For the number row  " << i << "  query point, Using Exact kNN Search 3 Nearest Neigbour : The number "<< j + 1 << " nearest neighbor index is  "<< indices1[j] << endl;
+//            }
         }
+        clock_t end = clock();
+        
+        double time = 1000.0f * (end - start) / CLOCKS_PER_SEC;
+        
+        fout << "K: " << K << "  Time: " << time << std::endl;
     }
+    
+    fout.close();
 
 //    vector<int> indices2;
 //    vector<double> squared_distances2;
