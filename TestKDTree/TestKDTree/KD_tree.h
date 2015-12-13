@@ -294,7 +294,7 @@ bool KDTree::KNNQuery(const Point& query_point, const int K,
     KDNode* cur_node = root;
     
     // travel to the leaf node
-    while(cur_node!=NULL)
+    while(cur_node != NULL)
     {
         candidate_nodes.push(cur_node);
         
