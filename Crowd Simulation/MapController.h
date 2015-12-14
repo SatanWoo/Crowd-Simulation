@@ -6,6 +6,7 @@
 #include "KDTree.h"
 #include "CostNode.h"
 #include "VirtualNode.h"
+#include "RVO.h"
 
 #include <iostream>
 #include <vector>
