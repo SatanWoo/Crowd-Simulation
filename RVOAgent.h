@@ -1,5 +1,5 @@
 /*
- * Obstacle.cpp
+ * Agent.h
  * RVO2 Library
  *
  * Copyright (c) 2008-2013 University of North Carolina at Chapel Hill.
@@ -54,9 +54,60 @@
  * <http://gamma.cs.unc.edu/RVO2/>
  */
 
-#include "Obstacle.h"
-#include "RVOSimulator.h"
+#ifndef RVO_AGENT_H_
+#define RVO_AGENT_H_
+/**
+ * \file       Agent.h
+ * \brief      Contains the Agent class.
+ */
+
+#include "Definitions.h"
+#include <Box2D/Box2D.h>
+#include <vector>
 
 namespace RVO {
-	Obstacle::Obstacle() : isConvex_(false), nextObstacle_(NULL), prevObstacle_(NULL), id_(0) { }
+    class KdTree;
+    
+    struct RVOAgent {
+        b2Vec2 pos;
+        b2Vec2 velocity;
+        b2Vec2 prefVelo;
+        
+        float32 radius;
+        size_t maxNeighbours;
+        size_t ID;
+        
+        typedef std::pair<float, const RVOAgent*> AgentDistanceMap;
+        typedef std::vector<AgentDistanceMap> Neighours;
+        
+        Neighours neighbours;
+        
+        KdTree *virtualTree;
+        /**
+         * \brief      Constructs an agent instance.
+         * \param      sim             The simulator instance.
+         */
+        RVOAgent(b2Vec2 pos = b2Vec2_zero, b2Vec2 velocity = b2Vec2_zero, b2Vec2 pref = b2Vec2(4, 4),
+                 float32 radius = 0.15, size_t maxNeighbours = 10, size_t ID = 0);
+        RVOAgent(const RVOAgent& agent);
+        
+        void update();
+        void computeNeighbours();
+        void insertAgentNeighbours(const RVOAgent* agent, float &range);
+        
+        b2Vec2 getPosition()const{return this->body->GetPosition();}
+        b2Vec2 getVelocity()const{return this->body->GetLinearVelocity();}
+        
+        void initBodyDef(b2World *world);
+        void initFixtureDef();
+        
+        // Box2D
+        b2FixtureDef *fixtureDef;
+        b2Fixture *fixture;
+        
+        b2Body *body;
+        b2BodyDef *bodyDef;
+    };
 }
+
+#endif /* RVO_AGENT_H_ */

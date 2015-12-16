@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1916ED8A1C2069FC00E85496 /* RVOAgent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1916ED811C2069FC00E85496 /* RVOAgent.cpp */; };
+		1916ED8B1C2069FC00E85496 /* KdTree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1916ED831C2069FC00E85496 /* KdTree.cpp */; };
 		191E6C5D1B1D4249009F8702 /* KDObstacle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 191E6C5B1B1D4249009F8702 /* KDObstacle.cpp */; };
 		1955D0E91AC44362001318C6 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1955D0E81AC44362001318C6 /* main.cpp */; };
 		1955D0F01AC44379001318C6 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1955D0EF1AC44379001318C6 /* GLUT.framework */; };
@@ -71,6 +73,10 @@
 
 /* Begin PBXFileReference section */
 		191246221B0DC7EB00742914 /* KDNode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KDNode.h; sourceTree = "<group>"; };
+		1916ED811C2069FC00E85496 /* RVOAgent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RVOAgent.cpp; sourceTree = "<group>"; };
+		1916ED821C2069FC00E85496 /* RVOAgent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RVOAgent.h; sourceTree = "<group>"; };
+		1916ED831C2069FC00E85496 /* KdTree.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = KdTree.cpp; sourceTree = "<group>"; };
+		1916ED841C2069FC00E85496 /* KdTree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KdTree.h; sourceTree = "<group>"; };
 		191E6C5B1B1D4249009F8702 /* KDObstacle.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = KDObstacle.cpp; sourceTree = "<group>"; };
 		191E6C5C1B1D4249009F8702 /* KDObstacle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KDObstacle.h; sourceTree = "<group>"; };
 		1955D0E51AC44362001318C6 /* Crowd Simulation */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "Crowd Simulation"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -374,6 +380,10 @@
 		199D5F731C1EED2B0025674D /* RVO */ = {
 			isa = PBXGroup;
 			children = (
+				1916ED811C2069FC00E85496 /* RVOAgent.cpp */,
+				1916ED821C2069FC00E85496 /* RVOAgent.h */,
+				1916ED831C2069FC00E85496 /* KdTree.cpp */,
+				1916ED841C2069FC00E85496 /* KdTree.h */,
 			);
 			name = RVO;
 			sourceTree = "<group>";
@@ -506,6 +516,7 @@
 				1987ED591AF136C9007BACE5 /* b2MouseJoint.cpp in Sources */,
 				19ABB1B01B14988000E7B623 /* KDTree.cpp in Sources */,
 				1987ED421AF136C9007BACE5 /* b2CircleShape.cpp in Sources */,
+				1916ED8B1C2069FC00E85496 /* KdTree.cpp in Sources */,
 				1987ED481AF136C9007BACE5 /* b2Body.cpp in Sources */,
 				199D5F821C1EED490025674D /* Obstacle.cpp in Sources */,
 				1987ED5B1AF136C9007BACE5 /* b2PulleyJoint.cpp in Sources */,
@@ -513,6 +524,7 @@
 				1987ED5A1AF136C9007BACE5 /* b2PrismaticJoint.cpp in Sources */,
 				1987ED561AF136C9007BACE5 /* b2GearJoint.cpp in Sources */,
 				1987ED4F1AF136C9007BACE5 /* b2Contact.cpp in Sources */,
+				1916ED8A1C2069FC00E85496 /* RVOAgent.cpp in Sources */,
 				1987ED471AF136C9007BACE5 /* b2StackAllocator.cpp in Sources */,
 				1987ED4A1AF136C9007BACE5 /* b2Fixture.cpp in Sources */,
 				1987ED3F1AF136C9007BACE5 /* b2Distance.cpp in Sources */,

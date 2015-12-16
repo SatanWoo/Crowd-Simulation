@@ -1,5 +1,5 @@
 /*
- * Obstacle.h
+ * Agent.cpp
  * RVO2 Library
  *
  * Copyright (c) 2008-2013 University of North Carolina at Chapel Hill.
@@ -54,39 +54,91 @@
  * <http://gamma.cs.unc.edu/RVO2/>
  */
 
-#ifndef RVO_OBSTACLE_H_
-#define RVO_OBSTACLE_H_
-
-/**
- * \file       Obstacle.h
- * \brief      Contains the Obstacle class.
- */
-
-#include "Definitions.h"
+#include "RVOAgent.h"
 
 namespace RVO {
-	/**
-	 * \brief      Defines static obstacles in the simulation.
-	 */
-	class Obstacle {
-	private:
-		/**
-		 * \brief      Constructs a static obstacle instance.
-		 */
-		Obstacle();
+    RVOAgent::RVOAgent(b2Vec2 pos, b2Vec2 velocity, b2Vec2 pref,
+                       float32 radius, size_t maxNeighbours, size_t ID)
+    {
+        this->pos = pos;
+        this->velocity = velocity;
+        this->prefVelo = pref;
+        this->radius = radius;
+        this->maxNeighbours = maxNeighbours;
+        this->ID = ID;
+    }
+    
+    RVOAgent::RVOAgent(const RVOAgent& agent)
+    {
+        this->pos = agent.pos;
+        this->velocity = agent.velocity;
+        this->prefVelo = agent.prefVelo;
+        this->radius = agent.radius;
+        this->maxNeighbours = agent.maxNeighbours;
+        this->ID = agent.ID;
+    }
+    
+    void RVOAgent::computeNeighbours()
+    {
+        float rangeSq = radius * radius;
+        neighbours.clear();
+        
+        if (maxNeighbours > 0)
+        {
+            this->virtualTree->computeAgentNeighbors(this, rangeSq);
+        }
+    }
+    
+    void RVOAgent::initBodyDef(b2World *world)
+    {
+        bodyDef = new b2BodyDef();
+        bodyDef->type = b2_dynamicBody;
+        bodyDef->position.Set(this->pos.x, this->pos.y);
+        
+        body = world->CreateBody(bodyDef);
+        initFixtureDef();
+    }
+    
+    void RVOAgent::initFixtureDef()
+    {
+        this->fixtureDef = new b2FixtureDef();
+        fixtureDef = new b2FixtureDef();
+        fixtureDef->density = 20.0;
+        fixtureDef->friction = 0.0;
+        fixtureDef->restitution = 0.0;
+        fixtureDef->shape = new b2CircleShape(radius);
+        fixture = body->CreateFixture(fixtureDef);
+    }
 
-		bool isConvex_;
-		Obstacle *nextObstacle_;
-		Vector2 point_;
-		Obstacle *prevObstacle_;
-		Vector2 unitDir_;
+	void RVOAgent::insertAgentNeighbours(const RVO::RVOAgent *agent, float &range)
+	{
+		if (this != agent) {
+			const float distSq = absSq(getPosition() - agent->getPosition());
 
-		size_t id_;
+			if (distSq < rangeSq) {
+				if (agentNeighbors_.size() < maxNeighbors_) {
+					agentNeighbors_.push_back(std::make_pair(distSq, agent));
+				}
 
-		friend class Agent;
-		friend class KdTree;
-		friend class RVOSimulator;
-	};
+				size_t i = agentNeighbors_.size() - 1;
+
+				while (i != 0 && distSq < agentNeighbors_[i - 1].first) {
+					agentNeighbors_[i] = agentNeighbors_[i - 1];
+					--i;
+				}
+
+				agentNeighbors_[i] = std::make_pair(distSq, agent);
+
+				if (agentNeighbors_.size() == maxNeighbors_) {
+					rangeSq = agentNeighbors_.back().first;
+				}
+			}
+		}
+	}
+
+	void RVOAgent::update()
+	{
+//		velocity_ = newVelocity_;
+//		position_ += velocity_ * sim_->timeStep_;
+	}
 }
-
-#endif /* RVO_OBSTACLE_H_ */
