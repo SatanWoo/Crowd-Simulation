@@ -189,8 +189,11 @@ void SimulationController::clusterSimulation()
 void SimulationController::resetContinnum()
 {
     densityField.clear();
+    densityField.resize(this->map->getHeight() * this->map->getWidth());
     discomfortField.clear();
+    discomfortField.resize(this->map->getHeight() * this->map->getWidth());
     avgVelocityField.clear();
+    avgVelocityField.resize(this->map->getHeight() * this->map->getWidth());
     
     // Obstacles.
 //    for (int i = obstacles.size() - 1; i >= 0; i--) {
@@ -296,6 +299,7 @@ void SimulationController::buildPotentialField(const b2Vec2 &goal)
 {
     static vector<bool> visited(this->map->getWidth() * this->map->getHeight(), false);
     visited.clear();
+    visited.resize(this->map->getWidth() * this->map->getHeight());
     
     int candidatesCount = 0;
     
@@ -347,6 +351,7 @@ void SimulationController::buildPotentialField(const b2Vec2 &goal)
 void SimulationController::buildFlowField()
 {
     flowFlied.clear();
+    flowFlied.resize(this->map->getWidth() * this->map->getHeight());
     
     for (int i = 0; i < this->map->getWidth(); ++i)
     {
