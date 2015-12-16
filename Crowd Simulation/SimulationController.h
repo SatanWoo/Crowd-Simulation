@@ -84,6 +84,9 @@ private:
     b2Vec2 forceFromCohesion(Cluster *cluster);
     //b2Vec2 forceFromCohesion(const RVOAgent *agent);
     
+private:
+    
+    
 // Utility
 private:
     int index(int x, int y)const;
@@ -92,22 +95,24 @@ private:
 private:
     MapController *map;
     b2World *world;
+    
     b2Vec3 relation;
-
+    double timeStep;
+    
+    size_t count;
+    SimulationMode mode;
+    
 // Data
 private:
     vector<RVOAgent *> agents;
     vector<b2Vec2 *> obstacles;
     
-    typedef unordered_map<int, bool> AvaibleAgents;
-    AvaibleAgents unclusteredAgents;
+    RVOAgent::AgentsPool unclusteredAgents;
     
     vector<Cluster *> clusters;
     
-    size_t count;
-    SimulationMode mode;
-    
-    double timeStep;
+    RVOKDTree *tree;
+
     
 // Field
 private:

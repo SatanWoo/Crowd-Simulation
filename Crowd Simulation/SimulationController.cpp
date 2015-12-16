@@ -45,6 +45,12 @@ SimulationController::~SimulationController()
     
     delete map;
     map = NULL;
+    
+    if (tree)
+    {
+        delete tree;
+        tree = NULL;
+    }
 }
 
 void SimulationController::simulate()
@@ -52,10 +58,12 @@ void SimulationController::simulate()
     continuumSimulation();
     flockSimulation();
     
-    if (this->mode == VirtualNode)
-    {
-        clusterSimulation();
-    }
+//    if (this->mode == VirtualNode)
+//    {
+//        clusterSimulation();
+//    }
+    
+    clusterSimulation();
     
     // Iteration times
     this->world->Step(this->timeStep, 10, 10);
@@ -74,6 +82,8 @@ void SimulationController::render()
 
 void SimulationController::init(int w, int h)
 {
+    static unsigned long long int usedID = 0;
+    
     unsigned long long int size = w * h;
     
     srand((unsigned)time(NULL));
@@ -94,12 +104,13 @@ void SimulationController::init(int w, int h)
     
     this->world = new b2World(b2Vec2_zero, true);
     
-    for (int yPos = 1; yPos < h - 1; ++yPos)
+    for (int yPos = 1; yPos < 2; ++yPos)
     {
-        for (int i = 0 ; i < 30; i++)
+        for (int i = 0 ; i < 1; i++)
         {
             RVOAgent *agent = new RVOAgent(b2Vec2(i % 3, yPos));
             agent->group = 0;
+            agent->ID = usedID++;
             agent->goal = b2Vec2(w - 2, h / 2.0);
             agent->initBodyDef(world);
             
@@ -107,12 +118,13 @@ void SimulationController::init(int w, int h)
         }
     }
     
-    for (int yPos = 1; yPos < h - 1; yPos++)
+    for (int yPos = 1; yPos < 2; yPos++)
     {
-        for (int i =0 ; i < 30; i++)
+        for (int i =0 ; i < 1; i++)
         {
             RVOAgent *agent = new RVOAgent(b2Vec2(w - (i + 1) % 3, yPos));
             agent->group = 1;
+            agent->ID = usedID++;
             agent->goal = b2Vec2(1, h / 2.0);
             agent->initBodyDef(world);
             
@@ -165,7 +177,12 @@ void SimulationController::flockSimulation()
 
 void SimulationController::clusterSimulation()
 {
-    // Do Nothing
+    this->unclusteredAgents.clear();
+    // First Use KDTree to check
+    for (int i = 0; i < agents.size(); i++)
+    {
+        agents[i]->computeNeighbours(this->unclusteredAgents);
+    }
 }
 
 #pragma mark - Continuum Step

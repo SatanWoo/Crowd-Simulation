@@ -18,6 +18,7 @@ MapController::MapController(int width, int height)
 
 MapController::~MapController()
 {
+    
 }
 
 void MapController::render()

@@ -60,6 +60,8 @@
 #include <OpenGL/OpenGL.h>
 #include <GLUT/GLUT.h>
 
+using namespace std;
+
 namespace RVO {
     int RVOAgent::maxForce = 20;
     int RVOAgent::maxSpeed = 4;
@@ -91,14 +93,14 @@ namespace RVO {
         this->ID = agent.ID;
     }
     
-    void RVOAgent::computeNeighbours()
+    void RVOAgent::computeNeighbours(AgentsPool& pool)
     {
         float rangeSq = radius * radius;
         neighbours.clear();
         
         if (maxNeighbours > 0)
         {
-            this->virtualTree->computeAgentNeighbors(this, rangeSq);
+            this->virtualTree->computeAgentNeighbors(this, rangeSq, pool);
         }
     }
     
@@ -123,11 +125,13 @@ namespace RVO {
         fixture = body->CreateFixture(fixtureDef);
     }
 
-    void RVOAgent::insertAgentNeighbours(const RVOAgent* agent, float &rangeSq)
+    void RVOAgent::insertAgentNeighbours(const RVOAgent* agent, float &rangeSq, AgentsPool& pool)
 	{
 		if (this != agent)
         {
             if (this->group != agent->group) return;
+            
+            if (pool.find(agent->ID) != pool.end()) return;
             
 			const float distSq = absSq(getPosition() - agent->getPosition());
 
@@ -135,6 +139,7 @@ namespace RVO {
             {
 				if (neighbours.size() < maxNeighbours)
                 {
+                    pool.insert(make_pair(agent->ID, true));
 					neighbours.push_back(std::make_pair(distSq, agent));
 				}
 
@@ -157,12 +162,12 @@ namespace RVO {
 
 	void RVOAgent::render(double gridSize)
 	{
-        glLineWidth(1);
-        glBegin(GL_LINES);
-            glColor4f(0.0, 1.0, 0.0, 1.0);
-            glVertex2d(goal.x * gridSize + 0.5 * gridSize, goal.y * gridSize + 0.5 * gridSize);
-            glVertex2f(this->getPosition().x * gridSize + 0.5 * gridSize, this->getPosition().y * gridSize + 0.5 * gridSize);
-        glEnd();
+//        glLineWidth(1);
+//        glBegin(GL_LINES);
+//            glColor4f(0.0, 1.0, 0.0, 1.0);
+//            glVertex2d(goal.x * gridSize + 0.5 * gridSize, goal.y * gridSize + 0.5 * gridSize);
+//            glVertex2f(this->getPosition().x * gridSize + 0.5 * gridSize, this->getPosition().y * gridSize + 0.5 * gridSize);
+//        glEnd();
         
         glPointSize(5);
         glBegin(GL_POINTS);

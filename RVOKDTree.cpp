@@ -131,18 +131,18 @@ namespace RVO {
 		}
 	}
     
-    void RVOKDTree::computeAgentNeighbors(RVOAgent *agent, float &rangeSq)
+    void RVOKDTree::computeAgentNeighbors(RVOAgent *agent, float &rangeSq, RVOAgent::AgentsPool& pool)
     {
-        queryAgentTreeRecursive(agent, rangeSq, 0);
+        queryAgentTreeRecursive(agent, rangeSq, 0, pool);
     }
 
-	void RVOKDTree::queryAgentTreeRecursive(RVOAgent* agent, float &rangeSq, size_t node)const
+	void RVOKDTree::queryAgentTreeRecursive(RVOAgent* agent, float &rangeSq, size_t node, RVOAgent::AgentsPool& pool)const
 	{
 		if (agentTree[node].end - agentTree[node].begin <= MAX_LEAF_SIZE)
         {
 			for (size_t i = agentTree[node].begin; i < agentTree[node].end; ++i)
             {
-				agent->insertAgentNeighbours(agents[i], rangeSq);
+				agent->insertAgentNeighbours(agents[i], rangeSq, pool);
 			}
 		}
 		else
@@ -164,11 +164,11 @@ namespace RVO {
                 // 离左子树近
 				if (distSqLeft < rangeSq)
                 {
-					queryAgentTreeRecursive(agent, rangeSq, left);
+					queryAgentTreeRecursive(agent, rangeSq, left, pool);
                     
                     // 必要的回溯
 					if (distSqRight < rangeSq) {
-						queryAgentTreeRecursive(agent, rangeSq, right);
+						queryAgentTreeRecursive(agent, rangeSq, right, pool);
 					}
 				}
 			}
@@ -177,10 +177,10 @@ namespace RVO {
                 // 离右子树近
 				if (distSqRight < rangeSq)
                 {
-					queryAgentTreeRecursive(agent, rangeSq, right);
+					queryAgentTreeRecursive(agent, rangeSq, right, pool);
 
 					if (distSqLeft < rangeSq) {
-						queryAgentTreeRecursive(agent, rangeSq, left);
+						queryAgentTreeRecursive(agent, rangeSq, left, pool);
 					}
 				}
 			}

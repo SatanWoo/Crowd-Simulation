@@ -11,5 +11,6 @@
 
 #include "RVOAgent.h"
 #include "RVOKDTree.h"
+#include <unordered_map>
 
 #endif /* RVO_h */

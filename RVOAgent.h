@@ -63,6 +63,7 @@
 
 #include "Definitions.h"
 #include <Box2D/Box2D.h>
+#include <unordered_map>
 #include <vector>
 
 namespace RVO {
@@ -103,8 +104,11 @@ namespace RVO {
         RVOAgent(const RVOAgent& agent);
         
         void render(double gridSize);
-        void computeNeighbours();
-        void insertAgentNeighbours(const RVOAgent* agent, float &range);
+        
+        typedef std::unordered_map<size_t, bool> AgentsPool;
+        
+        void computeNeighbours(AgentsPool &pool);
+        void insertAgentNeighbours(const RVOAgent* agent, float &range, AgentsPool& pool);
         
         b2Vec2 getPosition()const{return this->body->GetPosition();}
         b2Vec2 getVelocity()const{return this->body->GetLinearVelocity();}
