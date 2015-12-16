@@ -54,26 +54,26 @@
  * <http://gamma.cs.unc.edu/RVO2/>
  */
 
-#include "RVORVOKDTree.h"
+#include "RVOKDTree.h"
 #include "RVOAgent.h"
 
 namespace RVO {
-	RVORVOKDTree::RVORVOKDTree()
+	RVOKDTree::RVOKDTree()
     {
     }
     
-    RVORVOKDTree::RVORVOKDTree(const std::vector<RVOAgent *>& agents)
+    RVOKDTree::RVOKDTree(const std::vector<RVOAgent *>& agents)
     {
         this->agents.assign(agents.begin(), agents.end());
     }
 
-	RVORVOKDTree::RVORVOKDTree()
+	RVOKDTree::~RVOKDTree()
 	{
         this->agents.clear();
         this->agentTree.clear();
 	}
 
-	void RVORVOKDTree::buildAgentTree()
+	void RVOKDTree::buildAgentTree()
 	{
         agentTree.resize(2 * agents.size() - 1);
         buildAgentTreeRecursive(0, agents.size(), 0);
@@ -131,7 +131,7 @@ namespace RVO {
 		}
 	}
     
-    void RVOKDTree::computeAgentNeighbors(RVOAgent *agent, float &rangeSq)const
+    void RVOKDTree::computeAgentNeighbors(RVOAgent *agent, float &rangeSq)
     {
         queryAgentTreeRecursive(agent, rangeSq, 0);
     }

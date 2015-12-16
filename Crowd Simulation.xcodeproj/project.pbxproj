@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		1916ED8F1C21621800E85496 /* RVOAgent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1916ED811C2069FC00E85496 /* RVOAgent.cpp */; };
 		1916ED941C217FA000E85496 /* SimulationController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1916ED931C217FA000E85496 /* SimulationController.cpp */; };
+		1916ED951C21CB1F00E85496 /* RVOKDTree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1916ED831C2069FC00E85496 /* RVOKDTree.cpp */; };
 		1955D0E91AC44362001318C6 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1955D0E81AC44362001318C6 /* main.cpp */; };
 		1955D0F01AC44379001318C6 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1955D0EF1AC44379001318C6 /* GLUT.framework */; };
 		1955D0F41AC443D4001318C6 /* Vector.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1955D0F21AC443D4001318C6 /* Vector.cpp */; };
@@ -497,6 +498,7 @@
 				1987ED3E1AF136C9007BACE5 /* b2Collision.cpp in Sources */,
 				1987ED3B1AF136C9007BACE5 /* b2BroadPhase.cpp in Sources */,
 				1987ED551AF136C9007BACE5 /* b2FrictionJoint.cpp in Sources */,
+				1916ED951C21CB1F00E85496 /* RVOKDTree.cpp in Sources */,
 				1987ED491AF136C9007BACE5 /* b2ContactManager.cpp in Sources */,
 				1987ED511AF136C9007BACE5 /* b2PolygonAndCircleContact.cpp in Sources */,
 				1987ED5C1AF136C9007BACE5 /* b2RevoluteJoint.cpp in Sources */,

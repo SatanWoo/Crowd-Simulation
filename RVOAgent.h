@@ -69,7 +69,6 @@ namespace RVO {
     class RVOKDTree;
     
     struct RVOAgent {
-        
         static int maxForce; //rate of acceleration
         static int maxSpeed; //grid squares / second
         static float32 minSeparation; // We'll move away from anyone nearer than this
@@ -103,7 +102,7 @@ namespace RVO {
                  float32 radius = 0.15, size_t maxNeighbours = 10, size_t ID = 0);
         RVOAgent(const RVOAgent& agent);
         
-        void update();
+        void render(double gridSize);
         void computeNeighbours();
         void insertAgentNeighbours(const RVOAgent* agent, float &range);
         

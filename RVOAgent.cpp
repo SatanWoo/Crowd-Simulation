@@ -57,8 +57,10 @@
 #include "RVOAgent.h"
 #include "RVOKDTree.h"
 
+#include <OpenGL/OpenGL.h>
+#include <GLUT/GLUT.h>
+
 namespace RVO {
-    
     int RVOAgent::maxForce = 20;
     int RVOAgent::maxSpeed = 4;
     
@@ -153,9 +155,19 @@ namespace RVO {
 		}
 	}
 
-	void RVOAgent::update()
+	void RVOAgent::render(double gridSize)
 	{
-//		velocity_ = newVelocity_;
-//		position_ += velocity_ * sim_->timeStep_;
+        glLineWidth(1);
+        glBegin(GL_LINES);
+            glColor4f(0.0, 1.0, 0.0, 1.0);
+            glVertex2d(goal.x * gridSize + 0.5 * gridSize, goal.y * gridSize + 0.5 * gridSize);
+            glVertex2f(this->getPosition().x * gridSize + 0.5 * gridSize, this->getPosition().y * gridSize + 0.5 * gridSize);
+        glEnd();
+        
+        glPointSize(5);
+        glBegin(GL_POINTS);
+            glVertex2f(this->getPosition().x * gridSize + 0.5 * gridSize, this->getPosition().y * gridSize + 0.5 * gridSize);
+            glColor3f(1.0f, 0.0f, 1.0f);
+        glEnd();
 	}
 }

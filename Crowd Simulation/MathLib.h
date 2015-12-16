@@ -9,6 +9,9 @@
 #ifndef Crowd_Simulation_MathLib_h
 #define Crowd_Simulation_MathLib_h
 #include <math.h>
+#include <iostream>
+
+using namespace std;
 
 class MathLib
 {

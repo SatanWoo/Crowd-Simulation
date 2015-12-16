@@ -11,23 +11,24 @@
 #include <iostream>
 #include "Vector.h"
 #include "SimulationController.h"
+#include "MapController.h"
 
 using namespace std;
 
 const double MapWidth = 25;
 const double MapHeight = 30;
 
-//const double ScreenWidth = MapWidth * MapController::MapGridSize;
-//const double ScreenHeight = MapHeight * MapController::MapGridSize;
+const double ScreenWidth = MapWidth * MapController::MapGridSize;
+const double ScreenHeight = MapHeight * MapController::MapGridSize;
 
-//MapController *mapController = NULL;
+SimulationController *controller = NULL;
 
 void glRender()
 {
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
     glLoadIdentity();
     
-    //mapController->render();
+    controller->render();
     glutSwapBuffers();
 }
 
@@ -35,7 +36,7 @@ void glIdle()
 {
     int n = 1;
     while (n--) {
-        //mapController->update();
+        //controller->simulate();
     }
     
     glutPostRedisplay();
@@ -58,29 +59,31 @@ void glMouse(int button, int state, int x, int y)
 
 int main(int argc, const char * argv[])
 {
-    return 0;
-//    glutInit(&argc, const_cast<char **>(argv));
-//    glutInitDisplayMode(GLUT_RGBA|GLUT_DOUBLE);
-//    glutInitWindowSize(ScreenWidth, ScreenHeight);
-//    glutCreateWindow("Crowd Simulation");
-//    
-//    glutDisplayFunc(glRender);
-//    glutIdleFunc(glIdle);
-//    glutMouseFunc(glMouse);
-//    
-//    glMatrixMode(GL_PROJECTION);
-//    glLoadIdentity();
-//    gluOrtho2D(0, MapWidth * MapController::MapGridSize, 0, MapHeight * MapController::MapGridSize);
-//    glMatrixMode(GL_MODELVIEW);
-//    glLoadIdentity();
-//    glEnable(GL_POINT_SMOOTH);
-//    //glEnable(GL_BLEND);
-//    
-//    mapController = new MapController(MapWidth, MapHeight, MapHeight * 2);
-//
-//    glutMainLoop();
-//
-//    delete mapController;
-//    mapController = NULL;
-//    return EXIT_SUCCESS;
+    glutInit(&argc, const_cast<char **>(argv));
+    glutInitDisplayMode(GLUT_RGBA|GLUT_DOUBLE);
+    glutInitWindowSize(ScreenWidth, ScreenHeight);
+    glutCreateWindow("Cluster Simulation");
+    
+    glutDisplayFunc(glRender);
+    glutIdleFunc(glIdle);
+    glutMouseFunc(glMouse);
+    
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluOrtho2D(0, MapWidth * MapController::MapGridSize, 0, MapHeight * MapController::MapGridSize);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    glEnable(GL_POINT_SMOOTH);
+    //glEnable(GL_BLEND);
+    
+    controller = new SimulationController(MapHeight * 2);
+    controller->init(MapWidth, MapHeight);
+    controller->setRelation(b2Vec3(0.3, 0.15, 0.2));
+    controller->setTimeStep(0.02);
+    
+    glutMainLoop();
+
+    delete controller;
+    controller = NULL;
+    return EXIT_SUCCESS;
 }

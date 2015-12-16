@@ -11,6 +11,7 @@
 
 #include "RVO.h"
 #include "VirtualNode.h"
+#include "Box2D.h"
 #include <unordered_map>
 #include <vector>
 
@@ -22,7 +23,6 @@ typedef enum {
 } SimulationMode;
 
 class MapController;
-class b2Vec2;
 class FourGrid;
 
 typedef struct VirtualNode Cluster;
@@ -42,7 +42,11 @@ public:
     
     void setTimeStep(double time){this->timeStep = time;}
     double getTimeStep()const{return this->timeStep;}
-    const RVOAgent* getAgent(size_t ID)const{return this->agents[ID];}
+    
+    RVOAgent* getAgent(size_t ID)const{return this->agents[ID];}
+    
+    void setRelation(b2Vec3 relation){this->relation = relation;}
+    b2Vec3 getRelation()const{return this->relation;}
     
 protected:
     void continuumSimulation();
@@ -65,36 +69,40 @@ private:
     void buildFlowField();
     
 private:
-    b2Vec2 forceFromFlowField(const Cluster *cluster);
+    b2Vec2 forceFromFlowField(Cluster *cluster);
     //b2Vec2 forceFromFlowField(const RVOAgent* agent);
     
-    b2Vec2 forceFromSeek(const Cluster *cluster, b2Vec2 dest);
+    b2Vec2 forceFromSeek(Cluster *cluster, b2Vec2& dest);
     //b2Vec2 forceFromSeek(const RVOAgent *agent);
     
-    b2Vec2 forceFromSeparation(const Cluster *cluster);
+    b2Vec2 forceFromSeparation(Cluster *cluster);
     //b2Vec2 forceFromSeparation(const RVOAgent* agent);
     
-    b2Vec2 forceFromAlignment(const Cluster *cluster);
+    b2Vec2 forceFromAlignment(Cluster *cluster);
     //b2Vec2 forceFromAlignment(const RVOAgent *agent);
     
-    b2Vec2 forceFromCohesion(const Cluster *cluster);
+    b2Vec2 forceFromCohesion(Cluster *cluster);
     //b2Vec2 forceFromCohesion(const RVOAgent *agent);
     
 // Utility
 private:
+    int index(int x, int y)const;
     
 // Controller
 private:
     MapController *map;
-    int index(int x, int y)const;
+    b2World *world;
+    b2Vec3 relation;
+
 // Data
 private:
-    vector<const RVOAgent *> agents;
+    vector<RVOAgent *> agents;
+    vector<b2Vec2 *> obstacles;
     
     typedef unordered_map<int, bool> AvaibleAgents;
     AvaibleAgents unclusteredAgents;
     
-    vector<const Cluster *> clusters;
+    vector<Cluster *> clusters;
     
     size_t count;
     SimulationMode mode;

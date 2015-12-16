@@ -139,9 +139,8 @@ namespace RVO
 		 *                             neighbors are to be computed.
 		 * \param      rangeSq         The squared range around the agent.
 		 */
-		void computeAgentNeighbors(RVOAgent* agent, float &rangeSq)const;
-		void queryAgentTreeRecursive(RVOAgent* agent, float &rangeSq,
-									 size_t node)const;
+        void computeAgentNeighbors(RVOAgent* agent, float &rangeSq);
+		void queryAgentTreeRecursive(RVOAgent* agent, float &rangeSq, size_t node)const;
         
 		std::vector<RVOAgent *> agents;
 		std::vector<AgentTreeNode> agentTree;

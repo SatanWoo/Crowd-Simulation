@@ -22,6 +22,12 @@ struct CostNode {
         point.x = 0;
         point.y = 0;
     }
+    
+    CostNode(b2Vec2 p, float32 cost)
+    {
+        this->cost = cost;
+        this->point = p;
+    }
 
     bool operator< (const CostNode& v) const
     {
