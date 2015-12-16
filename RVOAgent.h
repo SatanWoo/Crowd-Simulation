@@ -66,23 +66,35 @@
 #include <vector>
 
 namespace RVO {
-    class KdTree;
+    class RVOKDTree;
     
     struct RVOAgent {
+        
+        static int maxForce; //rate of acceleration
+        static int maxSpeed; //grid squares / second
+        static float32 minSeparation; // We'll move away from anyone nearer than this
+        static int maxCohesion; //We'll move closer to anyone within this bound
+        
+        static int maxForceSquared;
+        static int maxSpeedSquared;
+        
         b2Vec2 pos;
         b2Vec2 velocity;
         b2Vec2 prefVelo;
+        b2Vec2 goal;
         
         float32 radius;
         size_t maxNeighbours;
         size_t ID;
         
+        int group;
+       
         typedef std::pair<float, const RVOAgent*> AgentDistanceMap;
         typedef std::vector<AgentDistanceMap> Neighours;
         
         Neighours neighbours;
         
-        KdTree *virtualTree;
+        RVOKDTree *virtualTree;
         /**
          * \brief      Constructs an agent instance.
          * \param      sim             The simulator instance.

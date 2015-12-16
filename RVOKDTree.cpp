@@ -1,5 +1,5 @@
 /*
- * KdTree.cpp
+ * RVOKDTree.cpp
  * RVO2 Library
  *
  * Copyright (c) 2008-2013 University of North Carolina at Chapel Hill.
@@ -54,32 +54,32 @@
  * <http://gamma.cs.unc.edu/RVO2/>
  */
 
-#include "KdTree.h"
+#include "RVORVOKDTree.h"
 #include "RVOAgent.h"
 
 namespace RVO {
-	KdTree::KdTree()
+	RVORVOKDTree::RVORVOKDTree()
     {
     }
     
-    KdTree::KdTree(const std::vector<RVOAgent *>& agents)
+    RVORVOKDTree::RVORVOKDTree(const std::vector<RVOAgent *>& agents)
     {
         this->agents.assign(agents.begin(), agents.end());
     }
 
-	KdTree::~KdTree()
+	RVORVOKDTree::RVORVOKDTree()
 	{
         this->agents.clear();
         this->agentTree.clear();
 	}
 
-	void KdTree::buildAgentTree()
+	void RVORVOKDTree::buildAgentTree()
 	{
         agentTree.resize(2 * agents.size() - 1);
         buildAgentTreeRecursive(0, agents.size(), 0);
 	}
 
-	void KdTree::buildAgentTreeRecursive(size_t begin, size_t end, size_t nodeID)
+	void RVOKDTree::buildAgentTreeRecursive(size_t begin, size_t end, size_t nodeID)
 	{
 		agentTree[nodeID].begin = begin;
 		agentTree[nodeID].end = end;
@@ -122,6 +122,7 @@ namespace RVO {
 				++right;
 			}
 
+            // 2n, 2n + 1
 			agentTree[nodeID].left = nodeID + 1;
 			agentTree[nodeID].right = nodeID + 2 * (left - begin);
 
@@ -130,12 +131,12 @@ namespace RVO {
 		}
 	}
     
-    void KdTree::computeAgentNeighbors(RVO::RVOAgent *agent, float &rangeSq)const
+    void RVOKDTree::computeAgentNeighbors(RVOAgent *agent, float &rangeSq)const
     {
         queryAgentTreeRecursive(agent, rangeSq, 0);
     }
 
-	void KdTree::queryAgentTreeRecursive(RVO::RVOAgent *agent, float &rangeSq, size_t node)const
+	void RVOKDTree::queryAgentTreeRecursive(RVOAgent* agent, float &rangeSq, size_t node)const
 	{
 		if (agentTree[node].end - agentTree[node].begin <= MAX_LEAF_SIZE)
         {
@@ -147,7 +148,7 @@ namespace RVO {
 		else
         {
             size_t left = agentTree[node].left, right = agentTree[node].right;
-        
+            // 计算当前Agent的位置到Box4个顶点之前的距离之和。
 			const float distSqLeft = sqr(std::max(0.0f, agentTree[left].minX - agent->getPosition().x)) +
                                      sqr(std::max(0.0f, agent->getPosition().x - agentTree[left].maxX)) +
                                      sqr(std::max(0.0f, agentTree[left].minY - agent->getPosition().y)) +
@@ -158,17 +159,24 @@ namespace RVO {
                                       sqr(std::max(0.0f, agentTree[right].minY - agent->getPosition().y)) +
                                       sqr(std::max(0.0f, agent->getPosition().y - agentTree[right].maxY));
 
-			if (distSqLeft < distSqRight) {
-				if (distSqLeft < rangeSq) {
+			if (distSqLeft < distSqRight)
+            {
+                // 离左子树近
+				if (distSqLeft < rangeSq)
+                {
 					queryAgentTreeRecursive(agent, rangeSq, left);
-
+                    
+                    // 必要的回溯
 					if (distSqRight < rangeSq) {
 						queryAgentTreeRecursive(agent, rangeSq, right);
 					}
 				}
 			}
-			else {
-				if (distSqRight < rangeSq) {
+			else
+            {
+                // 离右子树近
+				if (distSqRight < rangeSq)
+                {
 					queryAgentTreeRecursive(agent, rangeSq, right);
 
 					if (distSqLeft < rangeSq) {

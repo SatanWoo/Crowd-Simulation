@@ -55,8 +55,19 @@
  */
 
 #include "RVOAgent.h"
+#include "RVOKDTree.h"
 
 namespace RVO {
+    
+    int RVOAgent::maxForce = 20;
+    int RVOAgent::maxSpeed = 4;
+    
+    float32 RVOAgent::minSeparation = 0.6;
+    int RVOAgent::maxCohesion = 2;
+    
+    int RVOAgent::maxForceSquared = RVOAgent::maxForce * RVOAgent::maxForce;
+    int RVOAgent::maxSpeedSquared = RVOAgent::maxSpeed * RVOAgent::maxSpeed;
+    
     RVOAgent::RVOAgent(b2Vec2 pos, b2Vec2 velocity, b2Vec2 pref,
                        float32 radius, size_t maxNeighbours, size_t ID)
     {
@@ -110,27 +121,33 @@ namespace RVO {
         fixture = body->CreateFixture(fixtureDef);
     }
 
-	void RVOAgent::insertAgentNeighbours(const RVO::RVOAgent *agent, float &range)
+    void RVOAgent::insertAgentNeighbours(const RVOAgent* agent, float &rangeSq)
 	{
-		if (this != agent) {
+		if (this != agent)
+        {
+            if (this->group != agent->group) return;
+            
 			const float distSq = absSq(getPosition() - agent->getPosition());
 
-			if (distSq < rangeSq) {
-				if (agentNeighbors_.size() < maxNeighbors_) {
-					agentNeighbors_.push_back(std::make_pair(distSq, agent));
+			if (distSq < rangeSq)
+            {
+				if (neighbours.size() < maxNeighbours)
+                {
+					neighbours.push_back(std::make_pair(distSq, agent));
 				}
 
-				size_t i = agentNeighbors_.size() - 1;
-
-				while (i != 0 && distSq < agentNeighbors_[i - 1].first) {
-					agentNeighbors_[i] = agentNeighbors_[i - 1];
+                size_t i = neighbours.size() - 1;
+				while (i != 0 && distSq < neighbours[i - 1].first)
+                {
+					neighbours[i] = neighbours[i - 1];
 					--i;
 				}
 
-				agentNeighbors_[i] = std::make_pair(distSq, agent);
+				neighbours[i] = std::make_pair(distSq, agent);
 
-				if (agentNeighbors_.size() == maxNeighbors_) {
-					rangeSq = agentNeighbors_.back().first;
+				if (neighbours.size() == maxNeighbours)
+                {
+					rangeSq = neighbours.back().first;
 				}
 			}
 		}

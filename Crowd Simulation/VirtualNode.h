@@ -10,71 +10,105 @@
 #define Crowd_Simulation_VirtualNode_h
 
 #include <vector>
+#include <limits.h>
 #include "Box2D.h"
-#include "Agent.h"
+#include "RVOAgent.h"
+#include "SimulationController.h"
+
+using namespace std;
 
 struct VirtualNode
 {
-    double maxX;
-    double maxY;
-    
-    double minX;
-    double minY;
+    double maxX, maxY;
+    double minX, minY;
     
     double radius;
+    double mass;
+    int group;
     
+    b2Vec2 goal;
     b2Vec2 center;
     b2Vec2 velocity;
-    b2Vec2 ff;
-    b2Vec2 force;
+    b2Vec2 continuumForce;
+    b2Vec2 flockForce;
     
-    int group;
-    std::vector<Agent *> allNodes;
+    vector<int> IDs;
+    
+    //SimulationController *sc;
+    
+    VirtualNode(const std::vector<int> IDs)
+    {
+        this->IDs.assign(IDs.begin(), IDs.end());
+        
+        mass = 0;
+        center = b2Vec2_zero;
+        velocity = b2Vec2_zero;
+        continuumForce = b2Vec2_zero;
+        flockForce = b2Vec2_zero;
+    }
     
     void build()
     {
-        maxX = INT_MIN;
-        maxY = INT_MIN;
+        maxX = numeric_limits<double>::max();
+        maxY = numeric_limits<double>::max();
         
-        minX = INT_MAX;
-        minY = INT_MAX;
+        minX = numeric_limits<double>::min();
+        minY = numeric_limits<double>::min();
         
-        center = b2Vec2_zero;
-        velocity = b2Vec2_zero;
-        
-        int size = allNodes.size();
-        for (int i = 0; i < size; i++)
+        for (size_t i = 0; i < IDs.size(); i++)
         {
-            Agent *ai = allNodes[i];
-            
-            b2Vec2 pos = ai->getPosition();
-            b2Vec2 vec = ai->getVelocity();
-            center += pos;
-            velocity += vec;
-            
-            if (pos.x > maxX) maxX = pos.x;
-            if (pos.x < minX) minX = pos.x;
-            
-            if (pos.y > maxY) maxY = pos.y;
-            if (pos.y < minY) minY = pos.y;
+//            const RVO::RVOAgent* ai = sc->getAgentsByID(IDs[i]);
+//            
+//            b2Vec2 pos = ai->getPosition();
+//            b2Vec2 vec = ai->getVelocity();
+//            center += pos;
+//            velocity += vec;
+//            
+//            if (pos.x > maxX) maxX = pos.x;
+//            if (pos.x < minX) minX = pos.x;
+//            
+//            if (pos.y > maxY) maxY = pos.y;
+//            if (pos.y < minY) minY = pos.y;
         }
         
-        center *= 1 / size;
-        velocity *= 1 / size;
+        center *= 1 / this->IDs.size();
+        velocity *= 1 / this->IDs.size();
         
         double xDiff = maxX - minX;
         double yDiff = maxY - minY;
         radius = sqrt(xDiff * xDiff + yDiff * yDiff);
     }
     
+    b2Vec2 steeringForce(b2Vec2& direction)
+    {
+        b2Vec2 desiredVelocity = direction * RVO::RVOAgent::maxSpeed;
+    
+        //最好的速度
+        b2Vec2 velocityChange = desiredVelocity - this->velocity;
+        
+        // 转换成对着该方向运动的驱动力
+        return velocityChange * (RVO::RVOAgent::maxForce / RVO::RVOAgent::maxSpeed);
+    }
+    
+    b2Vec2 steeringForce(b2Vec2& direction)const
+    {
+        b2Vec2 desiredVelocity = direction * RVO::RVOAgent::maxSpeed;
+        
+        //最好的速度
+        b2Vec2 velocityChange = desiredVelocity - this->velocity;
+        
+        // 转换成对着该方向运动的驱动力
+        return velocityChange * (RVO::RVOAgent::maxForce / RVO::RVOAgent::maxSpeed);
+    }
+    
     void dispatch(double delta)
     {
-        int size = allNodes.size();
-        for (int i = 0; i < size; i++)
-        {
-            Agent *ai = allNodes[i];
-            ai->body->ApplyLinearImpulse(force * delta, ai->getPosition());
-        }
+//        int size = agents.size();
+//        for (int i = 0; i < size; i++)
+//        {
+//            const RVO::RVOAgent *ag = allNodes[i];
+//            ai->body->ApplyLinearImpulse(force * delta, ai->getPosition());
+//        }
     }
 };
 

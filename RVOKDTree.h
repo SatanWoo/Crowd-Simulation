@@ -1,5 +1,5 @@
 /*
- * KdTree.h
+ * RVOKDTree.h
  * RVO2 Library
  *
  * Copyright (c) 2008-2013 University of North Carolina at Chapel Hill.
@@ -56,27 +56,19 @@
 
 #ifndef RVO_KD_TREE_H_
 #define RVO_KD_TREE_H_
-
-/**
- * \file       KdTree.h
- * \brief      Contains the KdTree class.
- */
-
 #include "Definitions.h"
 #include "RVOAgent.h"
 #include <vector>
 
-namespace RVO {
-	/**
-	 * \brief      Defines <i>k</i>d-trees for agents and static obstacles in the
-	 *             simulation.
-	 */
-	class KdTree {
-	private:
+namespace RVO
+{
+	class RVOKDTree
+    {
 		/**
 		 * \brief      Defines an agent <i>k</i>d-tree node.
 		 */
-		class AgentTreeNode {
+		struct AgentTreeNode
+        {
 		public:
             
             // 这些都是ID
@@ -127,13 +119,13 @@ namespace RVO {
 		 * \param      sim             The simulator instance.
 		 */
     public:
-		KdTree();
-        KdTree(const std::vector<RVOAgent *>& agents);
+		RVOKDTree();
+        RVOKDTree(const std::vector<RVOAgent *>& agents);
 
 		/**
 		 * \brief      Destroys this kd-tree instance.
 		 */
-		~KdTree();
+		~RVOKDTree();
 
 		/**
 		 * \brief      Builds an agent <i>k</i>d-tree.
@@ -147,9 +139,9 @@ namespace RVO {
 		 *                             neighbors are to be computed.
 		 * \param      rangeSq         The squared range around the agent.
 		 */
-		void computeAgentNeighbors(RVOAgent* agent, float &rangeSq) const;
+		void computeAgentNeighbors(RVOAgent* agent, float &rangeSq)const;
 		void queryAgentTreeRecursive(RVOAgent* agent, float &rangeSq,
-									 size_t node) const;
+									 size_t node)const;
         
 		std::vector<RVOAgent *> agents;
 		std::vector<AgentTreeNode> agentTree;

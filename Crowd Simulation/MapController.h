@@ -1,34 +1,28 @@
 #ifndef _WZTERRAINMAP_H
 #define _WZTERRAINMAP_H
 
-#include "Agent.h"
 #include "Box2D.h"
-#include "KDTree.h"
-#include "CostNode.h"
-#include "VirtualNode.h"
 #include "RVO.h"
+#include "CostNode.h"
 
-#include <iostream>
 #include <vector>
 
-#if defined __GNUC__ || defined __APPLE__
-#include <ext/hash_map>
-#else
-#include <hash_map>
-#endif
-
-using namespace __gnu_cxx;
-
-class Terrain;
+using namespace std;
 
 class MapController
 {
+public:
+    void setMapSize(int width, int height){this->width = width; this->height = height;}
+    int getWidth()const{return this->width;}
+    int getHeight()const{return this->height;}
+    bool isInMap(int x, int y)const;
+    
 private:
+    int width, height;
     
-    KDTree *_tree;
+    RVO::RVOKDTree *tree;
     
-    std::vector<VirtualNode> virtualNodes;
-    std::vector<Agent> agents;
+    std::vector<const RVO::RVOAgent *> agents;
     std::vector<b2Vec2> destinationPoints;
     std::vector<b2Vec2> obstacles;
     
@@ -45,9 +39,6 @@ private:
         
     b2World *world;
     
-    vector<int> agentMap;
-    vector<int> coreNode;
-
 	int m_iWidth;
 	int m_iHeight;
     
@@ -67,7 +58,6 @@ protected:
     void deinitializeField(float32 **field);
     
     void updateContinuumCrowdData();
-    void ccClearBuffers();
     void ccCalculateDensityAndAverageSpeed();
     void ccCalculateUnitCostField();
     
@@ -77,16 +67,18 @@ protected:
     
     void ccPotentialFieldEikonalFill(b2Vec2 des);
     
-    b2Vec2 steeringBehaviourFlowField(VirtualNode &agent);
-    b2Vec2 steeringBehaviourSeek(VirtualNode &agent, b2Vec2 dest);
-    b2Vec2 steeringBehaviourSeparation(VirtualNode &agent);
-    b2Vec2 steeringBehaviourAlignment(VirtualNode &agent);
-    b2Vec2 steeringBehaviourCohesion(VirtualNode &agent);
-    b2Vec2 steerTowards(VirtualNode &agent, b2Vec2 direction);
+//    b2Vec2 steeringBehaviourFlowField(VirtualNode &agent);
+//    b2Vec2 steeringBehaviourSeek(VirtualNode &agent, b2Vec2 dest);
+//    b2Vec2 steeringBehaviourSeparation(VirtualNode &agent);
+//    b2Vec2 steeringBehaviourAlignment(VirtualNode &agent);
+//    b2Vec2 steeringBehaviourCohesion(VirtualNode &agent);
+//    b2Vec2 steerTowards(VirtualNode &agent, b2Vec2 direction);
     
 public:
 	MapController(int width, int height, int count, double timeStep = 0.02);
 	~MapController();
+    
+    b2Vec2 getPosition(size_t ID)const;
     
     void updateDestinationPoint(b2Vec2 newDest);
 
@@ -100,6 +92,8 @@ public:
 
 	static const double MapGridSize;
 	static const double restDensity;
+    
+    bool enableVirtualNode;
 };
 
 #endif
