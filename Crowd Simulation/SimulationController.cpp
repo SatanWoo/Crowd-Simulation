@@ -120,7 +120,7 @@ void SimulationController::init(int w, int h)
     
     for (int yPos = 1; yPos < 2; yPos++)
     {
-        for (int i =0 ; i < 1; i++)
+        for (int i = 0 ; i < 1; i++)
         {
             RVOAgent *agent = new RVOAgent(b2Vec2(w - (i + 1) % 3, yPos));
             agent->group = 1;
@@ -170,8 +170,20 @@ void SimulationController::flockSimulation()
         b2Vec2 alg = forceFromAlignment(agents[i]);
         b2Vec2 coh = forceFromCohesion(agents[i]);
         
-        agent->flockForce = sep * relation.x + alg * relation.y + coh * relation.z;
+        agent->flockForce = sep * relation.x + alg * relation.y + coh * relation.z + agent->continuumForce;
+    
+        
+        float32 lengthSquared =  agent->flockForce.LengthSquared();
+        if (lengthSquared > agent->maxForceSquared()) {
+            agent->flockForce *= (agent->maxForceSquared() / sqrt(lengthSquared));
+        }
         //agent->center = cluster->center + (cluster->continuumForce + cluster->flockForce) * this->timeStep;
+    }
+    
+    for (int i = 0; i < agents.size(); ++i)
+    {
+        RVOAgent *agent = agents[i];
+        agent->body ->ApplyLinearImpulse(agent->flockForce * this->timeStep, agent->getPosition());
     }
 }
 
