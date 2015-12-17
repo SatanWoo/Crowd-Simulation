@@ -62,6 +62,7 @@
  */
 
 #include "Definitions.h"
+#include "Particle.h"
 #include <Box2D/Box2D.h>
 #include <unordered_map>
 #include <vector>
@@ -69,26 +70,11 @@
 namespace RVO {
     class RVOKDTree;
     
-    struct RVOAgent {
-        static int maxForce; //rate of acceleration
-        static int maxSpeed; //grid squares / second
-        static float32 minSeparation; // We'll move away from anyone nearer than this
-        static int maxCohesion; //We'll move closer to anyone within this bound
-        
-        static int maxForceSquared;
-        static int maxSpeedSquared;
-        
-        b2Vec2 pos;
-        b2Vec2 velocity;
+    struct RVOAgent : public Particle {
         b2Vec2 prefVelo;
-        b2Vec2 goal;
-        
-        float32 radius;
+
         size_t maxNeighbours;
-        size_t ID;
-        
-        int group;
-       
+
         typedef std::pair<float, const RVOAgent*> AgentDistanceMap;
         typedef std::vector<AgentDistanceMap> Neighours;
         

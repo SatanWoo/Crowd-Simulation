@@ -63,15 +63,6 @@
 using namespace std;
 
 namespace RVO {
-    int RVOAgent::maxForce = 20;
-    int RVOAgent::maxSpeed = 4;
-    
-    float32 RVOAgent::minSeparation = 0.6;
-    int RVOAgent::maxCohesion = 2;
-    
-    int RVOAgent::maxForceSquared = RVOAgent::maxForce * RVOAgent::maxForce;
-    int RVOAgent::maxSpeedSquared = RVOAgent::maxSpeed * RVOAgent::maxSpeed;
-    
     RVOAgent::RVOAgent(b2Vec2 pos, b2Vec2 velocity, b2Vec2 pref,
                        float32 radius, size_t maxNeighbours, size_t ID)
     {

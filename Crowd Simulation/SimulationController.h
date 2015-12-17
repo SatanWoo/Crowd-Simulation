@@ -9,8 +9,9 @@
 #ifndef SimulationController_h
 #define SimulationController_h
 
+#include "Particle.h"
 #include "RVO.h"
-#include "VirtualNode.h"
+//#include "VirtualNode.h"
 #include "Box2D.h"
 #include <unordered_map>
 #include <vector>
@@ -69,20 +70,25 @@ private:
     void buildFlowField();
     
 private:
-    b2Vec2 forceFromFlowField(Cluster *cluster);
-    //b2Vec2 forceFromFlowField(const RVOAgent* agent);
+    //b2Vec2 forceFromFlowField(Particle *p);
+    //b2Vec2 forceFromFlowField(Cluster *cluster);
+    b2Vec2 forceFromFlowField(RVOAgent* agent);
     
-    b2Vec2 forceFromSeek(Cluster *cluster, b2Vec2& dest);
-    //b2Vec2 forceFromSeek(const RVOAgent *agent);
+    //b2Vec2 forceFromSeek(Particle *p);
+    //b2Vec2 forceFromSeek(Cluster *cluster, b2Vec2& dest);
+    b2Vec2 forceFromSeek(RVOAgent *agent, b2Vec2& dest);
     
-    b2Vec2 forceFromSeparation(Cluster *cluster);
-    //b2Vec2 forceFromSeparation(const RVOAgent* agent);
+    //b2Vec2 forceFromSeparation(Particle *p);
+    //b2Vec2 forceFromSeparation(Cluster *cluster);
+    b2Vec2 forceFromSeparation(RVOAgent* agent);
     
-    b2Vec2 forceFromAlignment(Cluster *cluster);
-    //b2Vec2 forceFromAlignment(const RVOAgent *agent);
+    //b2Vec2 forceFromAlignment(Particle *p);
+    //b2Vec2 forceFromAlignment(Cluster *cluster);
+    b2Vec2 forceFromAlignment(RVOAgent *agent);
     
-    b2Vec2 forceFromCohesion(Cluster *cluster);
-    //b2Vec2 forceFromCohesion(const RVOAgent *agent);
+    //b2Vec2 forceFromCohesion(Particle *p);
+    //b2Vec2 forceFromCohesion(Cluster *cluster);
+    b2Vec2 forceFromCohesion(RVOAgent *agent);
     
 private:
     
@@ -118,6 +124,8 @@ private:
 private:
     vector<b2Vec2> flowFlied;
     vector<b2Vec2> avgVelocityField;
+    
+    vector<float> obstacleField;
     
     vector<float> potentialField;
     vector<float> densityField;

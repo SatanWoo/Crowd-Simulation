@@ -36,7 +36,7 @@ void glIdle()
 {
     int n = 1;
     while (n--) {
-        //controller->simulate();
+        controller->simulate();
     }
     
     glutPostRedisplay();

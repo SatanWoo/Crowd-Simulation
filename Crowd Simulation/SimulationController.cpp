@@ -29,15 +29,15 @@ SimulationController::~SimulationController()
 {
     for (size_t i = 0; i < this->clusters.size(); ++i)
     {
-        this->clusters[i] = NULL;
         delete  this->clusters[i];
+        this->clusters[i] = NULL;
     }
     this->clusters.clear();
     
     for (size_t i = 0; i < this->agents.size(); ++i)
     {
-        this->agents[i] = NULL;
         delete this->agents[i];
+        this->agents[i] = NULL;
     }
     this->agents.clear();
     
@@ -63,7 +63,7 @@ void SimulationController::simulate()
 //        clusterSimulation();
 //    }
     
-    clusterSimulation();
+    //clusterSimulation();
     
     // Iteration times
     this->world->Step(this->timeStep, 10, 10);
@@ -150,28 +150,28 @@ void SimulationController::continuumSimulation()
     calculateDensityAndAverageSpeed();
     calculateUnitCostField();
     
-    for (int i = 0; i < clusters.size(); ++i)
+    for (int i = 0; i < agents.size(); ++i)
     {
         potentialField = vector<float>(this->map->getWidth() * this->map->getHeight(), FLT_MAX);
-        buildPotentialField(clusters[i]->goal);
+        buildPotentialField(agents[i]->goal);
         buildFlowField();
         
-        clusters[i]->continuumForce = forceFromFlowField(clusters[i]);
+        agents[i]->continuumForce = forceFromFlowField(agents[i]);
     }
 }
 
 void SimulationController::flockSimulation()
 {
-    for (int i = 0; i < clusters.size(); ++i)
+    for (int i = 0; i < agents.size(); ++i)
     {
-        Cluster *cluster = clusters[i];
+        RVOAgent *agent = agents[i];
         
-        b2Vec2 sep = forceFromSeparation(cluster);
-        b2Vec2 alg = forceFromAlignment(cluster);
-        b2Vec2 coh = forceFromCohesion(cluster);
+        b2Vec2 sep = forceFromSeparation(agents[i]);
+        b2Vec2 alg = forceFromAlignment(agents[i]);
+        b2Vec2 coh = forceFromCohesion(agents[i]);
         
-        cluster->flockForce = sep * relation.x + alg * relation.y + coh * relation.z;
-        cluster->center = cluster->center + (cluster->continuumForce + cluster->flockForce) * this->timeStep;
+        agent->flockForce = sep * relation.x + alg * relation.y + coh * relation.z;
+        //agent->center = cluster->center + (cluster->continuumForce + cluster->flockForce) * this->timeStep;
     }
 }
 
@@ -207,31 +207,31 @@ void SimulationController::calculateDensityAndAverageSpeed()
 {
     float32 perAgentDensity = 1.0;
 
-    for (int i = 0; i < clusters.size(); i++)
+    for (int i = 0; i < agents.size(); i++)
     {
         //Agent &pi = agents[i];
         
-        const Cluster *cluster = clusters[i];
+        RVOAgent *agent = agents[i];
 
-        b2Vec2 floor = B2Vec2DHelper::floorV(cluster->center);
-        float32 xWeight = cluster->center.x - floor.x;
-        float32 yWeight = cluster->center.y - floor.y;
+        b2Vec2 floor = B2Vec2DHelper::floorV(agent->getPosition());
+        float32 xWeight = agent->getPosition().x - floor.x;
+        float32 yWeight = agent->getPosition().y - floor.y;
 
         //top left
         if (this->map->isInMap(floor.x, floor.y)) {
-            buildDensityField(floor.x, floor.y, cluster->velocity, perAgentDensity * (1 - xWeight) * (1 - yWeight));
+            buildDensityField(floor.x, floor.y, agent->getVelocity(), perAgentDensity * (1 - xWeight) * (1 - yWeight));
         }
         //top right
         if (this->map->isInMap(floor.x + 1, floor.y)) {
-            buildDensityField(floor.x + 1, floor.y, cluster->velocity, perAgentDensity * (xWeight) * (1 - yWeight));
+            buildDensityField(floor.x + 1, floor.y, agent->getVelocity(), perAgentDensity * (xWeight) * (1 - yWeight));
         }
         //bottom left
         if (this->map->isInMap(floor.x, floor.y + 1)) {
-            buildDensityField(floor.x, floor.y + 1, cluster->velocity, perAgentDensity * (1 - xWeight) * (yWeight));
+            buildDensityField(floor.x, floor.y + 1, agent->getVelocity(), perAgentDensity * (1 - xWeight) * (yWeight));
         }
         //bottom right
         if (this->map->isInMap(floor.x + 1, floor.y + 1)) {
-            buildDensityField(floor.x + 1, floor.y + 1, cluster->velocity, perAgentDensity * (xWeight) * (yWeight));
+            buildDensityField(floor.x + 1, floor.y + 1, agent->getVelocity(), perAgentDensity * (xWeight) * (yWeight));
         }
     }
 }
@@ -275,10 +275,10 @@ void SimulationController::calculateUnitCostField()
                 if (density >= densityMax) {
                     speedField[index(i, j)].value[dir] = flowSpeed;
                 } else if (density <= densityMin) {
-                    speedField[index(i, j)].value[dir] = RVOAgent::maxSpeed;
+                    speedField[index(i, j)].value[dir] = Particle::MAX_SPEED;
                 } else {
                     //medium speed
-                    speedField[index(i, j)].value[dir] = RVOAgent::maxSpeed - (density - densityMin) / (densityMax - densityMin) * (4 - flowSpeed);
+                    speedField[index(i, j)].value[dir] = Particle::MAX_SPEED - (density - densityMin) / (densityMax - densityMin) * (4 - flowSpeed);
                 }
                 
                 //we're going to divide by speed later, so make sure it's not zero
@@ -397,9 +397,9 @@ void SimulationController::buildDensityField(int x, int y, const b2Vec2 &vec, fl
 }
 
 #pragma mark - Force
-b2Vec2 SimulationController::forceFromFlowField(Cluster *cluster)
+b2Vec2 SimulationController::forceFromFlowField(RVOAgent *agent)
 {
-    b2Vec2 floor = B2Vec2DHelper::floorV(cluster->center);
+    b2Vec2 floor = B2Vec2DHelper::floorV(agent->getPosition());
     
     int x = floor.x;
     int y = floor.y;
@@ -410,13 +410,13 @@ b2Vec2 SimulationController::forceFromFlowField(Cluster *cluster)
     b2Vec2 f11 = this->map->isInMap(x + 1, y + 1) ? this->flowFlied[index(x + 1, y + 1)] : b2Vec2_zero;
     
     // 水平方向插值
-    float32 xWeight = cluster->center.x - floor.x;
+    float32 xWeight = agent->getPosition().x - floor.x;
     
     b2Vec2 top = f00 * (1 - xWeight) +  f10 * xWeight;
     b2Vec2 bottom = f01 * (1 - xWeight) + f11 * xWeight;
     
     // 竖直方向插值
-    float32 yWeight = cluster->center.y - floor.y;
+    float32 yWeight = agent->getPosition().y - floor.y;
     
     // 基于水平和竖直方向上的插值，计算得出新的运动方向
     b2Vec2 desiredDirection = top * (1 - yWeight) + bottom * yWeight;
@@ -427,25 +427,25 @@ b2Vec2 SimulationController::forceFromFlowField(Cluster *cluster)
         return b2Vec2_zero;
     }
     
-    return cluster->steeringForce(desiredDirection);
+    return agent->steeringForce(desiredDirection);
 }
 
-b2Vec2 SimulationController::forceFromSeparation(Cluster *cluster)
+b2Vec2 SimulationController::forceFromSeparation(RVOAgent *agent)
 {
     b2Vec2 totalForce = b2Vec2_zero;
     
     int neighboursCount = 0;
     
-    for (int i = 0; i < clusters.size(); i++) {
-        Cluster* other = clusters[i];
-        if (other != cluster) {
-            float32 distance = B2Vec2DHelper::distanceTo(other->center, cluster->center);
-            if (distance < RVOAgent::minSeparation && distance > 0) {
-                b2Vec2 pushForce = cluster->center - other->center;
+    for (int i = 0; i < agents.size(); i++) {
+        RVOAgent* other = agents[i];
+        if (other != agent) {
+            float32 distance = B2Vec2DHelper::distanceTo(other->getPosition(), agent->getPosition());
+            if (distance < Particle::MIN_SPEARATION && distance > 0) {
+                b2Vec2 pushForce = agent->getPosition() - other->getPosition();
                 float32 length = pushForce.Normalize(); //Normalize returns the original length
-                float32 r = cluster->radius + other->radius;
+                float32 r = agent->radius + other->radius;
 
-                totalForce += pushForce * (1 - ((length - r) / (RVOAgent::minSeparation - r)));//agent.minSeparation)));
+                totalForce += pushForce * (1 - ((length - r) / (Particle::MIN_SPEARATION - r)));//agent.minSeparation)));
                 neighboursCount++;
             }
         }
@@ -455,25 +455,25 @@ b2Vec2 SimulationController::forceFromSeparation(Cluster *cluster)
         return totalForce; //Zero
     }
 
-    return totalForce * (RVOAgent::maxForce / neighboursCount);
+    return totalForce * (Particle::MAX_FORCE / neighboursCount);
 }
 
-b2Vec2 SimulationController::forceFromCohesion(Cluster *cluster)
+b2Vec2 SimulationController::forceFromCohesion(RVOAgent *agent)
 {
     //agent.position().Copy();
     b2Vec2 centerOfMass = b2Vec2_zero;
     int neighboursCount = 0;
 
-    for (int i = 0; i < clusters.size(); i++)
+    for (int i = 0; i < agents.size(); i++)
     {
-        Cluster *other = clusters[i];
-        if (other != cluster && other->group == cluster->group)
+        RVOAgent *other = agents[i];
+        if (other != agent && other->group == agent->group)
         {
-            float32 distance = B2Vec2DHelper::distanceTo(cluster->center, other->center);
-            if (distance < RVOAgent::maxCohesion)
+            float32 distance = B2Vec2DHelper::distanceTo(agent->getPosition(), other->getPosition());
+            if (distance < Particle::MAX_COHESION)
             {
                 //sum up the position of our neighbours
-                centerOfMass += other->center;
+                centerOfMass += other->getPosition();
                 neighboursCount++;
             }
         }
@@ -487,22 +487,22 @@ b2Vec2 SimulationController::forceFromCohesion(Cluster *cluster)
     centerOfMass *= (1 / neighboursCount);
 
     //seek that position
-    return forceFromSeek(cluster, centerOfMass);
+    return forceFromSeek(agent, centerOfMass);
 }
 
-b2Vec2 SimulationController::forceFromAlignment(Cluster *cluster)
+b2Vec2 SimulationController::forceFromAlignment(RVOAgent *agent)
 {
     b2Vec2 averageHeading = b2Vec2_zero;
     int neighboursCount = 0;
     
     //for each of our neighbours (including ourself)
-    for (int i = 0; i < clusters.size(); i++) {
-        Cluster *other = clusters[i];
-        float32 distance = B2Vec2DHelper::distanceTo(cluster->center, other->center);
+    for (int i = 0; i < agents.size(); i++) {
+        RVOAgent *other = agents[i];
+        float32 distance = B2Vec2DHelper::distanceTo(agent->getPosition(), other->getPosition());
         //That are within the max distance and are moving
-        if (distance < RVO::RVOAgent::maxCohesion && other->velocity.Length() > 0 && cluster->group == other->group) {
+        if (distance < Particle::MAX_COHESION && other->getVelocity().Length() > 0 && agent->group == other->group) {
             //Sum up our headings
-            b2Vec2 head = other->velocity;
+            b2Vec2 head = other->getVelocity();
             head.Normalize();
             averageHeading += head;
             neighboursCount++;
@@ -517,21 +517,21 @@ b2Vec2 SimulationController::forceFromAlignment(Cluster *cluster)
     averageHeading *= (1 / neighboursCount);
     
     //Steer towards that heading
-    return cluster->steeringForce(averageHeading);
+    return agent->steeringForce(averageHeading);
 }
 
-b2Vec2 SimulationController::forceFromSeek(Cluster *cluster, b2Vec2& dest)
+b2Vec2 SimulationController::forceFromSeek(RVOAgent *agent, b2Vec2& dest)
 {
-    if (dest.x == cluster->center.x && dest.y == cluster->center.y) {
+    if (dest.x == agent->getPosition().x && dest.y == agent->getPosition().y) {
         return b2Vec2_zero;
     }
     
-    b2Vec2 desired = dest - cluster->center;
+    b2Vec2 desired = dest - agent->getPosition();
     
-    desired *= (RVOAgent::maxSpeed / desired.Length());
+    desired *= (Particle::MAX_SPEED / desired.Length());
 
-    b2Vec2 velocityChange = desired - cluster->velocity;
-    return velocityChange * (RVOAgent::maxForce / RVOAgent::maxSpeed);
+    b2Vec2 velocityChange = desired - agent->getVelocity();
+    return velocityChange * (Particle::MAX_FORCE / Particle::MAX_SPEED);
 }
 
 #pragma mark - Helper

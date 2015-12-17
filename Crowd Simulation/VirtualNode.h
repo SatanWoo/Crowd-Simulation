@@ -12,12 +12,12 @@
 #include <vector>
 #include <limits.h>
 #include "Box2D.h"
-#include "RVOAgent.h"
+#include "Particle.h"
 #include "SimulationController.h"
 
 using namespace std;
 
-struct VirtualNode
+struct VirtualNode : public Particle
 {
     double maxX, maxY;
     double minX, minY;
@@ -29,8 +29,6 @@ struct VirtualNode
     b2Vec2 goal;
     b2Vec2 center;
     b2Vec2 velocity;
-    b2Vec2 continuumForce;
-    b2Vec2 flockForce;
     
     vector<int> IDs;
     
@@ -45,6 +43,11 @@ struct VirtualNode
         velocity = b2Vec2_zero;
         continuumForce = b2Vec2_zero;
         flockForce = b2Vec2_zero;
+    }
+    
+    virtual ~VirtualNode()
+    {
+        
     }
     
     void build()
@@ -77,28 +80,6 @@ struct VirtualNode
         double xDiff = maxX - minX;
         double yDiff = maxY - minY;
         radius = sqrt(xDiff * xDiff + yDiff * yDiff);
-    }
-    
-    b2Vec2 steeringForce(b2Vec2& direction)
-    {
-        b2Vec2 desiredVelocity = direction * RVO::RVOAgent::maxSpeed;
-    
-        //最好的速度
-        b2Vec2 velocityChange = desiredVelocity - this->velocity;
-        
-        // 转换成对着该方向运动的驱动力
-        return velocityChange * (RVO::RVOAgent::maxForce / RVO::RVOAgent::maxSpeed);
-    }
-    
-    b2Vec2 steeringForce(b2Vec2& direction)const
-    {
-        b2Vec2 desiredVelocity = direction * RVO::RVOAgent::maxSpeed;
-        
-        //最好的速度
-        b2Vec2 velocityChange = desiredVelocity - this->velocity;
-        
-        // 转换成对着该方向运动的驱动力
-        return velocityChange * (RVO::RVOAgent::maxForce / RVO::RVOAgent::maxSpeed);
     }
     
     void dispatch(double delta)
