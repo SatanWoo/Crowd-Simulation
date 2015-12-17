@@ -56,7 +56,7 @@ SimulationController::~SimulationController()
 void SimulationController::simulate()
 {
     continuumSimulation();
-    flockSimulation();
+    //flockSimulation();
     
 //    if (this->mode == VirtualNode)
 //    {
@@ -64,6 +64,12 @@ void SimulationController::simulate()
 //    }
     
     //clusterSimulation();
+    
+    for (int i = 0; i < agents.size(); ++i)
+    {
+        RVOAgent *agent = agents[i];
+        agent->body ->ApplyLinearImpulse(agent->continuumForce * this->timeStep, agent->getPosition());
+    }
     
     // Iteration times
     this->world->Step(this->timeStep, 10, 10);
@@ -179,12 +185,6 @@ void SimulationController::flockSimulation()
         }
         //agent->center = cluster->center + (cluster->continuumForce + cluster->flockForce) * this->timeStep;
     }
-    
-    for (int i = 0; i < agents.size(); ++i)
-    {
-        RVOAgent *agent = agents[i];
-        agent->body ->ApplyLinearImpulse(agent->flockForce * this->timeStep, agent->getPosition());
-    }
 }
 
 void SimulationController::clusterSimulation()
@@ -221,8 +221,6 @@ void SimulationController::calculateDensityAndAverageSpeed()
 
     for (int i = 0; i < agents.size(); i++)
     {
-        //Agent &pi = agents[i];
-        
         RVOAgent *agent = agents[i];
 
         b2Vec2 floor = B2Vec2DHelper::floorV(agent->getPosition());
@@ -246,6 +244,19 @@ void SimulationController::calculateDensityAndAverageSpeed()
             buildDensityField(floor.x + 1, floor.y + 1, agent->getVelocity(), perAgentDensity * (xWeight) * (yWeight));
         }
     }
+    
+    for (int i = 0; i < this->map->getWidth(); ++i)
+    {
+        for (int j = 0; j < this->map->getHeight(); ++j)
+        {
+            b2Vec2& velocity = this->avgVelocityField[index(i, j)];
+            float32 density = densityField[index(i, j)];
+            if (density > 0)
+            {
+                velocity *= (1/density);
+            }
+        }
+    }
 }
 
 void SimulationController::calculateUnitCostField()
@@ -258,15 +269,18 @@ void SimulationController::calculateUnitCostField()
     float32 timeWeight = 1;
     float32 discomfortWeight = 1;
     
-    for (int i = 0; i < this->map->getWidth(); i++) {
-        for (int j = 0; j < this->map->getHeight(); j++) {
-            
+    for (int i = 0; i < this->map->getWidth(); ++i)
+    {
+        for (int j = 0; j < this->map->getHeight(); ++j)
+        {
             //foreach direction we can leave that cell
-            for (int dir = 0; dir < 4; dir++) {
+            for (int dir = 0; dir < 4; ++dir)
+            {
                 int targetX = i + fourDir[dir][0];
                 int targetY = j + fourDir[dir][1];
                 
-                if (!this->map->isInMap(targetX, targetY)) {
+                if (!this->map->isInMap(targetX, targetY))
+                {
                     speedField[index(i, j)].value[dir] = FLT_MAX;
                     continue;
                 }
@@ -284,11 +298,16 @@ void SimulationController::calculateUnitCostField()
                 
                 float32 discomfort = discomfortField[index(targetX, targetY)];
                 
-                if (density >= densityMax) {
+                if (density >= densityMax)
+                {
                     speedField[index(i, j)].value[dir] = flowSpeed;
-                } else if (density <= densityMin) {
+                }
+                else if (density <= densityMin)
+                {
                     speedField[index(i, j)].value[dir] = Particle::MAX_SPEED;
-                } else {
+                }
+                else
+                {
                     //medium speed
                     speedField[index(i, j)].value[dir] = Particle::MAX_SPEED - (density - densityMin) / (densityMax - densityMin) * (4 - flowSpeed);
                 }
@@ -405,7 +424,7 @@ void SimulationController::buildDensityField(int x, int y, const b2Vec2 &vec, fl
 {
     int i = index(x, y);
     this->densityField[i] += weight;
-    avgVelocityField[i] += vec * weight;
+    this->avgVelocityField[i] += vec * weight;
 }
 
 #pragma mark - Force
