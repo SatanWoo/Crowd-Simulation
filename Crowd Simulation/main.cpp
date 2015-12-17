@@ -15,11 +15,13 @@
 
 using namespace std;
 
-const double MapWidth = 25;
+const double ScreenWidth = 800;
+const double ScreenHeight = 448;
+const double MapWidth = 30;
 const double MapHeight = 30;
 
-const double ScreenWidth = MapWidth * MapController::MapGridSize;
-const double ScreenHeight = MapHeight * MapController::MapGridSize;
+//const double ScreenWidth = MapWidth * MapController::MapGridSize;
+//const double ScreenHeight = MapHeight * MapController::MapGridSize;
 
 SimulationController *controller = NULL;
 
@@ -78,7 +80,7 @@ int main(int argc, const char * argv[])
     
     controller = new SimulationController(MapHeight * 2);
     controller->init(MapWidth, MapHeight);
-    controller->setRelation(b2Vec3(0.3, 0.15, 0.2));
+    controller->setRelation(b2Vec3(1.2, 0.3, 0.05));
     controller->setTimeStep(0.02);
     
     glutMainLoop();

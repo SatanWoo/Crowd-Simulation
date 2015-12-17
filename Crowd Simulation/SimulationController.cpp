@@ -156,13 +156,23 @@ void SimulationController::continuumSimulation()
     calculateDensityAndAverageSpeed();
     calculateUnitCostField();
     
-    for (int i = 0; i < agents.size(); ++i)
+    b2Vec2 v1(this->map->getWidth() - 2, this->map->getHeight() / 2);
+    b2Vec2 v2(1, this->map->getHeight() / 2);
+    
+    vector<b2Vec2> des;
+    des.push_back(v1);
+    des.push_back(v2);
+    
+    for (int group = 0; group <= 1; ++group)
     {
         potentialField = vector<float>(this->map->getWidth() * this->map->getHeight(), FLT_MAX);
-        buildPotentialField(agents[i]->goal);
+        buildPotentialField(des[group]);
         buildFlowField();
         
-        agents[i]->continuumForce = forceFromFlowField(agents[i]);
+        for (int i = agents.size() - 1; i >= 0; --i)
+        {
+             agents[i]->continuumForce = forceFromFlowField(agents[i]);
+        }
     }
 }
 
@@ -527,11 +537,13 @@ b2Vec2 SimulationController::forceFromAlignment(RVOAgent *agent)
     int neighboursCount = 0;
     
     //for each of our neighbours (including ourself)
-    for (int i = 0; i < agents.size(); i++) {
+    for (int i = 0; i < agents.size(); i++)
+    {
         RVOAgent *other = agents[i];
         float32 distance = B2Vec2DHelper::distanceTo(agent->getPosition(), other->getPosition());
         //That are within the max distance and are moving
-        if (distance < Particle::MAX_COHESION && other->getVelocity().Length() > 0 && agent->group == other->group) {
+        if (distance < Particle::MAX_COHESION && other->getVelocity().Length() > 0 && agent->group == other->group)
+        {
             //Sum up our headings
             b2Vec2 head = other->getVelocity();
             head.Normalize();
@@ -568,5 +580,5 @@ b2Vec2 SimulationController::forceFromSeek(RVOAgent *agent, b2Vec2& dest)
 #pragma mark - Helper
 inline int SimulationController::index(int x, int y)const
 {
-    return x * this->map->getWidth() + y;
+    return y * this->map->getWidth() + x;
 }
