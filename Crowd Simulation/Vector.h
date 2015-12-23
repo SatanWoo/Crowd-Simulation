@@ -11,6 +11,12 @@ private:
 public:
 	Vector2D();
 	Vector2D(double x, double y);
+    
+    Vector2D normalize();
+    
+    Vector2D roundV();
+    Vector2D floorV();
+    Vector2D ceilingV();
 
 	Vector2D& operator+= (const Vector2D& b);
 	Vector2D& operator-= (const Vector2D& b);
@@ -30,9 +36,11 @@ public:
 	friend Vector2D operator- (const Vector2D& a, const Vector2D& b);
 	friend Vector2D operator/ (const Vector2D& a, const double scale);
 	friend Vector2D operator* (const Vector2D& a, const double scale);
+    friend Vector2D operator* (const double scale, const Vector2D& a);
 	
 	double length()const{return m_dX*m_dX + m_dY*m_dY;}
 	double squaredLength()const{return sqrt(this->length());}
+    double distanceTo(const Vector2D& vec);
 
 	static Vector2D vec2Zero;
 };
@@ -56,8 +64,9 @@ public:
 
 	friend Vector3D operator+ (const Vector3D& a, const Vector3D& b);
 	friend Vector3D operator- (const Vector3D& a, const Vector3D& b);
-	friend Vector3D operator* (const Vector3D& a, const double scale);
 	friend Vector3D operator/ (const Vector3D& a, const double scale);
+    friend Vector3D operator* (const Vector3D& a, const double scale);
+    friend Vector3D operator* (const double scale, const Vector3D& a);
 
 	double length()const{return m_dX*m_dX + m_dY*m_dY + m_dZ*m_dZ;}
 	double squaredLength()const{return sqrt(this->length());}
