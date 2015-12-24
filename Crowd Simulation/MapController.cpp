@@ -212,6 +212,20 @@ void MapController::computerNearestNeighbours(double radius)
 
 void MapController::mergeNode()
 {
+    int group = 0;
+    
+    for (int i = 0; i < agents.size(); i++)
+    {
+        Agent *agent = agents[i];
+        for (int j = 0; j < agent->agentNeighbors_.size(); j++) {
+            Agent *ne = agent->agentNeighbors_[j].second;
+            ne->group = group;
+        }
+        
+        agent->group = group;
+        ++group;
+    }
+    
 //    virtualNodes.clear();
 //    for (int i = 0; i < coreNode.size(); i++)
 //    {
@@ -282,13 +296,9 @@ void MapController::render()
     glPointSize(5);
     glBegin(GL_POINTS);
     for (int i = 0; i < agents.size(); i++) {
-        
         Agent *node = agents[i];
-        if (node->group == 0) {
-            glColor3f(1.0f, 0.0f, 1.0f);
-        } else {
-            glColor3f(1.0f, 1.0f, 1.0f);
-        }
+        
+        glColor3f(0.5 * (node->group + 1), (node->group + 1) * 0.15, (node->group + 1) * 0.3);
         glVertex2f(node->getPosition().x * MapGridSize + 0.5 * MapGridSize, node->getPosition().y * MapGridSize + 0.5 * MapGridSize);
     }
     glEnd();
