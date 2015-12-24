@@ -55,6 +55,7 @@
 
 #include "RVOTree.h"
 #include "Agent.h"
+#include <iostream>
 
 namespace RVO {
     RVOTree::RVOTree(size_t count):count_(count){}
@@ -62,17 +63,19 @@ namespace RVO {
 	RVOTree::~RVOTree()
 	{}
 
-    void RVOTree::buildAgentTree(const std::vector<Agent>& agents)
+    void RVOTree::buildAgentTree(const std::vector<Agent *>& agents)
 	{
         agents_.clear();
         
-        for (size_t i = agents_.size(); i < agents.size(); ++i)
+        for (size_t i = 0; i < agents.size(); ++i)
         {
-            Agent agent = agents[i];
-            agents_.push_back(&agent);
+            agents_.push_back(agents[i]);
         }
         
-		if (!agents_.empty()) {
+        agentTree_.resize(2 * agents_.size() + 1);
+        
+		if (!agents_.empty())
+        {
 			buildAgentTreeRecursive(0, agents_.size(), 0);
 		}
 	}
@@ -84,7 +87,8 @@ namespace RVO {
 		agentTree_[node].minX = agentTree_[node].maxX = agents_[begin]->getPosition().x;
 		agentTree_[node].minY = agentTree_[node].maxY = agents_[begin]->getPosition().y;
 
-		for (size_t i = begin + 1; i < end; ++i) {
+		for (size_t i = begin + 1; i < end; ++i)
+        {
 			agentTree_[node].maxX = std::max(agentTree_[node].maxX, agents_[i]->getPosition().x);
 			agentTree_[node].minX = std::min(agentTree_[node].minX, agents_[i]->getPosition().x);
 			agentTree_[node].maxY = std::max(agentTree_[node].maxY, agents_[i]->getPosition().y);
@@ -100,23 +104,28 @@ namespace RVO {
 			size_t left = begin;
 			size_t right = end;
 
-			while (left < right) {
-				while (left < right && (isVertical ? agents_[left]->getPosition().x : agents_[left]->getPosition().y) < splitValue) {
+			while (left < right)
+            {
+				while (left < right && (isVertical ? agents_[left]->getPosition().x : agents_[left]->getPosition().y) < splitValue)
+                {
 					++left;
 				}
 
-				while (right > left && (isVertical ? agents_[right - 1]->getPosition().x : agents_[right - 1]->getPosition().y) >= splitValue) {
+				while (right > left && (isVertical ? agents_[right - 1]->getPosition().x : agents_[right - 1]->getPosition().y) >= splitValue)
+                {
 					--right;
 				}
 
-				if (left < right) {
+				if (left < right)
+                {
 					std::swap(agents_[left], agents_[right - 1]);
 					++left;
 					--right;
 				}
 			}
 
-			if (left == begin) {
+			if (left == begin)
+            {
 				++left;
 				++right;
 			}

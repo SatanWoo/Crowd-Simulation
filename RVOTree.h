@@ -121,7 +121,7 @@ namespace RVO {
         RVOTree(size_t count);
         ~RVOTree();
 
-		void buildAgentTree(const std::vector<Agent>& agents);
+		void buildAgentTree(const std::vector<Agent *>& agents);
 
 		void buildAgentTreeRecursive(size_t begin, size_t end, size_t node);
 

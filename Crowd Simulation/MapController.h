@@ -16,7 +16,7 @@ class Terrain;
 class MapController
 {
 private:
-    std::vector<Agent> agents;
+    std::vector<Agent *> agents;
     std::vector<b2Vec2> destinationPoints;
     std::vector<b2Vec2> obstacles;
     
@@ -64,12 +64,12 @@ protected:
     
     void ccPotentialFieldEikonalFill(b2Vec2 des);
     
-    b2Vec2 steeringBehaviourFlowField(Agent &agent);
-    b2Vec2 steeringBehaviourSeek(Agent &agent, b2Vec2 dest);
-    b2Vec2 steeringBehaviourSeparation(Agent &agent);
-    b2Vec2 steeringBehaviourAlignment(Agent &agent);
-    b2Vec2 steeringBehaviourCohesion(Agent &agent);
-    b2Vec2 steerTowards(Agent &agent, b2Vec2 direction);
+    b2Vec2 steeringBehaviourFlowField(Agent *agent);
+    b2Vec2 steeringBehaviourSeek(Agent *agent, b2Vec2 dest);
+    b2Vec2 steeringBehaviourSeparation(Agent *agent);
+    b2Vec2 steeringBehaviourAlignment(Agent *agent);
+    b2Vec2 steeringBehaviourCohesion(Agent *agent);
+    b2Vec2 steerTowards(Agent *agent, b2Vec2 direction);
     
 public:
 	MapController(int width, int height, int count, double timeStep = 0.02);
