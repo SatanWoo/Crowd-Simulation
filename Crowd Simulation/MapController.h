@@ -3,33 +3,24 @@
 
 #include "Agent.h"
 #include "Box2D.h"
-#include "KDTree.h"
 #include "CostNode.h"
-#include "VirtualNode.h"
 
 #include <iostream>
 #include <vector>
+#include <unordered_map>
 
-#if defined __GNUC__ || defined __APPLE__
-#include <ext/hash_map>
-#else
-#include <hash_map>
-#endif
-
-using namespace __gnu_cxx;
+#include "RVOTree.h"
 
 class Terrain;
 
 class MapController
 {
 private:
-    
-    KDTree *_tree;
-    
-    std::vector<VirtualNode> virtualNodes;
     std::vector<Agent> agents;
     std::vector<b2Vec2> destinationPoints;
     std::vector<b2Vec2> obstacles;
+    
+    RVOTree *tree;
     
     b2Vec2 **flow;
     b2Vec2 **avgVelocityField;
@@ -43,9 +34,6 @@ private:
     bool **visited;
         
     b2World *world;
-    
-    vector<int> agentMap;
-    vector<int> coreNode;
 
 	int m_iWidth;
 	int m_iHeight;
@@ -76,12 +64,12 @@ protected:
     
     void ccPotentialFieldEikonalFill(b2Vec2 des);
     
-    b2Vec2 steeringBehaviourFlowField(VirtualNode &agent);
-    b2Vec2 steeringBehaviourSeek(VirtualNode &agent, b2Vec2 dest);
-    b2Vec2 steeringBehaviourSeparation(VirtualNode &agent);
-    b2Vec2 steeringBehaviourAlignment(VirtualNode &agent);
-    b2Vec2 steeringBehaviourCohesion(VirtualNode &agent);
-    b2Vec2 steerTowards(VirtualNode &agent, b2Vec2 direction);
+    b2Vec2 steeringBehaviourFlowField(Agent &agent);
+    b2Vec2 steeringBehaviourSeek(Agent &agent, b2Vec2 dest);
+    b2Vec2 steeringBehaviourSeparation(Agent &agent);
+    b2Vec2 steeringBehaviourAlignment(Agent &agent);
+    b2Vec2 steeringBehaviourCohesion(Agent &agent);
+    b2Vec2 steerTowards(Agent &agent, b2Vec2 direction);
     
 public:
 	MapController(int width, int height, int count, double timeStep = 0.02);

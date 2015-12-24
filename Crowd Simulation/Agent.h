@@ -11,6 +11,9 @@
 
 #include "Box2D.h"
 #include <vector>
+#include "RVOTree.h"
+
+using namespace RVO;
 
 struct Agent {
     b2Vec2 pos;
@@ -37,6 +40,9 @@ struct Agent {
     Agent(b2Vec2 pos, int group){
         this->group = group;
         this->pos = pos;
+        
+        radius_ = Agent::radius;
+        maxSpeed_ = Agent::maxSpeed;
     }
     
     b2Vec2 getPosition()const{return this->body->GetPosition();}
@@ -68,6 +74,61 @@ struct Agent {
     
     b2Body *body;
     b2BodyDef *bodyDef;
+    
+#pragma mark - Neighbours
+    RVOTree *tree;
+    
+    std::vector<std::pair<float, Agent *>> agentNeighbors_;
+    
+    size_t maxNeighbors_;
+    float maxSpeed_;
+    float radius_;
+    float neighborDist_;
+    
+    size_t ID_;
+    
+    void computeNeighbors()
+    {
+        float rangeSq = radius_ * radius_;
+        
+        agentNeighbors_.clear();
+        
+        if (maxNeighbors_ > 0) {
+            rangeSq = neighborDist_ * neighborDist_;
+            tree->computeAgentNeighbors(this, rangeSq);
+        }
+    }
+    
+    void insertAgentNeighbor(Agent* agent, float &rangeSq)
+    {
+        if (this != agent)
+        {
+            const float distSq = (pos - agent->pos).LengthSquared();
+            
+            if (distSq < rangeSq)
+            {
+                if (agentNeighbors_.size() < maxNeighbors_)
+                {
+                    agentNeighbors_.push_back(std::make_pair(distSq, agent));
+                }
+                
+                size_t i = agentNeighbors_.size() - 1;
+                
+                while (i != 0 && distSq < agentNeighbors_[i - 1].first)
+                {
+                    agentNeighbors_[i] = agentNeighbors_[i - 1];
+                    --i;
+                }
+                
+                agentNeighbors_[i] = std::make_pair(distSq, agent);
+                
+                if (agentNeighbors_.size() == maxNeighbors_)
+                {
+                    rangeSq = agentNeighbors_.back().first;
+                }
+            }
+        }
+    }
 };
 
 #endif

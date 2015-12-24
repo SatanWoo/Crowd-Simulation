@@ -21,11 +21,11 @@ static int eightDir[8][2] = {{0, -1}, {1, 0}, {0, 1}, {-1, 0}, {1, 1}, {1, -1}, 
 
 MapController::MapController(int width, int height, int count, double timeStep)
 {
+    tree = new RVOTree(5);
+    
 	m_iWidth = width;
 	m_iHeight = height;
 	m_dTimeStep = timeStep;
-    
-    _tree = NULL;
     
     world = new b2World(b2Vec2_zero, true);
 
@@ -39,7 +39,7 @@ MapController::MapController(int width, int height, int count, double timeStep)
 
     for (int yPos = 1; yPos < m_iHeight - 1; yPos++) {
         
-        for (int i =0 ; i < 30; i++) {
+        for (int i =0 ; i < 3; i++) {
             Agent p1(b2Vec2(i % 3, yPos), 0);
             p1.initBodyDef(world);
             agents.push_back(p1);
@@ -48,7 +48,7 @@ MapController::MapController(int width, int height, int count, double timeStep)
     
     for (int yPos = 1; yPos < m_iHeight - 1; yPos++) {
         
-        for (int i =0 ; i < 30; i++) {
+        for (int i =0 ; i < 3; i++) {
             Agent p1(b2Vec2(m_iWidth - (i + 1) % 3, yPos), 1);
             p1.initBodyDef(world);
             agents.push_back(p1);
@@ -63,8 +63,6 @@ MapController::MapController(int width, int height, int count, double timeStep)
             obstacles.push_back(b2Vec2(y, i));
         }
     }
-    
-    agentMap.resize(agents.size());
     
     for (int i = 0; i < obstacles.size(); i++) {
         b2Vec2 pos = obstacles[i];
@@ -176,20 +174,20 @@ MapController::~MapController()
     delete [] speedField;
     speedField = NULL;
     
-    if (_tree)
+    if (tree)
     {
-        delete _tree;
-        _tree = NULL;
+        delete tree;
+        tree = NULL;
     }
 }
 
 #pragma mark - Protected
 void MapController::buildKDTree()
 {
-    if (_tree != NULL)
+    if (tree != NULL)
     {
-        delete _tree;
-        _tree = NULL;
+        delete tree;
+        tree = NULL;
     }
     
     size_t size = agents.size();
@@ -201,58 +199,38 @@ void MapController::buildKDTree()
         points.push_back(KDTuple(pi.pos.x, pi.pos.y, i, pi.group));
     }
     
-    _tree = new KDTree(points, 2);
+    tree = new RVOTree(5);
+    
+    //tree->buildAgentTree(agents);
 }
 
 void MapController::computerNearestNeighbours(double radius)
 {
-    std::fill(agentMap.begin(), agentMap.end(), 0);
-    
-    coreNode.clear();
-    
-    size_t size = agents.size();
-    std::vector<KDTuple> points;
-    
-    for (int i = 0 ; i < size; i++)
-    {
-        if (agentMap[i] != 0) continue;
-        
-        agentMap[i] += 1;
-        coreNode.push_back(i);
-
-        Agent &pi = agents[i];
-        pi.neighbours.clear();
-        _tree->searchKNearestNeighbours(KDTuple(pi.getPosition().x, pi.getPosition().y, -1), points, radius);
-        
-        size_t nSize = points.size();
-        for (int j = 0; j < nSize; j++)
-        {
-            KDTuple &tuple = points[j];
-            agentMap[tuple._ID] += 1;
-            pi.neighbours.push_back(tuple._ID);
-        }
-    }
+//    for (int i = 0; i < agents.size(); i++) {
+//        agents[i].computeNeighbors();
+//    }
+//}
 }
 
 void MapController::mergeNode()
 {
-    virtualNodes.clear();
-    for (int i = 0; i < coreNode.size(); i++)
-    {
-        Agent &ai = agents[coreNode[i]];
-        VirtualNode node;
-        
-        node.group = ai.group;
-        node.allNodes.push_back(&ai);
-        
-        for (int k = 0; k < ai.neighbours.size(); k++)
-        {
-            node.allNodes.push_back(&agents[ai.neighbours[k]]);
-        }
-        
-        node.build();
-        virtualNodes.push_back(node);
-    }
+//    virtualNodes.clear();
+//    for (int i = 0; i < coreNode.size(); i++)
+//    {
+//        Agent &ai = agents[coreNode[i]];
+//        VirtualNode node;
+//        
+//        node.group = ai.group;
+//        node.allNodes.push_back(&ai);
+//        
+//        for (int k = 0; k < ai.neighbours.size(); k++)
+//        {
+//            node.allNodes.push_back(&agents[ai.neighbours[k]]);
+//        }
+//        
+//        node.build();
+//        virtualNodes.push_back(node);
+//    }
 }
 
 #pragma mark - End Of Protected
@@ -331,9 +309,9 @@ void MapController::update()
 
     updateContinuumCrowdData();
 
-    int size = virtualNodes.size();
+    int size = agents.size();
     for (int i = size - 1; i >= 0; i--) {
-        VirtualNode &node = virtualNodes[i];
+        Agent &node = agents[i];
         
         b2Vec2 ff = node.ff;
         
@@ -351,18 +329,19 @@ void MapController::update()
     
     //Move agents based on forces being applied (aka physics)
     for (int i = size - 1; i >= 0; i--) {
-        VirtualNode &node = virtualNodes[i];
-        node.center = node.center + node.force * m_dTimeStep;
-        node.dispatch(m_dTimeStep);
+        Agent &node = agents[i];
+        node.body->ApplyLinearImpulse(node.force * m_dTimeStep, node.getPosition());
+//        node.center = node.center + node.force * m_dTimeStep;
+//        node.dispatch(m_dTimeStep);
     }
     
     world->Step(m_dTimeStep, 10, 10);
     world->ClearForces();
 }
 
-b2Vec2 MapController::steeringBehaviourFlowField(VirtualNode &node)
+b2Vec2 MapController::steeringBehaviourFlowField(Agent &node)
 {
-    b2Vec2 floor = B2Vec2DHelper::floorV(node.center);
+    b2Vec2 floor = B2Vec2DHelper::floorV(node.getPosition());
     
     int x = floor.x;
     int y = floor.y;
@@ -373,13 +352,13 @@ b2Vec2 MapController::steeringBehaviourFlowField(VirtualNode &node)
     b2Vec2 f11 = isValid(x + 1, y + 1) ? flow[x + 1][y + 1] : b2Vec2_zero;
     
     //Do the x interpolations
-    float32 xWeight = node.center.x - floor.x;
+    float32 xWeight = node.getPosition().x - floor.x;
     
     b2Vec2 top = f00 * (1 - xWeight) +  f10 * xWeight;
     b2Vec2 bottom = f01 * (1 - xWeight) + f11 * xWeight;
     
     //Do the y interpolation
-    float32 yWeight = node.center.y - floor.y;
+    float32 yWeight = node.getPosition().y - floor.y;
     
     //This is now the direction we want to be travelling in (needs to be normalized)
     b2Vec2 desiredDirection = top * (1 - yWeight) + bottom * yWeight;
@@ -393,33 +372,33 @@ b2Vec2 MapController::steeringBehaviourFlowField(VirtualNode &node)
     return steerTowards(node, desiredDirection);
 }
 
-b2Vec2 MapController::steeringBehaviourSeek(VirtualNode &node, b2Vec2 dest)
+b2Vec2 MapController::steeringBehaviourSeek(Agent &node, b2Vec2 dest)
 {
-    if (dest.x == node.center.x && dest.y == node.center.y) {
+    if (dest.x == node.pos.x && dest.y == node.pos.y) {
         return b2Vec2_zero;
     }
     
-    b2Vec2 desired = dest - node.center;
+    b2Vec2 desired = dest - node.pos;
    
     desired *= (Agent::maxSpeed / desired.Length());
    
-    b2Vec2 velocityChange = desired - node.velocity;
+    b2Vec2 velocityChange = desired - node.getVelocity();
     
     return velocityChange * (Agent::maxForce / Agent::maxSpeed);
 }
 
-b2Vec2 MapController::steeringBehaviourSeparation(VirtualNode &node)
+b2Vec2 MapController::steeringBehaviourSeparation(Agent &node)
 {
     b2Vec2 totalForce = b2Vec2_zero;
     
     int neighboursCount = 0;
     
-    for (int i = 0; i < virtualNodes.size(); i++) {
-        VirtualNode &a = virtualNodes[i];
+    for (int i = 0; i < agents.size(); i++) {
+        Agent &a = agents[i];
         if (&a != &node) {
-            float32 distance = B2Vec2DHelper::distanceTo(node.center, a.center);
+            float32 distance = B2Vec2DHelper::distanceTo(node.getPosition(), a.getPosition());
             if (distance < Agent::minSeparation && distance > 0) {
-                b2Vec2 pushForce = node.center - a.center;
+                b2Vec2 pushForce = node.getPosition() - a.getPosition();
                 float32 length = pushForce.Normalize(); //Normalize returns the original length
                 float32 r = (Agent::radius + Agent::radius);
                 
@@ -436,18 +415,18 @@ b2Vec2 MapController::steeringBehaviourSeparation(VirtualNode &node)
     return totalForce * (Agent::maxForce / neighboursCount);
 }
 
-b2Vec2 MapController::steeringBehaviourCohesion(VirtualNode &node)
+b2Vec2 MapController::steeringBehaviourCohesion(Agent &node)
 {
     b2Vec2 centerOfMass = b2Vec2_zero;//agent.position().Copy();
     int neighboursCount = 0;
     
-    for (int i = 0; i < virtualNodes.size(); i++) {
-        VirtualNode &a = virtualNodes[i];
+    for (int i = 0; i < agents.size(); i++) {
+        Agent &a = agents[i];
         if (&a != &node && a.group == node.group) {
-            float32 distance = B2Vec2DHelper::distanceTo(node.center, node.center);
+            float32 distance = B2Vec2DHelper::distanceTo(node.getPosition(), node.getPosition());
             if (distance < Agent::maxCohesion) {
                 //sum up the position of our neighbours
-                centerOfMass += a.center;
+                centerOfMass += a.getPosition();
                 neighboursCount++;
             }
         }
@@ -464,19 +443,19 @@ b2Vec2 MapController::steeringBehaviourCohesion(VirtualNode &node)
     return steeringBehaviourSeek(node, centerOfMass);
 }
 
-b2Vec2 MapController::steeringBehaviourAlignment(VirtualNode &node)
+b2Vec2 MapController::steeringBehaviourAlignment(Agent &node)
 {
     b2Vec2 averageHeading = b2Vec2_zero;
     int neighboursCount = 0;
     
     //for each of our neighbours (including ourself)
-    for (int i = 0; i < virtualNodes.size(); i++) {
-        VirtualNode &a = virtualNodes[i];
-        float32 distance = B2Vec2DHelper::distanceTo(node.center, a.center);
+    for (int i = 0; i < agents.size(); i++) {
+        Agent &a = agents[i];
+        float32 distance = B2Vec2DHelper::distanceTo(node.getPosition(), a.getPosition());
         //That are within the max distance and are moving
-        if (distance < Agent::maxCohesion && a.velocity.Length() > 0 && a.group == node.group) {
+        if (distance < Agent::maxCohesion && a.getVelocity().Length() > 0 && a.group == node.group) {
             //Sum up our headings
-            b2Vec2 head = a.velocity;
+            b2Vec2 head = a.getVelocity();
             head.Normalize();
             averageHeading += head;
             neighboursCount++;
@@ -494,12 +473,12 @@ b2Vec2 MapController::steeringBehaviourAlignment(VirtualNode &node)
     return steerTowards(node, averageHeading);
 }
 
-b2Vec2 MapController::steerTowards(VirtualNode &node, b2Vec2 direction)
+b2Vec2 MapController::steerTowards(Agent &node, b2Vec2 direction)
 {
     b2Vec2 desiredVelocity = direction * Agent::maxSpeed;
     
     //The velocity change we want
-    b2Vec2 velocityChange = desiredVelocity - node.velocity;
+    b2Vec2 velocityChange = desiredVelocity - node.getVelocity();
     //Convert to a force
     return velocityChange * (Agent::maxForce / Agent::maxSpeed);
 }
@@ -526,9 +505,9 @@ void MapController::updateContinuumCrowdData()
         ccGenerateFlowField(); //TODO: This does not use the way of calculating described in the paper (I think)
         
         //(use these for steering later)
-        for (int i = virtualNodes.size() - 1; i >= 0; i--) {
-            if (virtualNodes[i].group == group) {
-                virtualNodes[i].ff = steeringBehaviourFlowField(virtualNodes[i]);
+        for (int i = agents.size() - 1; i >= 0; i--) {
+            if (agents[i].group == group) {
+                agents[i].ff = steeringBehaviourFlowField(agents[i]);
             }
         }
     }

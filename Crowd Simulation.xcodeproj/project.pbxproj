@@ -13,6 +13,7 @@
 		1955D0F41AC443D4001318C6 /* Vector.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1955D0F21AC443D4001318C6 /* Vector.cpp */; };
 		1955D0FE1AC445BC001318C6 /* MapController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1955D0F81AC445BC001318C6 /* MapController.cpp */; };
 		1955D1031AC46E4C001318C6 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1955D1021AC46E4C001318C6 /* OpenGL.framework */; };
+		197482461C2AF8D300BB7F23 /* RVOTree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 197482421C2AF8D300BB7F23 /* RVOTree.cpp */; };
 		1987ED3B1AF136C9007BACE5 /* b2BroadPhase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1987ECF01AF136C9007BACE5 /* b2BroadPhase.cpp */; };
 		1987ED3C1AF136C9007BACE5 /* b2CollideCircle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1987ECF21AF136C9007BACE5 /* b2CollideCircle.cpp */; };
 		1987ED3D1AF136C9007BACE5 /* b2CollidePolygon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1987ECF31AF136C9007BACE5 /* b2CollidePolygon.cpp */; };
@@ -79,6 +80,8 @@
 		1955D1021AC46E4C001318C6 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 		196734C31AEFEEA200765E4F /* MathLib.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MathLib.h; sourceTree = "<group>"; };
 		1970B60C1AFB89F60026A84C /* CostNode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CostNode.h; sourceTree = "<group>"; };
+		197482421C2AF8D300BB7F23 /* RVOTree.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RVOTree.cpp; sourceTree = "<group>"; };
+		197482431C2AF8D300BB7F23 /* RVOTree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RVOTree.h; sourceTree = "<group>"; };
 		1987ECEC1AF136C9007BACE5 /* Box2D.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Box2D.h; sourceTree = "<group>"; };
 		1987ECED1AF136C9007BACE5 /* Box2DConfig.cmake */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Box2DConfig.cmake; sourceTree = "<group>"; };
 		1987ECEE1AF136C9007BACE5 /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
@@ -179,6 +182,7 @@
 		1955D0DC1AC44362001318C6 = {
 			isa = PBXGroup;
 			children = (
+				1974823F1C2AF8C900BB7F23 /* RVO */,
 				1987ECEB1AF136C9007BACE5 /* Box2D */,
 				1955D1021AC46E4C001318C6 /* OpenGL.framework */,
 				1955D0EF1AC44379001318C6 /* GLUT.framework */,
@@ -224,6 +228,15 @@
 				1955D0F91AC445BC001318C6 /* MapController.h */,
 			);
 			name = App;
+			sourceTree = "<group>";
+		};
+		1974823F1C2AF8C900BB7F23 /* RVO */ = {
+			isa = PBXGroup;
+			children = (
+				197482421C2AF8D300BB7F23 /* RVOTree.cpp */,
+				197482431C2AF8D300BB7F23 /* RVOTree.h */,
+			);
+			name = RVO;
 			sourceTree = "<group>";
 		};
 		1987ECEB1AF136C9007BACE5 /* Box2D */ = {
@@ -444,6 +457,7 @@
 				19FF13FD1B049C5E008B91F2 /* Agent.cpp in Sources */,
 				1987ED581AF136C9007BACE5 /* b2LineJoint.cpp in Sources */,
 				1987ED3E1AF136C9007BACE5 /* b2Collision.cpp in Sources */,
+				197482461C2AF8D300BB7F23 /* RVOTree.cpp in Sources */,
 				1987ED3B1AF136C9007BACE5 /* b2BroadPhase.cpp in Sources */,
 				1987ED551AF136C9007BACE5 /* b2FrictionJoint.cpp in Sources */,
 				1987ED491AF136C9007BACE5 /* b2ContactManager.cpp in Sources */,
