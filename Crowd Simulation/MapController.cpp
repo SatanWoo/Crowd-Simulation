@@ -37,18 +37,18 @@ MapController::MapController(int width, int height, int count, double timeStep)
     destinationPoints.push_back(v1);
     destinationPoints.push_back(v2);
 
-    for (int yPos = 1; yPos < m_iHeight - 1; yPos++) {
+    for (int yPos = 1; yPos < 5; yPos++) {
         
-        for (int i =0 ; i < 3; i++) {
+        for (int i =0 ; i < 1; i++) {
             Agent *p1 = new Agent(b2Vec2(i % 3, yPos), 0);
             p1->initBodyDef(world);
             agents.push_back(p1);
         }
     }
     
-    for (int yPos = 1; yPos < m_iHeight - 1; yPos++) {
+    for (int yPos = 1; yPos < 5; yPos++) {
         
-        for (int i =0 ; i < 3; i++) {
+        for (int i =0 ; i < 1; i++) {
             Agent *p1 = new Agent(b2Vec2(m_iWidth - (i + 1) % 3, yPos), 1);
             p1->initBodyDef(world);
             agents.push_back(p1);
@@ -195,19 +195,19 @@ void MapController::buildKDTree()
         tree = NULL;
     }
     
+    tree = new RVOTree(5);
     
-    
-    //tree = new RVOTree(5);
-    
-    //tree->buildAgentTree(agents);
+    tree->buildAgentTree(agents);
 }
 
 void MapController::computerNearestNeighbours(double radius)
 {
-//    for (int i = 0; i < agents.size(); i++) {
-//        agents[i].computeNeighbors();
-//    }
-//}
+    for (int i = 0; i < agents.size(); i++) {
+        agents[i]->tree = tree;
+        agents[i]->computeNeighbors();
+    }
+    
+    std::cout << "haha" << endl;
 }
 
 void MapController::mergeNode()
