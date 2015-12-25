@@ -21,28 +21,30 @@ struct Agent {
     b2Vec2 force;
     int group;
     
+    int maxNeighbours;
+    int preferVelocity;
+    
     std::vector<int> neighbours;
     
-    static int maxForce; //rate of acceleration
-    static int maxSpeed; //grid squares / second
+    static float32 MAX_FORCE;
+    static float32 MAX_SPEED;
     
-    static float32 radius;
-    static float32 minSeparation; // We'll move away from anyone nearer than this
+    static float32 RADIUS;
+    static float32 MIN_SEPARATION;
     
-    static int maxCohesion; //We'll move closer to anyone within this bound
+    // We'll move away from anyone nearer than this
     
-    static int maxForceSquared;
-    static int maxSpeedSquared;
-    
-    static int maxNeighbours;
-    static int preferVelocity;
-    
-    Agent(b2Vec2 pos, int group){
+    static float32 MAX_COHESION;
+    static float32 MAX_FORCE_SQUARED;
+    static float32 MAX_SPEED_SQUARED;
+
+    Agent(b2Vec2 pos, int group)
+    {
         this->group = group;
         this->pos = pos;
         
-        radius_ = Agent::radius;
-        maxSpeed_ = Agent::maxSpeed;
+        radius_ = Agent::RADIUS;
+        maxSpeed_ = Agent::MAX_SPEED;
     }
     
     b2Vec2 getPosition()const{return this->body->GetPosition();}
@@ -65,7 +67,7 @@ struct Agent {
         fixtureDef->density = 20.0;
         fixtureDef->friction = 0.0;
         fixtureDef->restitution = 0.0;
-        fixtureDef->shape = new b2CircleShape(Agent::radius);
+        fixtureDef->shape = new b2CircleShape(Agent::RADIUS);
         fixture = body->CreateFixture(fixtureDef);
     }
     
@@ -80,12 +82,11 @@ struct Agent {
     
     std::vector<std::pair<float, Agent *>> agentNeighbors_;
     
-    size_t maxNeighbors_;
-    float maxSpeed_;
-    float radius_;
-    float neighborDist_;
-    
     size_t ID_;
+    size_t maxNeighbors_;
+    float32 maxSpeed_;
+    float32 radius_;
+    float32 neighborDist_;
     
     void computeNeighbors()
     {
@@ -93,7 +94,8 @@ struct Agent {
         
         agentNeighbors_.clear();
         
-        if (maxNeighbors_ > 0) {
+        if (maxNeighbors_ > 0)
+        {
             rangeSq = neighborDist_ * neighborDist_;
             tree->computeAgentNeighbors(this, rangeSq);
         }

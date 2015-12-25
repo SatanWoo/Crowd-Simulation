@@ -309,7 +309,7 @@ void MapController::update()
     if (frame % 30 == 0)
     {
         buildKDTree();
-        computerNearestNeighbours(Agent::radius * 10);
+        computerNearestNeighbours(Agent::RADIUS * 10);
         mergeNode();
     }
     
@@ -330,8 +330,8 @@ void MapController::update()
         node->force = ff + sep * 1.2 + alg * 0.3 + coh * 0.05;
         
         float32 lengthSquared =  node->force.LengthSquared();
-        if (lengthSquared > Agent::maxForceSquared) {
-            node->force *= (Agent::maxForce / sqrt(lengthSquared));
+        if (lengthSquared > Agent::MAX_FORCE_SQUARED) {
+            node->force *= (Agent::MAX_FORCE_SQUARED / sqrt(lengthSquared));
         }
     }
     
@@ -388,11 +388,11 @@ b2Vec2 MapController::steeringBehaviourSeek(Agent *node, b2Vec2 dest)
     
     b2Vec2 desired = dest - node->pos;
    
-    desired *= (Agent::maxSpeed / desired.Length());
+    desired *= (Agent::MAX_SPEED / desired.Length());
    
     b2Vec2 velocityChange = desired - node->getVelocity();
     
-    return velocityChange * (Agent::maxForce / Agent::maxSpeed);
+    return velocityChange * (Agent::MAX_FORCE / Agent::MAX_SPEED);
 }
 
 b2Vec2 MapController::steeringBehaviourSeparation(Agent *node)
@@ -405,12 +405,12 @@ b2Vec2 MapController::steeringBehaviourSeparation(Agent *node)
         Agent *a = agents[i];
         if (&a != &node) {
             float32 distance = B2Vec2DHelper::distanceTo(node->getPosition(), a->getPosition());
-            if (distance < Agent::minSeparation && distance > 0) {
+            if (distance < Agent::MIN_SEPARATION && distance > 0) {
                 b2Vec2 pushForce = node->getPosition() - a->getPosition();
                 float32 length = pushForce.Normalize(); //Normalize returns the original length
-                float32 r = (Agent::radius + Agent::radius);
+                float32 r = (Agent::RADIUS + Agent::RADIUS);
                 
-                totalForce += pushForce * (1 - ((length - r) / (Agent::minSeparation - r)));//agent.minSeparation)));
+                totalForce += pushForce * (1 - ((length - r) / (Agent::MIN_SEPARATION - r)));//agent.minSeparation)));
                 neighboursCount++;
             }
         }
@@ -420,7 +420,7 @@ b2Vec2 MapController::steeringBehaviourSeparation(Agent *node)
         return totalForce; //Zero
     }
     
-    return totalForce * (Agent::maxForce / neighboursCount);
+    return totalForce * (Agent::MAX_FORCE / neighboursCount);
 }
 
 b2Vec2 MapController::steeringBehaviourCohesion(Agent *node)
@@ -432,7 +432,7 @@ b2Vec2 MapController::steeringBehaviourCohesion(Agent *node)
         Agent *a = agents[i];
         if (a != node && a->group == node->group) {
             float32 distance = B2Vec2DHelper::distanceTo(node->getPosition(), node->getPosition());
-            if (distance < Agent::maxCohesion) {
+            if (distance < Agent::MAX_COHESION) {
                 //sum up the position of our neighbours
                 centerOfMass += a->getPosition();
                 neighboursCount++;
@@ -461,7 +461,7 @@ b2Vec2 MapController::steeringBehaviourAlignment(Agent *node)
         Agent *a = agents[i];
         float32 distance = B2Vec2DHelper::distanceTo(node->getPosition(), a->getPosition());
         //That are within the max distance and are moving
-        if (distance < Agent::maxCohesion && a->getVelocity().Length() > 0 && a->group == node->group) {
+        if (distance < Agent::MAX_COHESION && a->getVelocity().Length() > 0 && a->group == node->group) {
             //Sum up our headings
             b2Vec2 head = a->getVelocity();
             head.Normalize();
@@ -483,12 +483,12 @@ b2Vec2 MapController::steeringBehaviourAlignment(Agent *node)
 
 b2Vec2 MapController::steerTowards(Agent *node, b2Vec2 direction)
 {
-    b2Vec2 desiredVelocity = direction * Agent::maxSpeed;
+    b2Vec2 desiredVelocity = direction * Agent::MAX_SPEED;
     
     //The velocity change we want
     b2Vec2 velocityChange = desiredVelocity - node->getVelocity();
     //Convert to a force
-    return velocityChange * (Agent::maxForce / Agent::maxSpeed);
+    return velocityChange * (Agent::MAX_FORCE / Agent::MAX_SPEED);
 }
 
 // Continnum Crowd
@@ -631,10 +631,10 @@ void MapController::ccCalculateUnitCostField()
                 if (density >= densityMax) {
                     speedField[i][j].value[dir] = flowSpeed;
                 } else if (density <= densityMin) {
-                    speedField[i][j].value[dir] = Agent::maxSpeed;
+                    speedField[i][j].value[dir] = Agent::MAX_SPEED;
                 } else {
                     //medium speed
-                    speedField[i][j].value[dir] = Agent::maxSpeed - (density - densityMin) / (densityMax - densityMin) * (4 - flowSpeed);
+                    speedField[i][j].value[dir] = Agent::MAX_SPEED - (density - densityMin) / (densityMax - densityMin) * (4 - flowSpeed);
                 }
                 
                 //we're going to divide by speed later, so make sure it's not zero
@@ -646,8 +646,6 @@ void MapController::ccCalculateUnitCostField()
                 
                 //Work out the cost to move in to the destination cell
                 costField[i][j].value[dir] = (speedField[i][j].value[dir] * lengthWeight + timeWeight + discomfortWeight * discomfort) / speedField[i][j].value[dir];
-                
-                
                 //cout << "X:" << i << "Y:" << j << "I:" << dir << " " <<costField[i][j].value[dir] << endl;
             }
         }

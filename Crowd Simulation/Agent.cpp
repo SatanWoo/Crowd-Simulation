@@ -9,10 +9,10 @@
 #include "Agent.h"
 
 
-int Agent::maxForce = 20;
-int Agent::maxSpeed = 4;
-float32 Agent::radius = 0.15;
-float32 Agent::minSeparation = 0.6;
-int Agent::maxCohesion = 2;
-int Agent::maxForceSquared = Agent::maxForce * Agent::maxForce;
-int Agent::maxSpeedSquared = Agent::maxSpeed * Agent::maxSpeed;
+float32 Agent::MAX_FORCE = 20;
+float32 Agent::MAX_SPEED = 4;
+float32 Agent::RADIUS = 0.15;
+float32 Agent::MIN_SEPARATION = 0.6;
+float32 Agent::MAX_COHESION = 2;
+float32 Agent::MAX_FORCE_SQUARED = Agent::MAX_FORCE * Agent::MAX_FORCE;
+float32 Agent::MAX_SPEED_SQUARED = Agent::MAX_SPEED * Agent::MAX_SPEED;
