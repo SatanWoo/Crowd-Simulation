@@ -71,7 +71,7 @@ struct Agent {
         fixtureDef->density = 20.0;
         fixtureDef->friction = 0.0;
         fixtureDef->restitution = 0.0;
-        fixtureDef->shape = new b2CircleShape(Agent::RADIUS);
+        fixtureDef->shape = new b2CircleShape(radius_);
         fixture = body->CreateFixture(fixtureDef);
     }
     

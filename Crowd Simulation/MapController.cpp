@@ -199,7 +199,7 @@ MapController::~MapController()
     }
 }
 
-#pragma mark - Protected
+#pragma mark - KDTree
 void MapController::buildKDTree()
 {
     if (tree != NULL)
@@ -215,7 +215,7 @@ void MapController::buildKDTree()
     tree->buildAgentTree(agents);
 }
 
-void MapController::computerNearestNeighbours(double radius)
+void MapController::computerNearestNeighbours()
 {
     for (int i = 0; i < agents.size(); i++)
     {
@@ -253,11 +253,13 @@ void MapController::mergeNode()
 
 void MapController::update()
 {
-    if (frame % 30 == 0)
+    if (simulationMode == Virtual)
     {
         buildKDTree();
-        computerNearestNeighbours(Agent::RADIUS * 10);
+        computerNearestNeighbours();
         mergeNode();
+    } else {
+        
     }
     
     frame ++;
@@ -269,13 +271,11 @@ void MapController::update()
     {
         Agent *node = agents[i];
         
-        b2Vec2 ff = node->continuumForce;
-        
         b2Vec2 sep = steeringBehaviourSeparation(node);
         b2Vec2 alg = steeringBehaviourAlignment(node);
         b2Vec2 coh = steeringBehaviourCohesion(node);
     
-        node->flockForce = ff + sep * 1.2 + alg * 0.3 + coh * 0.05;
+        node->flockForce = node->continuumForce + sep * 1.2 + alg * 0.3 + coh * 0.05;
         
         float32 lengthSquared =  node->flockForce.LengthSquared();
         if (lengthSquared > Agent::MAX_FORCE_SQUARED)
@@ -478,7 +478,8 @@ void MapController::updateContinuumCrowdData()
         //(use these for steering later)
         for (int i = agents.size() - 1; i >= 0; i--)
         {
-            if (agents[i]->group == group) {
+            if (agents[i]->group == group)
+            {
                 agents[i]->continuumForce = steeringBehaviourFlowField(agents[i]);
             }
         }
@@ -619,8 +620,6 @@ void MapController::ccCalculateUnitCostField()
                 float32 threshold = 0.001;
                 speedField[i][j].value[dir] = max(threshold, speed);
                 
-               
-                
                 //Work out the cost to move in to the destination cell
                 costField[i][j].value[dir] = (speedField[i][j].value[dir] * lengthWeight + timeWeight + discomfortWeight * discomfort) / speedField[i][j].value[dir];
                 //cout << "X:" << i << "Y:" << j << "I:" << dir << " " <<costField[i][j].value[dir] << endl;
@@ -754,14 +753,27 @@ void MapController::updateDestinationPoint(b2Vec2 newDest)
     destinationPoints[1].y = m_iHeight - destinationPoints[0].y - 1;
 }
 
+void MapController::switchState()
+{
+    simulationMode = (MapControllerState)(1 - simulationMode);
+}
+
 bool MapController::isValid(int x, int y)
 {
     return x >=0 && x < m_iWidth && y >= 0 && y < m_iHeight;
 }
 
+void MapController::simulateAgents(const std::vector<Agent *> agents)
+{
+    
+}
+
 #pragma mark - Render 
 void MapController::render()
 {
+    renderBackground();
+    renderObstacels();
+    
     glPointSize(10);
     glBegin(GL_POINTS);
     glColor4f(0.0, 1.0, 0.0, 1.0);
@@ -770,8 +782,6 @@ void MapController::render()
     glVertex2d(destinationPoints[1].x * MapGridSize + 0.5 * MapGridSize, destinationPoints[1].y * MapGridSize + 0.5 * MapGridSize);
     glEnd();
     
-    renderBackground();
-    renderObstacels();
     renderAgents();
 }
 

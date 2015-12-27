@@ -31,7 +31,14 @@ private:
     FourGrid **costField;
     
     bool **visited;
-
+    
+    b2Vec2** initializeVecField();
+    float32** initializeFloatField();
+    
+    void deinitializeField(b2Vec2 **field);
+    void deinitializeField(float32 **field);
+    
+private:
     std::vector<Agent *> agents;
     std::vector<VirtualNode *> nodes;
     std::vector<Agent *> leadingAgents;
@@ -51,19 +58,15 @@ private:
     
 	int m_iWidth;
     int m_iHeight;
-protected:
-    bool isValid(int x, int y);
     
+    MapControllerState simulationMode;
+    
+private:
     void buildKDTree();
-    void computerNearestNeighbours(double radius);
+    void computerNearestNeighbours();
     void mergeNode();
     
-    b2Vec2** initializeVecField();
-    float32** initializeFloatField();
-    
-    void deinitializeField(b2Vec2 **field);
-    void deinitializeField(float32 **field);
-    
+private:
     void updateContinuumCrowdData();
     void ccClearBuffers();
     void ccCalculateDensityAndAverageSpeed();
@@ -74,7 +77,8 @@ protected:
     void ccClearPotentialField();
     
     void ccPotentialFieldEikonalFill(b2Vec2 des);
-    
+
+private:
     b2Vec2 steeringBehaviourFlowField(Agent *agent);
     b2Vec2 steeringBehaviourSeek(Agent *agent, b2Vec2 dest);
     b2Vec2 steeringBehaviourSeparation(Agent *agent);
@@ -87,11 +91,16 @@ private:
     void renderAgents();
     void renderObstacels();
     
+    bool isValid(int x, int y);
+    
+    void simulateAgents(const std::vector<Agent *> agents);
+    
 public:
 	MapController(int width, int height, int count, double timeStep = 0.02);
 	~MapController();
     
     void updateDestinationPoint(b2Vec2 newDest);
+    void switchState();
 
     b2World* getWorld()const{return world;}
     

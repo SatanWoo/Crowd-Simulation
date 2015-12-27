@@ -13,7 +13,7 @@
 #include "Box2D.h"
 #include "Agent.h"
 
-struct VirtualNode : Agent
+struct VirtualNode
 {
     double maxX;
     double maxY;
@@ -23,6 +23,11 @@ struct VirtualNode : Agent
     
     b2Vec2 center;
     b2Vec2 velocity;
+    
+    size_t ID_;
+    size_t groupID_;
+    
+    float32 radius_;
     
     std::vector<Agent *> allNodes;
     
@@ -37,8 +42,8 @@ struct VirtualNode : Agent
         center = b2Vec2_zero;
         velocity = b2Vec2_zero;
         
-        int size = allNodes.size();
-        for (int i = 0; i < size; i++)
+        size_t size = allNodes.size();
+        for (size_t i = 0; i < size; ++i)
         {
             Agent *ai = allNodes[i];
             
@@ -54,13 +59,43 @@ struct VirtualNode : Agent
             if (pos.y < minY) minY = pos.y;
         }
         
-        center *= 1 / size;
         velocity *= 1 / size;
         
         double xDiff = maxX - minX;
         double yDiff = maxY - minY;
         radius_ = sqrt(xDiff * xDiff + yDiff * yDiff);
     }
+    
+    void initBodyDef(b2World *world)
+    {
+        bodyDef = new b2BodyDef();
+        bodyDef->type = b2_dynamicBody;
+        bodyDef->position.Set(this->center.x, this->center.y);
+        
+        body = world->CreateBody(bodyDef);
+        initFixtureDef();
+    }
+    
+    void initFixtureDef()
+    {
+        this->fixtureDef = new b2FixtureDef();
+        fixtureDef = new b2FixtureDef();
+        fixtureDef->density = 20.0;
+        fixtureDef->friction = 0.0;
+        fixtureDef->restitution = 0.0;
+        fixtureDef->shape = new b2CircleShape(radius_);
+        fixture = body->CreateFixture(fixtureDef);
+    }
+    
+    b2Vec2 getPosition()const{return this->body->GetPosition();}
+    b2Vec2 getVelocity()const{return this->body->GetLinearVelocity();}
+    
+    b2FixtureDef *fixtureDef;
+    b2Fixture *fixture;
+    
+    b2Body *body;
+    b2BodyDef *bodyDef;
+
     
 //    void dispatch(double delta)
 //    {

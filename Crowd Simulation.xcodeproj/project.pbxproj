@@ -224,8 +224,8 @@
 		1955D1011AC445BF001318C6 /* App */ = {
 			isa = PBXGroup;
 			children = (
-				1955D0F81AC445BC001318C6 /* MapController.cpp */,
 				1955D0F91AC445BC001318C6 /* MapController.h */,
+				1955D0F81AC445BC001318C6 /* MapController.cpp */,
 				19C9ADC91C2FD718005DF748 /* Definition.h */,
 			);
 			name = App;

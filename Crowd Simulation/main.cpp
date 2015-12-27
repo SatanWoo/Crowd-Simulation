@@ -56,6 +56,15 @@ void glMouse(int button, int state, int x, int y)
     }
 }
 
+void glKeyboard(unsigned char key, int x, int y)
+{
+    switch (key) {
+        case 'b':
+            mapController->switchState();
+            break;
+    }
+}
+
 int main(int argc, const char * argv[])
 {
     glutInit(&argc, const_cast<char **>(argv));
@@ -66,6 +75,7 @@ int main(int argc, const char * argv[])
     glutDisplayFunc(glRender);
     glutIdleFunc(glIdle);
     glutMouseFunc(glMouse);
+    glutKeyboardFunc(glKeyboard);
     
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
