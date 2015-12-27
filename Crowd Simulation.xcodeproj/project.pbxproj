@@ -160,6 +160,7 @@
 		19ABB1AF1B14988000E7B623 /* KDTree.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = KDTree.cpp; sourceTree = "<group>"; };
 		19AC4BD81AF67B9E009831BA /* B2Vec2DHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = B2Vec2DHelper.h; sourceTree = "<group>"; };
 		19B4F55B1B1DF63600276510 /* VirtualNode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VirtualNode.h; sourceTree = "<group>"; };
+		19C9ADC91C2FD718005DF748 /* Definition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Definition.h; sourceTree = "<group>"; };
 		19FF13F81B0466C0008B91F2 /* Agent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Agent.h; sourceTree = "<group>"; };
 		19FF13F91B047AC8008B91F2 /* GlobalConfig.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GlobalConfig.cpp; sourceTree = "<group>"; };
 		19FF13FA1B047AC8008B91F2 /* GlobalConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GlobalConfig.h; sourceTree = "<group>"; };
@@ -182,10 +183,8 @@
 		1955D0DC1AC44362001318C6 = {
 			isa = PBXGroup;
 			children = (
-				1974823F1C2AF8C900BB7F23 /* RVO */,
+				19C9ADCA1C2FD8C0005DF748 /* OpenGL */,
 				1987ECEB1AF136C9007BACE5 /* Box2D */,
-				1955D1021AC46E4C001318C6 /* OpenGL.framework */,
-				1955D0EF1AC44379001318C6 /* GLUT.framework */,
 				1955D0E71AC44362001318C6 /* Crowd Simulation */,
 				1955D0E61AC44362001318C6 /* Products */,
 			);
@@ -202,6 +201,7 @@
 		1955D0E71AC44362001318C6 /* Crowd Simulation */ = {
 			isa = PBXGroup;
 			children = (
+				1974823F1C2AF8C900BB7F23 /* RVO */,
 				19A802F41AD29B5400CC6FBC /* Object */,
 				1955D1011AC445BF001318C6 /* App */,
 				1955D0F11AC443C5001318C6 /* Foundation */,
@@ -226,6 +226,7 @@
 			children = (
 				1955D0F81AC445BC001318C6 /* MapController.cpp */,
 				1955D0F91AC445BC001318C6 /* MapController.h */,
+				19C9ADC91C2FD718005DF748 /* Definition.h */,
 			);
 			name = App;
 			sourceTree = "<group>";
@@ -233,10 +234,11 @@
 		1974823F1C2AF8C900BB7F23 /* RVO */ = {
 			isa = PBXGroup;
 			children = (
-				197482421C2AF8D300BB7F23 /* RVOTree.cpp */,
 				197482431C2AF8D300BB7F23 /* RVOTree.h */,
+				197482421C2AF8D300BB7F23 /* RVOTree.cpp */,
 			);
 			name = RVO;
+			path = ..;
 			sourceTree = "<group>";
 		};
 		1987ECEB1AF136C9007BACE5 /* Box2D */ = {
@@ -373,11 +375,11 @@
 			isa = PBXGroup;
 			children = (
 				1970B60C1AFB89F60026A84C /* CostNode.h */,
+				19B4F55B1B1DF63600276510 /* VirtualNode.h */,
 				19FF13F81B0466C0008B91F2 /* Agent.h */,
 				19FF13FC1B049C5E008B91F2 /* Agent.cpp */,
-				19FF13F91B047AC8008B91F2 /* GlobalConfig.cpp */,
 				19FF13FA1B047AC8008B91F2 /* GlobalConfig.h */,
-				19B4F55B1B1DF63600276510 /* VirtualNode.h */,
+				19FF13F91B047AC8008B91F2 /* GlobalConfig.cpp */,
 			);
 			name = Object;
 			sourceTree = "<group>";
@@ -393,6 +395,15 @@
 				191E6C5C1B1D4249009F8702 /* KDObstacle.h */,
 			);
 			name = KDTree;
+			sourceTree = "<group>";
+		};
+		19C9ADCA1C2FD8C0005DF748 /* OpenGL */ = {
+			isa = PBXGroup;
+			children = (
+				1955D1021AC46E4C001318C6 /* OpenGL.framework */,
+				1955D0EF1AC44379001318C6 /* GLUT.framework */,
+			);
+			name = OpenGL;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

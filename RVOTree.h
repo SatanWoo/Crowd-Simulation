@@ -62,6 +62,7 @@
  */
 
 #include <vector>
+#include "Definition.h"
 
 class Agent;
 
@@ -125,8 +126,8 @@ namespace RVO {
 
 		void buildAgentTreeRecursive(size_t begin, size_t end, size_t node);
 
-		void computeAgentNeighbors(Agent* agent, float &rangeSq);
-		void queryAgentTreeRecursive(Agent* agent, float &rangeSq, size_t node);
+		void computeAgentNeighbors(HashMap& map, Agent* agent, float &rangeSq);
+		void queryAgentTreeRecursive(HashMap& map, Agent* agent, float &rangeSq, size_t node);
         
 		std::vector<Agent *> agents_;
 		std::vector<AgentTreeNode> agentTree_;

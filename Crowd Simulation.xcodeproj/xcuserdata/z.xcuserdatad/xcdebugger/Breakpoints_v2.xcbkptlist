@@ -10,11 +10,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Crowd Simulation/MapController.cpp"
-            timestampString = "472671124.966888"
+            timestampString = "472900043.174259"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "519"
-            endingLineNumber = "519"
+            startingLineNumber = "483"
+            endingLineNumber = "483"
             landmarkName = "MapController::updateContinuumCrowdData()"
             landmarkType = "5">
          </BreakpointContent>
@@ -105,29 +105,13 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "RVOTree.cpp"
-            timestampString = "472669978.75044"
+            filePath = "Crowd Simulation/MapController.cpp"
+            timestampString = "472900043.174259"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "137"
-            endingLineNumber = "137"
-            landmarkName = "RVOTree::buildAgentTreeRecursive(size_t begin, size_t end, size_t node)"
-            landmarkType = "5">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "RVOTree.cpp"
-            timestampString = "472669979.38787"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "136"
-            endingLineNumber = "136"
-            landmarkName = "RVOTree::buildAgentTreeRecursive(size_t begin, size_t end, size_t node)"
+            startingLineNumber = "250"
+            endingLineNumber = "250"
+            landmarkName = "MapController::mergeNode()"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>

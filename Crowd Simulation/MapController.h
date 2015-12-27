@@ -7,23 +7,20 @@
 
 #include <iostream>
 #include <vector>
-#include <unordered_map>
+#include "Definition.h"
 
 #include "RVOTree.h"
 
-class Terrain;
+class VirtualNode;
+
+typedef enum {
+  Normal = 0,
+  Virtual = 1
+} MapControllerState;
 
 class MapController
 {
 private:
-    std::vector<Agent *> agents;
-    std::vector<b2Vec2> destinationPoints;
-    std::vector<b2Vec2> obstacles;
-    
-    std::unordered_map<size_t, bool> availableAgents;
-    
-    RVOTree *tree;
-    
     b2Vec2 **flow;
     b2Vec2 **avgVelocityField;
     
@@ -34,15 +31,26 @@ private:
     FourGrid **costField;
     
     bool **visited;
-        
+
+    std::vector<Agent *> agents;
+    std::vector<VirtualNode *> nodes;
+    std::vector<Agent *> leadingAgents;
+    
+    std::vector<b2Vec2> destinationPoints;
+    std::vector<b2Vec2> obstacles;
+    
+    HashMap availableAgents;
+    
+    RVOTree *tree;
     b2World *world;
     
-    size_t counter;
-	int m_iWidth;
-	int m_iHeight;
-
-	double m_dTimeStep;
+    double m_dTimeStep;
     
+    size_t IDcounter;
+    size_t groupCounter;
+    
+	int m_iWidth;
+    int m_iHeight;
 protected:
     bool isValid(int x, int y);
     

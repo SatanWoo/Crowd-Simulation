@@ -138,18 +138,18 @@ namespace RVO {
 		}
 	}
 
-	void RVOTree::computeAgentNeighbors(Agent* agent, float &rangeSq)
+	void RVOTree::computeAgentNeighbors(HashMap& map, Agent* agent, float &rangeSq)
 	{
-		queryAgentTreeRecursive(agent, rangeSq, 0);
+		queryAgentTreeRecursive(map, agent, rangeSq, 0);
 	}
     
-	void RVOTree::queryAgentTreeRecursive(Agent* agent, float &rangeSq, size_t node)
+	void RVOTree::queryAgentTreeRecursive(HashMap& map, Agent* agent, float &rangeSq, size_t node)
 	{
 		if (agentTree_[node].end - agentTree_[node].begin <= MAX_LEAF_SIZE)
         {
             for (size_t i = agentTree_[node].begin; i < agentTree_[node].end; ++i)
             {
-				agent->insertAgentNeighbor(agents_[i], rangeSq);
+				agent->insertAgentNeighbor(map, agents_[i], rangeSq);
 			}
 		}
 		else
@@ -162,11 +162,11 @@ namespace RVO {
             {
 				if (distSqLeft < rangeSq)
                 {
-					queryAgentTreeRecursive(agent, rangeSq, agentTree_[node].left);
+					queryAgentTreeRecursive(map, agent, rangeSq, agentTree_[node].left);
 
 					if (distSqRight < rangeSq)
                     {
-						queryAgentTreeRecursive(agent, rangeSq, agentTree_[node].right);
+						queryAgentTreeRecursive(map, agent, rangeSq, agentTree_[node].right);
 					}
 				}
 			}
@@ -174,11 +174,11 @@ namespace RVO {
             {
 				if (distSqRight < rangeSq)
                 {
-					queryAgentTreeRecursive(agent, rangeSq, agentTree_[node].right);
+					queryAgentTreeRecursive(map, agent, rangeSq, agentTree_[node].right);
 
 					if (distSqLeft < rangeSq)
                     {
-						queryAgentTreeRecursive(agent, rangeSq, agentTree_[node].left);
+						queryAgentTreeRecursive(map, agent, rangeSq, agentTree_[node].left);
 					}
 				}
 			}

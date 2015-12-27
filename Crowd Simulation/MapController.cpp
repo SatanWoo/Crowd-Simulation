@@ -1,13 +1,11 @@
-#include "MapController.h"
-#include "MathLib.h"
-#include "Agent.h"
-#include "B2Vec2DHelper.h"
-#include "KDTuple.h"
-
 #include <GLUT/GLUT.h>
 #include <math.h>
-#include <deque>
 #include <queue>
+
+#include "MapController.h"
+#include "Agent.h"
+#include "VirtualNode.h"
+#include "B2Vec2DHelper.h"
 
 using namespace std;
 
@@ -21,7 +19,11 @@ static int eightDir[8][2] = {{0, -1}, {1, 0}, {0, 1}, {-1, 0}, {1, 1}, {1, -1}, 
 
 MapController::MapController(int width, int height, int count, double timeStep)
 {
+    srand((unsigned)time(NULL));
+    
     tree = new RVOTree(5);
+    
+    IDcounter = 0;
     
 	m_iWidth = width;
 	m_iHeight = height;
@@ -29,8 +31,6 @@ MapController::MapController(int width, int height, int count, double timeStep)
     
     world = new b2World(b2Vec2_zero, true);
 
-    srand((unsigned)time(NULL));
-    
     b2Vec2 v1(m_iWidth - 2, m_iHeight / 2);
     b2Vec2 v2(1, m_iHeight / 2);
     
@@ -43,7 +43,7 @@ MapController::MapController(int width, int height, int count, double timeStep)
         {
             Agent *p1 = new Agent(b2Vec2(i % 3, yPos), 0);
             p1->initBodyDef(world);
-            p1->ID_ = counter++;
+            p1->ID_ = IDcounter++;
             agents.push_back(p1);
         }
     }
@@ -54,7 +54,7 @@ MapController::MapController(int width, int height, int count, double timeStep)
         {
             Agent *p1 = new Agent(b2Vec2(m_iWidth - (i + 1) % 3, yPos), 1);
             p1->initBodyDef(world);
-            p1->ID_ = counter++;
+            p1->ID_ = IDcounter++;
             agents.push_back(p1);
         }
     }
@@ -207,8 +207,9 @@ void MapController::buildKDTree()
         delete tree;
         tree = NULL;
     }
-    
+
     availableAgents.clear();
+    leadingAgents.clear();
     
     tree = new RVOTree(5);
     tree->buildAgentTree(agents);
@@ -219,31 +220,36 @@ void MapController::computerNearestNeighbours(double radius)
     for (int i = 0; i < agents.size(); i++)
     {
         agents[i]->tree = tree;
-        agents[i]->computeNeighbors();
+        
+        if (availableAgents.find(agents[i]->ID_) == availableAgents.end())
+        {
+            leadingAgents.push_back(agents[i]);
+            agents[i]->computeNeighbors(this->availableAgents);
+        }
     }
-    
-    std::cout << "haha" << endl;
 }
 
 void MapController::mergeNode()
 {
-    int group = 0;
+    groupCounter = 0;
     
-    for (int i = 0; i < agents.size(); i++)
+    for (int i = 0; i < leadingAgents.size(); i++)
     {
-        Agent *agent = agents[i];
-        for (int j = 0; j < agent->agentNeighbors_.size(); j++)
-        {
-            Agent *ne = agent->agentNeighbors_[j].second;
-            ne->group = group;
-        }
+        Agent *leader = agents[i];
+        leader->group = groupCounter++;
         
-        agent->group = group;
-        ++group;
+        for (int j = 0; j < leader->agentNeighbors_.size(); j++)
+        {
+            Agent *ne = leader->agentNeighbors_[j].second;
+        
+            ne->group = leader->group;
+            
+            cout << "neight of ID " << leader->ID_ << " is :" << ne->ID_ << endl;
+        }
     }
 }
 
-#pragma mark - End Of Protected
+#pragma mark - Public
 
 void MapController::update()
 {
@@ -263,18 +269,18 @@ void MapController::update()
     {
         Agent *node = agents[i];
         
-        b2Vec2 ff = node->ff;
+        b2Vec2 ff = node->continuumForce;
         
         b2Vec2 sep = steeringBehaviourSeparation(node);
         b2Vec2 alg = steeringBehaviourAlignment(node);
         b2Vec2 coh = steeringBehaviourCohesion(node);
     
-        node->force = ff + sep * 1.2 + alg * 0.3 + coh * 0.05;
+        node->flockForce = ff + sep * 1.2 + alg * 0.3 + coh * 0.05;
         
-        float32 lengthSquared =  node->force.LengthSquared();
+        float32 lengthSquared =  node->flockForce.LengthSquared();
         if (lengthSquared > Agent::MAX_FORCE_SQUARED)
         {
-            node->force *= (Agent::MAX_FORCE_SQUARED / sqrt(lengthSquared));
+            node->flockForce *= (Agent::MAX_FORCE_SQUARED / sqrt(lengthSquared));
         }
     }
     
@@ -282,7 +288,7 @@ void MapController::update()
     for (int i = size - 1; i >= 0; i--)
     {
         Agent *node = agents[i];
-        node->body->ApplyLinearImpulse(node->force * m_dTimeStep, node->getPosition());
+        node->body->ApplyLinearImpulse(node->flockForce * m_dTimeStep, node->getPosition());
 //        node.center = node.center + node.force * m_dTimeStep;
 //        node.dispatch(m_dTimeStep);
     }
@@ -291,6 +297,7 @@ void MapController::update()
     world->ClearForces();
 }
 
+#pragma mark - Flock
 b2Vec2 MapController::steeringBehaviourFlowField(Agent *node)
 {
     b2Vec2 floor = B2Vec2DHelper::floorV(node->getPosition());
@@ -472,7 +479,7 @@ void MapController::updateContinuumCrowdData()
         for (int i = agents.size() - 1; i >= 0; i--)
         {
             if (agents[i]->group == group) {
-                agents[i]->ff = steeringBehaviourFlowField(agents[i]);
+                agents[i]->continuumForce = steeringBehaviourFlowField(agents[i]);
             }
         }
     }

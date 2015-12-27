@@ -9,18 +9,20 @@
 #ifndef Crowd_Simulation_Agent_h
 #define Crowd_Simulation_Agent_h
 
-#include "Box2D.h"
 #include <vector>
+#include "Box2D.h"
 #include "RVOTree.h"
+#include "Definition.h"
 
 using namespace RVO;
+using namespace std;
 
 struct Agent {
     b2Vec2 pos;
-    b2Vec2 ff;
-    b2Vec2 force;
-    int group;
+    b2Vec2 continuumForce;
+    b2Vec2 flockForce;
     
+    int group;
     int maxNeighbours;
     int preferVelocity;
     
@@ -45,6 +47,8 @@ struct Agent {
         
         radius_ = Agent::RADIUS;
         maxSpeed_ = Agent::MAX_SPEED;
+        
+        neighborDist_ = 3;
     }
     
     b2Vec2 getPosition()const{return this->body->GetPosition();}
@@ -88,7 +92,7 @@ struct Agent {
     float32 radius_;
     float32 neighborDist_;
     
-    void computeNeighbors()
+    void computeNeighbors(HashMap& map)
     {
         float rangeSq = radius_ * radius_;
         
@@ -97,14 +101,15 @@ struct Agent {
         if (maxNeighbors_ > 0)
         {
             rangeSq = neighborDist_ * neighborDist_;
-            tree->computeAgentNeighbors(this, rangeSq);
+            tree->computeAgentNeighbors(map, this, rangeSq);
         }
     }
     
-    void insertAgentNeighbor(Agent* agent, float &rangeSq)
+    void insertAgentNeighbor(HashMap& map, Agent* agent, float &rangeSq)
     {
         if (this != agent)
         {
+            map.insert(make_pair(agent->ID_, true));
             const float distSq = (pos - agent->pos).LengthSquared();
             
             if (distSq < rangeSq)

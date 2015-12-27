@@ -13,7 +13,7 @@
 #include "Box2D.h"
 #include "Agent.h"
 
-struct VirtualNode
+struct VirtualNode : Agent
 {
     double maxX;
     double maxY;
@@ -21,14 +21,9 @@ struct VirtualNode
     double minX;
     double minY;
     
-    double radius;
-    
     b2Vec2 center;
     b2Vec2 velocity;
-    b2Vec2 ff;
-    b2Vec2 force;
     
-    int group;
     std::vector<Agent *> allNodes;
     
     void build()
@@ -64,7 +59,7 @@ struct VirtualNode
         
         double xDiff = maxX - minX;
         double yDiff = maxY - minY;
-        radius = sqrt(xDiff * xDiff + yDiff * yDiff);
+        radius_ = sqrt(xDiff * xDiff + yDiff * yDiff);
     }
     
 //    void dispatch(double delta)
