@@ -20,6 +20,8 @@ private:
     std::vector<b2Vec2> destinationPoints;
     std::vector<b2Vec2> obstacles;
     
+    std::unordered_map<size_t, bool> availableAgents;
+    
     RVOTree *tree;
     
     b2Vec2 **flow;
@@ -34,10 +36,11 @@ private:
     bool **visited;
         
     b2World *world;
-
+    
+    size_t counter;
 	int m_iWidth;
 	int m_iHeight;
-    
+
 	double m_dTimeStep;
     
 protected:
@@ -70,6 +73,11 @@ protected:
     b2Vec2 steeringBehaviourAlignment(Agent *agent);
     b2Vec2 steeringBehaviourCohesion(Agent *agent);
     b2Vec2 steerTowards(Agent *agent, b2Vec2 direction);
+    
+private:
+    void renderBackground();
+    void renderAgents();
+    void renderObstacels();
     
 public:
 	MapController(int width, int height, int count, double timeStep = 0.02);

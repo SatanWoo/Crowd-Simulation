@@ -67,15 +67,15 @@ struct VirtualNode
         radius = sqrt(xDiff * xDiff + yDiff * yDiff);
     }
     
-    void dispatch(double delta)
-    {
-        int size = allNodes.size();
-        for (int i = 0; i < size; i++)
-        {
-            Agent *ai = allNodes[i];
-            ai->body->ApplyLinearImpulse(force * delta, ai->getPosition());
-        }
-    }
+//    void dispatch(double delta)
+//    {
+//        int size = allNodes.size();
+//        for (int i = 0; i < size; i++)
+//        {
+//            Agent *ai = allNodes[i];
+//            ai->body->ApplyLinearImpulse(force * delta, ai->getPosition());
+//        }
+//    }
 };
 
 #endif
