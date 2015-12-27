@@ -37,24 +37,26 @@ MapController::MapController(int width, int height, int count, double timeStep)
     destinationPoints.push_back(v1);
     destinationPoints.push_back(v2);
 
-    for (int yPos = 1; yPos < 5; yPos++)
+    for (int yPos = 1; yPos < 3; yPos++)
     {
         for (int i =0 ; i < 1; i++)
         {
             Agent *p1 = new Agent(b2Vec2(i % 3, yPos), 0);
             p1->initBodyDef(world);
             p1->ID_ = IDcounter++;
+            p1->goal = v1;
             agents.push_back(p1);
         }
     }
     
-    for (int yPos = 1; yPos < 5; yPos++)
+    for (int yPos = 1; yPos < 3; yPos++)
     {
         for (int i =0 ; i < 1; i++)
         {
             Agent *p1 = new Agent(b2Vec2(m_iWidth - (i + 1) % 3, yPos), 1);
             p1->initBodyDef(world);
             p1->ID_ = IDcounter++;
+            p1->goal = v2;
             agents.push_back(p1);
         }
     }
@@ -233,9 +235,9 @@ void MapController::mergeNode()
 {
     groupCounter = 0;
     
-    for (int i = 0; i < leadingAgents.size(); i++)
+    for (int i = 0; i < leadingAgents.size(); ++i)
     {
-        Agent *leader = agents[i];
+        Agent *leader = leadingAgents[i];
         leader->group = groupCounter++;
         
         for (int j = 0; j < leader->agentNeighbors_.size(); j++)
@@ -253,14 +255,18 @@ void MapController::mergeNode()
 
 void MapController::update()
 {
-    if (simulationMode == Virtual)
+    cout << "//////////////////////////  Start Loop  /////////////////////////" << endl;
+    
+    if (simulationMode == Normal)
     {
-        buildKDTree();
-        computerNearestNeighbours();
-        mergeNode();
+       
     } else {
         
     }
+    
+    buildKDTree();
+    computerNearestNeighbours();
+    mergeNode();
     
     frame ++;
 

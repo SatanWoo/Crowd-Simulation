@@ -22,6 +22,8 @@ struct Agent {
     b2Vec2 continuumForce;
     b2Vec2 flockForce;
     
+    b2Vec2 goal;
+    
     int group;
     int maxNeighbours;
     int preferVelocity;
@@ -39,6 +41,17 @@ struct Agent {
     static float32 MAX_COHESION;
     static float32 MAX_FORCE_SQUARED;
     static float32 MAX_SPEED_SQUARED;
+    
+    Agent()
+    {
+        this->group = 0;
+        this->pos = b2Vec2_zero;
+        
+        radius_ = Agent::RADIUS;
+        maxSpeed_ = Agent::MAX_SPEED;
+        
+        neighborDist_ = 3;
+    }
 
     Agent(b2Vec2 pos, int group)
     {
@@ -109,13 +122,13 @@ struct Agent {
     {
         if (this != agent)
         {
-            map.insert(make_pair(agent->ID_, true));
-            const float distSq = (pos - agent->pos).LengthSquared();
+            const float distSq = (getPosition() - agent->getPosition()).LengthSquared();
             
             if (distSq < rangeSq)
             {
                 if (agentNeighbors_.size() < maxNeighbors_)
                 {
+                    map.insert(make_pair(agent->ID_, true));
                     agentNeighbors_.push_back(std::make_pair(distSq, agent));
                 }
                 
