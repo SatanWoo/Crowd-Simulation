@@ -34,8 +34,8 @@ MapController::MapController(int width, int height, int count, double timeStep)
     b2Vec2 v1(m_iWidth - 2, m_iHeight / 2);
     b2Vec2 v2(1, m_iHeight / 2);
     
-    destinationPoints.push_back(v1);
-    destinationPoints.push_back(v2);
+//    destinationPoints.push_back(v1);
+//    destinationPoints.push_back(v2);
 
     for (int yPos = 1; yPos < 3; yPos++)
     {
@@ -233,6 +233,7 @@ void MapController::computerNearestNeighbours()
 
 void MapController::mergeNode()
 {
+    destinationPoints.clear();
     groupCounter = 0;
     
     for (int i = 0; i < leadingAgents.size(); ++i)
@@ -240,12 +241,13 @@ void MapController::mergeNode()
         Agent *leader = leadingAgents[i];
         leader->group = groupCounter++;
         
+        destinationPoints.push_back(leader->goal);
+        
         for (int j = 0; j < leader->agentNeighbors_.size(); j++)
         {
             Agent *ne = leader->agentNeighbors_[j].second;
         
             ne->group = leader->group;
-            
             cout << "neight of ID " << leader->ID_ << " is :" << ne->ID_ << endl;
         }
     }
@@ -471,7 +473,7 @@ void MapController::updateContinuumCrowdData()
     //CC Paper says this is group dependant, but I'm not sure how...
     ccCalculateUnitCostField();
     
-    for (int group = 0; group <= 1; group++) //foreach group
+    for (int group = 0; group < leadingAgents.size(); ++group) //foreach group
     {
         ccClearPotentialField();
         
@@ -583,13 +585,14 @@ void MapController::ccCalculateUnitCostField()
     {
         for (int j = 0; j < m_iHeight; j++)
         {
-            
             //foreach direction we can leave that cell
-            for (int dir = 0; dir < 4; dir++) {
+            for (int dir = 0; dir < 4; dir++)
+            {
                 int targetX = i + fourDir[dir][0];
                 int targetY = j + fourDir[dir][1];
                 
-                if (!isValid(targetX, targetY)) {
+                if (!isValid(targetX, targetY))
+                {
                     speedField[i][j].value[dir] = FLT_MAX;
                     continue;
                 }
@@ -780,43 +783,54 @@ void MapController::render()
     renderBackground();
     renderObstacels();
     
-    glPointSize(10);
-    glBegin(GL_POINTS);
-    glColor4f(0.0, 1.0, 0.0, 1.0);
-    glVertex2d(destinationPoints[0].x * MapGridSize + 0.5 * MapGridSize, destinationPoints[0].y * MapGridSize + 0.5 * MapGridSize);
-    glColor4f(0.0, 1.0, 1.0, 1.0);
-    glVertex2d(destinationPoints[1].x * MapGridSize + 0.5 * MapGridSize, destinationPoints[1].y * MapGridSize + 0.5 * MapGridSize);
-    glEnd();
+//    glPointSize(10);
+//    glBegin(GL_POINTS);
+//    glColor4f(0.0, 1.0, 0.0, 1.0);
+//    glVertex2d(destinationPoints[0].x * MapGridSize + 0.5 * MapGridSize, destinationPoints[0].y * MapGridSize + 0.5 * MapGridSize);
+//    glColor4f(0.0, 1.0, 1.0, 1.0);
+//    glVertex2d(destinationPoints[1].x * MapGridSize + 0.5 * MapGridSize, destinationPoints[1].y * MapGridSize + 0.5 * MapGridSize);
+//    glEnd();
     
     renderAgents();
 }
 
 void MapController::renderBackground()
 {
-    glLineWidth(1);
-    glBegin(GL_LINES);
-    glColor4f(1.0f, 1.0f, 1.0f, 0.1);
-    for (int i = 0; i < m_iWidth + 1; i++)
-    {
-        for (int j = 0; j < m_iHeight + 1; j++)
-        {
-            double xPos = i * MapGridSize;
-            double yPos = j * MapGridSize;
-            
-            for (int k = 0; k < 4; k++)
-            {
-                int kx = i + fourDir[k][0];
-                int ky = j + fourDir[k][1];
-                
-                if (isValid(kx, ky))
-                {
-                    glVertex2d(xPos , yPos);
-                    glVertex2d(kx * MapGridSize, ky * MapGridSize);
-                }
-            }
-        }
-    }
+    glBegin(GL_QUADS);
+    glColor3f(1.0f, 1.0f, 1.0f);
+    
+    glVertex2d(0 * MapGridSize, 0 * MapGridSize);
+    glVertex2d((m_iWidth + 1) * MapGridSize, 0 * MapGridSize);
+    glVertex2d((m_iWidth + 1) * MapGridSize, (m_iHeight + 1) * MapGridSize);
+    glVertex2d(0 * MapGridSize, (m_iHeight + 1) * MapGridSize);
+    
+    
     glEnd();
+    
+//    glLineWidth(1);
+//    glBegin(GL_LINES);
+//    glColor4f(1.0f, 1.0f, 1.0f, 0.1);
+//    for (int i = 0; i < m_iWidth + 1; i++)
+//    {
+//        for (int j = 0; j < m_iHeight + 1; j++)
+//        {
+//            double xPos = i * MapGridSize;
+//            double yPos = j * MapGridSize;
+//            
+//            for (int k = 0; k < 4; k++)
+//            {
+//                int kx = i + fourDir[k][0];
+//                int ky = j + fourDir[k][1];
+//                
+//                if (isValid(kx, ky))
+//                {
+//                    glVertex2d(xPos , yPos);
+//                    glVertex2d(kx * MapGridSize, ky * MapGridSize);
+//                }
+//            }
+//        }
+//    }
+//    glEnd();
 }
 
 void MapController::renderObstacels()

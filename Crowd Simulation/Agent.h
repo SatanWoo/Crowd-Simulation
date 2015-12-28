@@ -120,7 +120,7 @@ struct Agent {
     
     void insertAgentNeighbor(HashMap& map, Agent* agent, float &rangeSq)
     {
-        if (this != agent)
+        if (this != agent && this->group == agent->group)
         {
             const float distSq = (getPosition() - agent->getPosition()).LengthSquared();
             
