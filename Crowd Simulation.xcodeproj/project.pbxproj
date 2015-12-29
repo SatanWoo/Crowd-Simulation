@@ -50,6 +50,7 @@
 		1987ED5C1AF136C9007BACE5 /* b2RevoluteJoint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1987ED371AF136C9007BACE5 /* b2RevoluteJoint.cpp */; };
 		1987ED5D1AF136C9007BACE5 /* b2WeldJoint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1987ED391AF136C9007BACE5 /* b2WeldJoint.cpp */; };
 		19ABB1B01B14988000E7B623 /* KDTree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 19ABB1AF1B14988000E7B623 /* KDTree.cpp */; };
+		19B866381C31A5C7000E33D4 /* VirtualNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 19B866371C31A5C7000E33D4 /* VirtualNode.cpp */; };
 		19FF13FB1B047AC8008B91F2 /* GlobalConfig.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 19FF13F91B047AC8008B91F2 /* GlobalConfig.cpp */; };
 		19FF13FD1B049C5E008B91F2 /* Agent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 19FF13FC1B049C5E008B91F2 /* Agent.cpp */; };
 /* End PBXBuildFile section */
@@ -160,6 +161,7 @@
 		19ABB1AF1B14988000E7B623 /* KDTree.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = KDTree.cpp; sourceTree = "<group>"; };
 		19AC4BD81AF67B9E009831BA /* B2Vec2DHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = B2Vec2DHelper.h; sourceTree = "<group>"; };
 		19B4F55B1B1DF63600276510 /* VirtualNode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VirtualNode.h; sourceTree = "<group>"; };
+		19B866371C31A5C7000E33D4 /* VirtualNode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = VirtualNode.cpp; sourceTree = "<group>"; };
 		19C9ADC91C2FD718005DF748 /* Definition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Definition.h; sourceTree = "<group>"; };
 		19FF13F81B0466C0008B91F2 /* Agent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Agent.h; sourceTree = "<group>"; };
 		19FF13F91B047AC8008B91F2 /* GlobalConfig.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GlobalConfig.cpp; sourceTree = "<group>"; };
@@ -376,6 +378,7 @@
 			children = (
 				1970B60C1AFB89F60026A84C /* CostNode.h */,
 				19B4F55B1B1DF63600276510 /* VirtualNode.h */,
+				19B866371C31A5C7000E33D4 /* VirtualNode.cpp */,
 				19FF13F81B0466C0008B91F2 /* Agent.h */,
 				19FF13FC1B049C5E008B91F2 /* Agent.cpp */,
 				19FF13FA1B047AC8008B91F2 /* GlobalConfig.h */,
@@ -479,6 +482,7 @@
 				1987ED4B1AF136C9007BACE5 /* b2Island.cpp in Sources */,
 				1987ED4D1AF136C9007BACE5 /* b2WorldCallbacks.cpp in Sources */,
 				1987ED3D1AF136C9007BACE5 /* b2CollidePolygon.cpp in Sources */,
+				19B866381C31A5C7000E33D4 /* VirtualNode.cpp in Sources */,
 				1987ED4E1AF136C9007BACE5 /* b2CircleContact.cpp in Sources */,
 				1987ED521AF136C9007BACE5 /* b2PolygonContact.cpp in Sources */,
 				1987ED451AF136C9007BACE5 /* b2Math.cpp in Sources */,

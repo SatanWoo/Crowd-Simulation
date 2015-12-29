@@ -37,7 +37,7 @@ MapController::MapController(int width, int height, int count, double timeStep)
 //    destinationPoints.push_back(v1);
 //    destinationPoints.push_back(v2);
 
-    for (int yPos = 1; yPos < 3; yPos++)
+    for (int yPos = 1; yPos < 2; yPos++)
     {
         for (int i =0 ; i < 1; i++)
         {
@@ -49,7 +49,7 @@ MapController::MapController(int width, int height, int count, double timeStep)
         }
     }
     
-    for (int yPos = 1; yPos < 3; yPos++)
+    for (int yPos = 1; yPos < 2; yPos++)
     {
         for (int i =0 ; i < 1; i++)
         {
@@ -208,6 +208,13 @@ void MapController::buildKDTree()
     {
         delete tree;
         tree = NULL;
+        
+        for (int i = 0; i < nodes.size(); ++i) {
+            delete nodes[i];
+            nodes[i] = NULL;
+        }
+        
+        nodes.clear();
     }
 
     availableAgents.clear();
@@ -243,14 +250,24 @@ void MapController::mergeNode()
         
         destinationPoints.push_back(leader->goal);
         
+        std::vector<Agent *>temp;
+        
         for (int j = 0; j < leader->agentNeighbors_.size(); j++)
         {
             Agent *ne = leader->agentNeighbors_[j].second;
         
             ne->group = leader->group;
+            temp.push_back(ne);
             cout << "neight of ID " << leader->ID_ << " is :" << ne->ID_ << endl;
         }
+        
+        VirtualNode *cluster = new VirtualNode(leader, temp);
+        cluster->initBodyDef(world);
+        nodes.push_back(cluster);
     }
+    
+    //cout << nodes.size() << endl;
+    cout << "//////////////End of Merge //////////////" << endl;
 }
 
 #pragma mark - Public
@@ -259,25 +276,25 @@ void MapController::update()
 {
     cout << "//////////////////////////  Start Loop  /////////////////////////" << endl;
     
-    if (simulationMode == Normal)
-    {
-       
-    } else {
-        
-    }
-    
+//    if (simulationMode == Normal)
+//    {
+//       
+//    } else {
+//        
+//    }
+//    
     buildKDTree();
     computerNearestNeighbours();
     mergeNode();
-    
-    frame ++;
-
+//
+//    frame ++;
+//
     updateContinuumCrowdData();
 
-    int size = agents.size();
+    int size = nodes.size();
     for (int i = size - 1; i >= 0; i--)
     {
-        Agent *node = agents[i];
+        Agent *node = nodes[i];
         
         b2Vec2 sep = steeringBehaviourSeparation(node);
         b2Vec2 alg = steeringBehaviourAlignment(node);
@@ -295,7 +312,7 @@ void MapController::update()
     //Move agents based on forces being applied (aka physics)
     for (int i = size - 1; i >= 0; i--)
     {
-        Agent *node = agents[i];
+        VirtualNode *node = nodes[i];
         node->body->ApplyLinearImpulse(node->flockForce * m_dTimeStep, node->getPosition());
 //        node.center = node.center + node.force * m_dTimeStep;
 //        node.dispatch(m_dTimeStep);
@@ -342,12 +359,12 @@ b2Vec2 MapController::steeringBehaviourFlowField(Agent *node)
 
 b2Vec2 MapController::steeringBehaviourSeek(Agent *node, b2Vec2 dest)
 {
-    if (dest.x == node->pos.x && dest.y == node->pos.y)
+    if (dest.x == node->getPosition().x && dest.y == node->getPosition().y)
     {
         return b2Vec2_zero;
     }
     
-    b2Vec2 desired = dest - node->pos;
+    b2Vec2 desired = dest - node->getPosition();
    
     desired *= (Agent::MAX_SPEED / desired.Length());
    
@@ -362,9 +379,9 @@ b2Vec2 MapController::steeringBehaviourSeparation(Agent *node)
     
     int neighboursCount = 0;
     
-    for (int i = 0; i < agents.size(); i++)
+    for (int i = 0; i < nodes.size(); i++)
     {
-        Agent *a = agents[i];
+        Agent *a = nodes[i];
         if (&a != &node)
         {
             float32 distance = B2Vec2DHelper::distanceTo(node->getPosition(), a->getPosition());
@@ -393,9 +410,9 @@ b2Vec2 MapController::steeringBehaviourCohesion(Agent *node)
     b2Vec2 centerOfMass = b2Vec2_zero;//agent.position().Copy();
     int neighboursCount = 0;
     
-    for (int i = 0; i < agents.size(); i++)
+    for (int i = 0; i < nodes.size(); i++)
     {
-        Agent *a = agents[i];
+        Agent *a = nodes[i];
         if (a != node && a->group == node->group)
         {
             float32 distance = B2Vec2DHelper::distanceTo(node->getPosition(), node->getPosition());
@@ -425,9 +442,9 @@ b2Vec2 MapController::steeringBehaviourAlignment(Agent *node)
     int neighboursCount = 0;
     
     //for each of our neighbours (including ourself)
-    for (int i = 0; i < agents.size(); i++)
+    for (int i = 0; i < nodes.size(); i++)
     {
-        Agent *a = agents[i];
+        VirtualNode *a = nodes[i];
         float32 distance = B2Vec2DHelper::distanceTo(node->getPosition(), a->getPosition());
         //That are within the max distance and are moving
         if (distance < Agent::MAX_COHESION && a->getVelocity().Length() > 0 && a->group == node->group)
@@ -473,7 +490,7 @@ void MapController::updateContinuumCrowdData()
     //CC Paper says this is group dependant, but I'm not sure how...
     ccCalculateUnitCostField();
     
-    for (int group = 0; group < leadingAgents.size(); ++group) //foreach group
+    for (int group = 0; group < nodes.size(); ++group) //foreach group
     {
         ccClearPotentialField();
         
@@ -484,11 +501,11 @@ void MapController::updateContinuumCrowdData()
         ccGenerateFlowField();
         
         //(use these for steering later)
-        for (int i = agents.size() - 1; i >= 0; i--)
+        for (int i = nodes.size() - 1; i >= 0; i--)
         {
-            if (agents[i]->group == group)
+            if (nodes[i]->group == group)
             {
-                agents[i]->continuumForce = steeringBehaviourFlowField(agents[i]);
+                nodes[i]->continuumForce = steeringBehaviourFlowField(nodes[i]);
             }
         }
     }
@@ -518,9 +535,9 @@ void MapController::ccCalculateDensityAndAverageSpeed()
 {
     float32 perAgentDensity = 1.0;
     
-    for (int i = 0; i < agents.size(); i++)
+    for (int i = 0; i < nodes.size(); i++)
     {
-        Agent *pi = agents[i];
+        Agent *pi = nodes[i];
         
         b2Vec2 floor = B2Vec2DHelper::floorV(pi->getPosition());
         float32 xWeight = pi->getPosition().x - floor.x;
@@ -806,31 +823,6 @@ void MapController::renderBackground()
     
     
     glEnd();
-    
-//    glLineWidth(1);
-//    glBegin(GL_LINES);
-//    glColor4f(1.0f, 1.0f, 1.0f, 0.1);
-//    for (int i = 0; i < m_iWidth + 1; i++)
-//    {
-//        for (int j = 0; j < m_iHeight + 1; j++)
-//        {
-//            double xPos = i * MapGridSize;
-//            double yPos = j * MapGridSize;
-//            
-//            for (int k = 0; k < 4; k++)
-//            {
-//                int kx = i + fourDir[k][0];
-//                int ky = j + fourDir[k][1];
-//                
-//                if (isValid(kx, ky))
-//                {
-//                    glVertex2d(xPos , yPos);
-//                    glVertex2d(kx * MapGridSize, ky * MapGridSize);
-//                }
-//            }
-//        }
-//    }
-//    glEnd();
 }
 
 void MapController::renderObstacels()
@@ -855,14 +847,15 @@ void MapController::renderObstacels()
 
 void MapController::renderAgents()
 {
-    glPointSize(5);
-    glBegin(GL_POINTS);
-    for (int i = 0; i < agents.size(); i++)
+    
+    for (int i = 0; i < nodes.size(); i++)
     {
-        Agent *node = agents[i];
-        
+        VirtualNode *node = nodes[i];
+        glPointSize(5 * node->radius_);
+        glBegin(GL_POINTS);
         glColor3f(0.5 * (node->group + 1), (node->group + 1) * 0.15, (node->group + 1) * 0.3);
         glVertex2f(node->getPosition().x * MapGridSize + 0.5 * MapGridSize, node->getPosition().y * MapGridSize + 0.5 * MapGridSize);
+        glEnd();
     }
-    glEnd();
+   
 }
