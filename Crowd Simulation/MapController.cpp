@@ -847,11 +847,20 @@ void MapController::renderObstacels()
 
 void MapController::renderAgents()
 {
+    for (int i = 0; i < destinationPoints.size(); i++)
+    {
+        b2Vec2 &des = destinationPoints[i];
+        glPointSize(10);
+        glBegin(GL_POINTS);
+        glColor3f(0, 0, 0);
+        glVertex2f(des.x * MapGridSize + 0.5 * MapGridSize, des.y * MapGridSize + 0.5 * MapGridSize);
+        glEnd();
+    }
     
     for (int i = 0; i < nodes.size(); i++)
     {
         VirtualNode *node = nodes[i];
-        glPointSize(5 * node->radius_);
+        glPointSize(5);
         glBegin(GL_POINTS);
         glColor3f(0.5 * (node->group + 1), (node->group + 1) * 0.15, (node->group + 1) * 0.3);
         glVertex2f(node->getPosition().x * MapGridSize + 0.5 * MapGridSize, node->getPosition().y * MapGridSize + 0.5 * MapGridSize);
