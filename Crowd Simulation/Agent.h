@@ -17,7 +17,8 @@
 using namespace RVO;
 using namespace std;
 
-struct Agent {
+class Agent {
+public:
     b2Vec2 pos;
     b2Vec2 continuumForce;
     b2Vec2 flockForce;
@@ -27,8 +28,6 @@ struct Agent {
     int group;
     int maxNeighbours;
     int preferVelocity;
-    
-    std::vector<int> neighbours;
     
     static float32 MAX_FORCE;
     static float32 MAX_SPEED;
@@ -84,7 +83,7 @@ struct Agent {
         fixtureDef->density = 20.0;
         fixtureDef->friction = 0.0;
         fixtureDef->restitution = 0.0;
-        fixtureDef->shape = new b2CircleShape(radius_);
+        fixtureDef->shape = new b2CircleShape(Agent::RADIUS);
         fixture = body->CreateFixture(fixtureDef);
     }
     

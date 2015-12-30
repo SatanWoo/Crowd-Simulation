@@ -15,7 +15,7 @@
 using namespace std;
 
 const double MapWidth = 25;
-const double MapHeight = 30;
+const double MapHeight = 14;
 
 const double ScreenWidth = MapWidth * MapController::MapGridSize;
 const double ScreenHeight = MapHeight * MapController::MapGridSize;

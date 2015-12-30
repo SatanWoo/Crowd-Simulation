@@ -37,7 +37,7 @@ MapController::MapController(int width, int height, int count, double timeStep)
 //    destinationPoints.push_back(v1);
 //    destinationPoints.push_back(v2);
 
-    for (int yPos = 1; yPos < 2; yPos++)
+    for (int yPos = 1; yPos < m_iHeight - 1; yPos++)
     {
         for (int i =0 ; i < 1; i++)
         {
@@ -49,7 +49,7 @@ MapController::MapController(int width, int height, int count, double timeStep)
         }
     }
     
-    for (int yPos = 1; yPos < 2; yPos++)
+    for (int yPos = 1; yPos < m_iHeight - 1; yPos++)
     {
         for (int i =0 ; i < 1; i++)
         {
@@ -209,14 +209,14 @@ void MapController::buildKDTree()
         delete tree;
         tree = NULL;
         
-        for (int i = 0; i < nodes.size(); ++i) {
+        for (int i = 0; i < nodes.size(); ++i)
+        {
             delete nodes[i];
             nodes[i] = NULL;
         }
-        
-        nodes.clear();
     }
-
+    
+    nodes.clear();
     availableAgents.clear();
     leadingAgents.clear();
     
@@ -228,11 +228,11 @@ void MapController::computerNearestNeighbours()
 {
     for (int i = 0; i < agents.size(); i++)
     {
+        leadingAgents.push_back(agents[i]);
         agents[i]->tree = tree;
         
         if (availableAgents.find(agents[i]->ID_) == availableAgents.end())
         {
-            leadingAgents.push_back(agents[i]);
             agents[i]->computeNeighbors(this->availableAgents);
         }
     }
@@ -246,7 +246,6 @@ void MapController::mergeNode()
     for (int i = 0; i < leadingAgents.size(); ++i)
     {
         Agent *leader = leadingAgents[i];
-        leader->group = groupCounter++;
         
         destinationPoints.push_back(leader->goal);
         
@@ -258,7 +257,6 @@ void MapController::mergeNode()
         
             ne->group = leader->group;
             temp.push_back(ne);
-            cout << "neight of ID " << leader->ID_ << " is :" << ne->ID_ << endl;
         }
         
         VirtualNode *cluster = new VirtualNode(leader, temp);
@@ -266,48 +264,34 @@ void MapController::mergeNode()
         nodes.push_back(cluster);
     }
     
-    //cout << nodes.size() << endl;
-    cout << "//////////////End of Merge //////////////" << endl;
+    cout << nodes.size() << endl;
 }
 
 #pragma mark - Public
 
 void MapController::update()
 {
-    cout << "//////////////////////////  Start Loop  /////////////////////////" << endl;
-    
-//    if (simulationMode == Normal)
-//    {
-//       
-//    } else {
-//        
-//    }
-    
     if (frame == 0)
     {
-        
+        buildKDTree();
+        computerNearestNeighbours();
+        mergeNode();
     }
     
-    buildKDTree();
-    computerNearestNeighbours();
-    mergeNode();
-//
-//
-   frame ++;
-//
+    frame++;
+    
     updateContinuumCrowdData();
 
     int size = nodes.size();
     for (int i = size - 1; i >= 0; i--)
     {
-        Agent *node = nodes[i];
+        VirtualNode *node = nodes[i];
         
         b2Vec2 sep = steeringBehaviourSeparation(node);
         b2Vec2 alg = steeringBehaviourAlignment(node);
         b2Vec2 coh = steeringBehaviourCohesion(node);
         
         //
-    
         node->flockForce = node->continuumForce + sep * 1.2 + alg * 0.3 + coh * 0.05;
         
         float32 lengthSquared =  node->flockForce.LengthSquared();
@@ -323,11 +307,7 @@ void MapController::update()
         VirtualNode *node = nodes[i];
         b2Vec2 impluse = node->flockForce * m_dTimeStep;
         
-        cout << "Impulse Force is " << i << ":" << impluse.x << "||" << impluse.y << endl;
-       
         node->body->ApplyLinearImpulse(impluse, node->getPosition());
-        node->impulse += impluse;
-        node->dispatch(m_dTimeStep);
     }
     
     world->Step(m_dTimeStep, 10, 10);
@@ -519,7 +499,7 @@ void MapController::updateContinuumCrowdData()
             {
                 nodes[i]->continuumForce = steeringBehaviourFlowField(nodes[i]);
                 
-//                cout << "Continuum Force: " << i << "  " << nodes[i]->continuumForce.x << "|" << nodes[i]->continuumForce.y << endl;
+                //cout << "Continuum Force: " << i << "  " << nodes[i]->continuumForce.x << "|" << nodes[i]->continuumForce.y << endl;
             }
         }
     }
@@ -873,7 +853,7 @@ void MapController::renderAgents()
     
     for (int i = 0; i < nodes.size(); i++)
     {
-        VirtualNode *node = nodes[i];
+        Agent *node = nodes[i];
         glPointSize(5);
         glBegin(GL_POINTS);
         glColor3f(0.5 * (node->group + 1), (node->group + 1) * 0.15, (node->group + 1) * 0.3);

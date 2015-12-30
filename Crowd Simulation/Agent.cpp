@@ -11,8 +11,8 @@
 
 float32 Agent::MAX_FORCE = 20;
 float32 Agent::MAX_SPEED = 4;
-float32 Agent::RADIUS = 0.15;
-float32 Agent::MIN_SEPARATION = 0.6;
+float32 Agent::RADIUS = 0.23;
+float32 Agent::MIN_SEPARATION = 0.8;
 float32 Agent::MAX_COHESION = 2;
 float32 Agent::MAX_FORCE_SQUARED = Agent::MAX_FORCE * Agent::MAX_FORCE;
 float32 Agent::MAX_SPEED_SQUARED = Agent::MAX_SPEED * Agent::MAX_SPEED;

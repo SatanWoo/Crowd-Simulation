@@ -85,7 +85,6 @@ private:
     b2Vec2 steeringBehaviourSeparation(Agent *agent);
     b2Vec2 steeringBehaviourAlignment(Agent *agent);
     b2Vec2 steeringBehaviourCohesion(Agent *agent);
-    b2Vec2 steeringBehaviourCohesion(VirtualNode *node);
     
     b2Vec2 steerTowards(Agent *agent, b2Vec2 direction);
 private:
