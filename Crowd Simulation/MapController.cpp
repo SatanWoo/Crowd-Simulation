@@ -1,6 +1,7 @@
 #include <GLUT/GLUT.h>
 #include <math.h>
 #include <queue>
+#include <fstream>
 
 #include "MapController.h"
 #include "Agent.h"
@@ -16,6 +17,8 @@ static int frame = 0;
 
 static int fourDir[4][2] = {{0, -1}, {1, 0}, {0, 1}, {-1, 0}};
 static int eightDir[8][2] = {{0, -1}, {1, 0}, {0, 1}, {-1, 0}, {1, 1}, {1, -1}, {-1, -1}, {-1, 1}};
+
+int totalSimulation = 0, totalBuild = 0, totalSearch = 0, totalMerge = 0;
 
 MapController::MapController(int width, int height, int count, double timeStep)
 {
@@ -269,12 +272,26 @@ void MapController::mergeNode()
 //MARK: - Change Agent
 void MapController::update()
 {
-    if (frame == 0)
-    {
+    int origin = glutGet(GLUT_ELAPSED_TIME);
+    int now = glutGet(GLUT_ELAPSED_TIME);
+    
+    if (frame % 30 == 0) {
         buildKDTree();
+        
+        totalBuild += glutGet(GLUT_ELAPSED_TIME) - now;
+        now = glutGet(GLUT_ELAPSED_TIME);
+        
         computerNearestNeighbours();
+        
+        totalSearch += glutGet(GLUT_ELAPSED_TIME) - now;
+        now = glutGet(GLUT_ELAPSED_TIME);
+        
         mergeNode();
+        
+        totalMerge += glutGet(GLUT_ELAPSED_TIME) - now;
     }
+    
+    if (frame == 100) return;
     
     frame++;
     
@@ -310,6 +327,15 @@ void MapController::update()
     
     world->Step(m_dTimeStep, 10, 10);
     world->ClearForces();
+    
+    totalSimulation += glutGet(GLUT_ELAPSED_TIME) - origin;
+    
+    cout << "Total Build " << totalBuild << endl;
+    cout << "Total Search" << totalSearch << endl;
+    cout << "Total Merge" << totalMerge << endl;
+    cout << "Total Simulation" << totalSimulation << endl;
+    cout << "Frame is " << frame << endl;
+    cout << "////////////////////////////////////" << endl;
 }
 
 #pragma mark - Flock
@@ -499,7 +525,6 @@ void MapController::updateContinuumCrowdData()
             if (nodes[i]->group == group)
             {
                 nodes[i]->continuumForce = steeringBehaviourFlowField(nodes[i]);
-                
                 //cout << "Continuum Force: " << i << "  " << nodes[i]->continuumForce.x << "|" << nodes[i]->continuumForce.y << endl;
             }
         }

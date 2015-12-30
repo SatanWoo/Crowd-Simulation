@@ -18,7 +18,7 @@ using namespace std;
 const double MapWidth = 25;
 const double MapHeight = 14;
 
-ofstream fout("/Users/z/Documents/Crowd\ Simulation/Crowd\ Simulation/TunnelScene-FPS-Virtual.txt");
+ofstream fout("/Users/z/Documents/Crowd\ Simulation/Crowd\ Simulation/SkipFrame-FPS.txt");
 
 const double ScreenWidth = MapWidth * MapController::MapGridSize;
 const double ScreenHeight = MapHeight * MapController::MapGridSize;
