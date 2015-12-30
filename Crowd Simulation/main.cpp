@@ -9,6 +9,7 @@
 
 #include <GLUT/GLUT.h>
 #include <iostream>
+#include <fstream>
 #include "Vector.h"
 #include "MapController.h"
 
@@ -17,18 +18,33 @@ using namespace std;
 const double MapWidth = 25;
 const double MapHeight = 14;
 
+ofstream fout("/Users/z/Documents/Crowd\ Simulation/Crowd\ Simulation/TunnelScene-FPS-Virtual.txt");
+
 const double ScreenWidth = MapWidth * MapController::MapGridSize;
 const double ScreenHeight = MapHeight * MapController::MapGridSize;
 
 MapController *mapController = NULL;
 
+bool stop = true;
+
+int now = 0, start = 0, frame = 0;
+
 void glRender()
 {
+    //if (stop) return;
+    
+    frame++;
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-       glLoadIdentity();
+    glLoadIdentity();
     
     mapController->render();
     glutSwapBuffers();
+    
+    if (frame % 100 == 0)
+    {
+        cout << "frame is %d" << frame << endl;
+        stop = true;
+    }
 }
 
 void glIdle()
@@ -36,6 +52,14 @@ void glIdle()
     int n = 1;
     while (n--) {
         mapController->update();
+    }
+    
+    now = glutGet(GLUT_ELAPSED_TIME);
+    
+    if (now - start > 1000)
+    {
+        double fps = (double)(frame * 1000.0) / (double)(now - start);
+        fout << mapController->totalAgents() * 10 << "  " << fps << endl;
     }
     
     glutPostRedisplay();
@@ -88,6 +112,8 @@ int main(int argc, const char * argv[])
     mapController = new MapController(MapWidth, MapHeight, MapHeight * 2);
 
     glutMainLoop();
+    
+    fout.close();
 
     delete mapController;
     mapController = NULL;

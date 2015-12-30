@@ -46,10 +46,12 @@ public:
         this->group = 0;
         this->pos = b2Vec2_zero;
         
-        radius_ = Agent::RADIUS;
+        radius_ = Agent::RADIUS * 10;
         maxSpeed_ = Agent::MAX_SPEED;
         
-        neighborDist_ = 3;
+        neighborDist_ = radius_;
+        
+        maxNeighbors_ = 100;
     }
 
     Agent(b2Vec2 pos, int group)
@@ -57,10 +59,12 @@ public:
         this->group = group;
         this->pos = pos;
         
-        radius_ = Agent::RADIUS;
+        radius_ = Agent::RADIUS * 10;
         maxSpeed_ = Agent::MAX_SPEED;
         
-        neighborDist_ = 3;
+        maxNeighbors_ = 100;
+        
+        neighborDist_ = radius_;
     }
     
     b2Vec2 getPosition()const{return this->body->GetPosition();}

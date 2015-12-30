@@ -41,52 +41,52 @@ public:
         leader_ = leader;
         goal = leader_->goal;
         
-//        allNodes.assign(neighbours.begin(), neighbours.end());
+        allNodes.assign(neighbours.begin(), neighbours.end());
         
-//        maxX = INT_MIN;
-//        maxY = INT_MIN;
-//        
-//        minX = INT_MAX;
-//        minY = INT_MAX;
+        maxX = INT_MIN;
+        maxY = INT_MIN;
+        
+        minX = INT_MAX;
+        minY = INT_MAX;
         
 //        impulse = b2Vec2_zero;
-//        b2Vec2 center = b2Vec2_zero;
-//        
-//        if (leader->pos.x > maxX) maxX = leader->pos.x;
-//        if (leader->pos.x < minX) minX = leader->pos.x;
-//        
-//        if (leader->pos.y > maxY) maxY = leader->pos.y;
-//        if (leader->pos.y < minY) minY = leader->pos.y;
-//        
-//        size_t size = allNodes.size();
-//        for (size_t i = 0; i < size; ++i)
-//        {
-//            Agent *ai = allNodes[i];
-//            
-//            b2Vec2 pos = ai->getPosition();
-//            center += pos;
-//            
-//            if (pos.x > maxX) maxX = pos.x;
-//            if (pos.x < minX) minX = pos.x;
-//            
-//            if (pos.y > maxY) maxY = pos.y;
-//            if (pos.y < minY) minY = pos.y;
-//        }
+        b2Vec2 center = b2Vec2_zero;
         
-//        size += 1;
-//        center += VirtualNode::Leading_Weight * leader->getPosition();
-//        center *= 1 / size;
-//        
+        if (leader->pos.x > maxX) maxX = leader->pos.x;
+        if (leader->pos.x < minX) minX = leader->pos.x;
+        
+        if (leader->pos.y > maxY) maxY = leader->pos.y;
+        if (leader->pos.y < minY) minY = leader->pos.y;
+        
+        size_t size = allNodes.size();
+        for (size_t i = 0; i < size; ++i)
+        {
+            Agent *ai = allNodes[i];
+            
+            b2Vec2 pos = ai->getPosition();
+            center += pos;
+            
+            if (pos.x > maxX) maxX = pos.x;
+            if (pos.x < minX) minX = pos.x;
+            
+            if (pos.y > maxY) maxY = pos.y;
+            if (pos.y < minY) minY = pos.y;
+        }
+        
+        size += 1;
+        center += VirtualNode::Leading_Weight * leader->getPosition();
+        center *= 1 / size;
+//
         group = leader->group;
         pos = leader->getPosition();
         
-//        double xDiff = maxX - minX;
-//        double yDiff = maxY - minY;
-//        radius_ = sqrt(xDiff * xDiff + yDiff * yDiff);
-//        
-//        if (size == 1) {
-//            radius_ = Agent::RADIUS;
-//        }
+        double xDiff = maxX - minX;
+        double yDiff = maxY - minY;
+        radius_ = sqrt(xDiff * xDiff + yDiff * yDiff);
+        
+        if (size == 1) {
+            radius_ = Agent::RADIUS;
+        }
     }
     
     void dispatch(double delta)

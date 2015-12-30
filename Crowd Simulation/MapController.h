@@ -100,6 +100,8 @@ public:
 	MapController(int width, int height, int count, double timeStep = 0.02);
 	~MapController();
     
+    int totalAgents()const{return agents.size();}
+    
     void updateDestinationPoint(b2Vec2 newDest);
     void switchState();
 
