@@ -24,6 +24,8 @@ struct VirtualNode : public Agent
     b2Vec2 center;
     b2Vec2 velocity;
     
+    b2Vec2 impulse;
+    
     std::vector<Agent *> allNodes;
     
     static float32 Leading_Weight;
@@ -38,6 +40,7 @@ struct VirtualNode : public Agent
         minX = INT_MAX;
         minY = INT_MAX;
         
+        impulse = b2Vec2_zero;
         center = b2Vec2_zero;
         velocity = b2Vec2_zero;
         
@@ -83,15 +86,15 @@ struct VirtualNode : public Agent
         }
     }
     
-//    void dispatch(double delta)
-//    {
-//        int size = allNodes.size();
-//        for (int i = 0; i < size; i++)
-//        {
-//            Agent *ai = allNodes[i];
-//            ai->body->ApplyLinearImpulse(force * delta, ai->getPosition());
-//        }
-//    }
+    void dispatch(double delta)
+    {
+        int size = allNodes.size();
+        for (int i = 0; i < size; i++)
+        {
+            Agent *ai = allNodes[i];
+            ai->body->ApplyLinearImpulse(impulse, ai->getPosition());
+        }
+    }
 };
 
 #endif

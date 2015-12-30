@@ -282,12 +282,16 @@ void MapController::update()
 //    } else {
 //        
 //    }
-//    
-    buildKDTree();
-    computerNearestNeighbours();
-    mergeNode();
+    
+    if (frame == 0)
+    {
+        buildKDTree();
+        computerNearestNeighbours();
+        mergeNode();
+    }
 //
-//    frame ++;
+//
+   frame ++;
 //
     updateContinuumCrowdData();
 
@@ -313,9 +317,12 @@ void MapController::update()
     for (int i = size - 1; i >= 0; i--)
     {
         VirtualNode *node = nodes[i];
-        node->body->ApplyLinearImpulse(node->flockForce * m_dTimeStep, node->getPosition());
+        b2Vec2 impluse = node->flockForce * m_dTimeStep * 0.01;
+       
+        node->body->ApplyLinearImpulse(impluse, node->getPosition());
+        node->impulse += impluse;
 //        node.center = node.center + node.force * m_dTimeStep;
-//        node.dispatch(m_dTimeStep);
+        node->dispatch(m_dTimeStep);
     }
     
     world->Step(m_dTimeStep, 10, 10);
