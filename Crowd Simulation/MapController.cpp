@@ -30,7 +30,7 @@ MapController::MapController(int width, int height, int count, double timeStep)
 	m_dTimeStep = timeStep;
     
     world = new b2World(b2Vec2_zero, true);
-
+    
     b2Vec2 v1(m_iWidth - 2, m_iHeight / 2);
     b2Vec2 v2(1, m_iHeight / 2);
     
@@ -285,10 +285,12 @@ void MapController::update()
     
     if (frame == 0)
     {
-        buildKDTree();
-        computerNearestNeighbours();
-        mergeNode();
+        
     }
+    
+    buildKDTree();
+    computerNearestNeighbours();
+    mergeNode();
 //
 //
    frame ++;
@@ -303,13 +305,15 @@ void MapController::update()
         b2Vec2 sep = steeringBehaviourSeparation(node);
         b2Vec2 alg = steeringBehaviourAlignment(node);
         b2Vec2 coh = steeringBehaviourCohesion(node);
+        
+        //
     
         node->flockForce = node->continuumForce + sep * 1.2 + alg * 0.3 + coh * 0.05;
         
         float32 lengthSquared =  node->flockForce.LengthSquared();
         if (lengthSquared > Agent::MAX_FORCE_SQUARED)
         {
-            node->flockForce *= (Agent::MAX_FORCE_SQUARED / sqrt(lengthSquared));
+            node->flockForce *= (Agent::MAX_FORCE / sqrt(lengthSquared));
         }
     }
     
@@ -317,11 +321,12 @@ void MapController::update()
     for (int i = size - 1; i >= 0; i--)
     {
         VirtualNode *node = nodes[i];
-        b2Vec2 impluse = node->flockForce * m_dTimeStep * 0.01;
+        b2Vec2 impluse = node->flockForce * m_dTimeStep;
+        
+        cout << "Impulse Force is " << i << ":" << impluse.x << "||" << impluse.y << endl;
        
         node->body->ApplyLinearImpulse(impluse, node->getPosition());
         node->impulse += impluse;
-//        node.center = node.center + node.force * m_dTimeStep;
         node->dispatch(m_dTimeStep);
     }
     
@@ -513,6 +518,8 @@ void MapController::updateContinuumCrowdData()
             if (nodes[i]->group == group)
             {
                 nodes[i]->continuumForce = steeringBehaviourFlowField(nodes[i]);
+                
+//                cout << "Continuum Force: " << i << "  " << nodes[i]->continuumForce.x << "|" << nodes[i]->continuumForce.y << endl;
             }
         }
     }

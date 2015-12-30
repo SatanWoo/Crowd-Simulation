@@ -28,10 +28,14 @@ struct VirtualNode : public Agent
     
     std::vector<Agent *> allNodes;
     
+    Agent *leader_;
+    
     static float32 Leading_Weight;
     
     VirtualNode(Agent *leader, std::vector<Agent *> &neighbours)
     {
+        leader_ = leader;
+        
         allNodes.assign(neighbours.begin(), neighbours.end());
         
         maxX = INT_MIN;
@@ -94,6 +98,8 @@ struct VirtualNode : public Agent
             Agent *ai = allNodes[i];
             ai->body->ApplyLinearImpulse(impulse, ai->getPosition());
         }
+        
+        leader_->body->ApplyLinearImpulse(impulse, leader_->getPosition());
     }
 };
 
