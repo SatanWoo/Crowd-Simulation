@@ -21,6 +21,9 @@ const double MapHeight = 14;
 
 MapController *mapController = NULL;
 
+bool stop = true;
+
+
 void glRender()
 {
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
@@ -32,6 +35,8 @@ void glRender()
 
 void glIdle()
 {
+    if (!stop) return;
+    
     int n = 1;
     while (n--) {
         mapController->update();
@@ -55,6 +60,16 @@ void glMouse(int button, int state, int x, int y)
     }
 }
 
+void glKeyboard(unsigned char key, int x, int y)
+{
+    switch (key) {
+        case 'b':
+            stop = !stop;
+            break;
+    }
+}
+
+
 int main(int argc, const char * argv[])
 {
     glutInit(&argc, const_cast<char **>(argv));
@@ -65,6 +80,7 @@ int main(int argc, const char * argv[])
     glutDisplayFunc(glRender);
     glutIdleFunc(glIdle);
     glutMouseFunc(glMouse);
+    glutKeyboardFunc(glKeyboard);
     
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
