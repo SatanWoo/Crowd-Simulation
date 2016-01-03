@@ -26,45 +26,42 @@ MapController::MapController(int width, int height, int count, double timeStep)
 
     srand((unsigned)time(NULL));
     
-    b2Vec2 v1(m_iWidth - 2, m_iHeight / 2);
-    b2Vec2 v2(1, m_iHeight / 2);
-    
+    b2Vec2 v1(m_iWidth/2, m_iHeight / 2);
     destinationPoints.push_back(v1);
-    destinationPoints.push_back(v2);
 
     for (int yPos = 1; yPos < m_iHeight - 1; yPos++) {
-        Agent p1(b2Vec2(0, yPos), 0);
-        Agent p2(b2Vec2(1, yPos), 0);
-        Agent p3(b2Vec2(2, yPos), 0);
-        p1.initBodyDef(world);
-        p2.initBodyDef(world);
-        p3.initBodyDef(world);
-        
-        agents.push_back(p1);
-        agents.push_back(p2);
-        agents.push_back(p3);
+        for (int k = 0; k < 30; k++)
+        {
+            Agent p1(b2Vec2(k % 3, yPos), 0);
+            p1.initBodyDef(world);
+            agents.push_back(p1);
+        }
     }
     
-    for (int yPos = 1; yPos < m_iHeight - 1; yPos++) {
-        Agent p1(b2Vec2(m_iWidth - 1, yPos), 1);
-        Agent p2(b2Vec2(m_iWidth - 2, yPos), 1);
-        Agent p3(b2Vec2(m_iWidth - 3, yPos), 1);
-        p1.initBodyDef(world);
-        p2.initBodyDef(world);
-        p3.initBodyDef(world);
-        
-        agents.push_back(p1);
-        agents.push_back(p2);
-        agents.push_back(p3);
+    // Top Row
+    for (int i = m_iWidth/2 - 5; i <= m_iWidth/2 + 8; ++i)
+    {
+        if (i >= m_iWidth/2 - 1 && i <= m_iWidth/2 + 1) continue;
+        obstacles.push_back(b2Vec2(i, m_iHeight/2 - 5));
     }
     
-    for (int i = 0; i < m_iHeight; i++) {
-        if (i >= m_iHeight / 2 - 2 && i < m_iHeight / 2 + 2) {
-            continue;
-        }
-        for (int y = 6; y < m_iWidth - 6; y++) {
-            obstacles.push_back(b2Vec2(y, i));
-        }
+    // Bottom Row
+    for (int i = m_iWidth/2 - 5; i <= m_iWidth/2 + 5; ++i)
+    {
+        
+        obstacles.push_back(b2Vec2(i, m_iHeight/2 + 5));
+    }
+    
+    // Left Column
+    for (int i = m_iHeight/2 - 5; i <= m_iHeight/2 + 5; ++i)
+    {
+        if (i >= m_iHeight/2 - 1 && i <= m_iHeight/2 + 1) continue;
+        obstacles.push_back(b2Vec2(m_iWidth/2 - 5, i));
+    }
+    
+    for (int i = m_iHeight/2 - 5; i <= m_iHeight/2 + 5; ++i)
+    {
+        obstacles.push_back(b2Vec2(m_iWidth/2 + 5, i));
     }
     
     for (int i = 0; i < obstacles.size(); i++) {
@@ -184,30 +181,31 @@ void MapController::render()
     glBegin(GL_POINTS);
     glColor4f(0.0, 1.0, 0.0, 1.0);
     glVertex2d(destinationPoints[0].x * MapGridSize + 0.5 * MapGridSize, destinationPoints[0].y * MapGridSize + 0.5 * MapGridSize);
-    glColor4f(0.0, 1.0, 1.0, 1.0);
-    glVertex2d(destinationPoints[1].x * MapGridSize + 0.5 * MapGridSize, destinationPoints[1].y * MapGridSize + 0.5 * MapGridSize);
+//    glColor4f(0.0, 1.0, 1.0, 1.0);
+//    glVertex2d(destinationPoints[1].x * MapGridSize + 0.5 * MapGridSize, destinationPoints[1].y * MapGridSize + 0.5 * MapGridSize);
+//    glEnd();
     glEnd();
     
-    glLineWidth(1);
-    glBegin(GL_LINES);
-    glColor4f(1.0f, 1.0f, 1.0f, 0.1);
-    for (int i = 0; i < m_iWidth; i++) {
-        for (int j = 0; j < m_iHeight; j++) {
-            double xPos = i * MapGridSize;
-            double yPos = j * MapGridSize;
-            
-            for (int k = 0; k < 4; k++) {
-                int kx = i + fourDir[k][0];
-                int ky = j + fourDir[k][1];
-                
-                if (isValid(kx, ky)) {
-                    glVertex2d(xPos , yPos);
-                    glVertex2d(kx * MapGridSize, ky * MapGridSize);
-                }
-            }
-        }
-    }
-    glEnd();
+//    glLineWidth(1);
+//    glBegin(GL_LINES);
+//    glColor4f(1.0f, 1.0f, 1.0f, 0.1);
+//    for (int i = 0; i < m_iWidth; i++) {
+//        for (int j = 0; j < m_iHeight; j++) {
+//            double xPos = i * MapGridSize;
+//            double yPos = j * MapGridSize;
+//            
+//            for (int k = 0; k < 4; k++) {
+//                int kx = i + fourDir[k][0];
+//                int ky = j + fourDir[k][1];
+//                
+//                if (isValid(kx, ky)) {
+//                    glVertex2d(xPos , yPos);
+//                    glVertex2d(kx * MapGridSize, ky * MapGridSize);
+//                }
+//            }
+//        }
+//    }
+//    glEnd();
     
     glBegin(GL_QUADS);
     glColor3f(1.0f, 0.0f, 0.0f);
@@ -429,7 +427,7 @@ void MapController::updateContinuumCrowdData()
     //CC Paper says this is group dependant, but I'm not sure how...
     ccCalculateUnitCostField();
     
-    for (int group = 0; group <= 1; group++) //foreach group
+    for (int group = 0; group < 1; group++) //foreach group
     {
         ccClearPotentialField();
         
@@ -689,8 +687,8 @@ void MapController::updateDestinationPoint(b2Vec2 newDest)
     destinationPoints[0].x = newDest.x;
     destinationPoints[0].y = newDest.y;
     
-    destinationPoints[1].x = m_iWidth - destinationPoints[0].x - 1;
-    destinationPoints[1].y = m_iHeight - destinationPoints[0].y - 1;
+//    destinationPoints[1].x = m_iWidth - destinationPoints[0].x - 1;
+//    destinationPoints[1].y = m_iHeight - destinationPoints[0].y - 1;
 }
 
 bool MapController::isValid(int x, int y)
