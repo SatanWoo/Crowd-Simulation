@@ -48,6 +48,7 @@
 		1987ED5B1AF136C9007BACE5 /* b2PulleyJoint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1987ED351AF136C9007BACE5 /* b2PulleyJoint.cpp */; };
 		1987ED5C1AF136C9007BACE5 /* b2RevoluteJoint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1987ED371AF136C9007BACE5 /* b2RevoluteJoint.cpp */; };
 		1987ED5D1AF136C9007BACE5 /* b2WeldJoint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1987ED391AF136C9007BACE5 /* b2WeldJoint.cpp */; };
+		198C46431C3A93B700A3A130 /* Obstacle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 198C46411C3A93B700A3A130 /* Obstacle.cpp */; };
 		19FF13FB1B047AC8008B91F2 /* GlobalConfig.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 19FF13F91B047AC8008B91F2 /* GlobalConfig.cpp */; };
 		19FF13FD1B049C5E008B91F2 /* Agent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 19FF13FC1B049C5E008B91F2 /* Agent.cpp */; };
 /* End PBXBuildFile section */
@@ -150,6 +151,9 @@
 		1987ED381AF136C9007BACE5 /* b2RevoluteJoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = b2RevoluteJoint.h; sourceTree = "<group>"; };
 		1987ED391AF136C9007BACE5 /* b2WeldJoint.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = b2WeldJoint.cpp; sourceTree = "<group>"; };
 		1987ED3A1AF136C9007BACE5 /* b2WeldJoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = b2WeldJoint.h; sourceTree = "<group>"; };
+		198C46411C3A93B700A3A130 /* Obstacle.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Obstacle.cpp; sourceTree = "<group>"; };
+		198C46421C3A93B700A3A130 /* Obstacle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Obstacle.h; sourceTree = "<group>"; };
+		19A16C221C3B72C8005CD3D2 /* Spawner.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Spawner.h; sourceTree = "<group>"; };
 		19AC4BD81AF67B9E009831BA /* B2Vec2DHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = B2Vec2DHelper.h; sourceTree = "<group>"; };
 		19FF13F81B0466C0008B91F2 /* Agent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Agent.h; sourceTree = "<group>"; };
 		19FF13F91B047AC8008B91F2 /* GlobalConfig.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GlobalConfig.cpp; sourceTree = "<group>"; };
@@ -354,11 +358,14 @@
 		19A802F41AD29B5400CC6FBC /* Object */ = {
 			isa = PBXGroup;
 			children = (
+				198C46421C3A93B700A3A130 /* Obstacle.h */,
+				198C46411C3A93B700A3A130 /* Obstacle.cpp */,
 				1970B60C1AFB89F60026A84C /* CostNode.h */,
 				19FF13F81B0466C0008B91F2 /* Agent.h */,
 				19FF13FC1B049C5E008B91F2 /* Agent.cpp */,
-				19FF13F91B047AC8008B91F2 /* GlobalConfig.cpp */,
 				19FF13FA1B047AC8008B91F2 /* GlobalConfig.h */,
+				19FF13F91B047AC8008B91F2 /* GlobalConfig.cpp */,
+				19A16C221C3B72C8005CD3D2 /* Spawner.h */,
 			);
 			name = Object;
 			sourceTree = "<group>";
@@ -439,6 +446,7 @@
 				1987ED521AF136C9007BACE5 /* b2PolygonContact.cpp in Sources */,
 				1987ED451AF136C9007BACE5 /* b2Math.cpp in Sources */,
 				1955D0F41AC443D4001318C6 /* Vector.cpp in Sources */,
+				198C46431C3A93B700A3A130 /* Obstacle.cpp in Sources */,
 				1987ED441AF136C9007BACE5 /* b2BlockAllocator.cpp in Sources */,
 				1987ED591AF136C9007BACE5 /* b2MouseJoint.cpp in Sources */,
 				1987ED421AF136C9007BACE5 /* b2CircleShape.cpp in Sources */,

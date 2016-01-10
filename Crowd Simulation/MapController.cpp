@@ -33,7 +33,7 @@ MapController::MapController(int width, int height, int count, double timeStep)
     destinationPoints.push_back(v2);
 
     for (int yPos = 1; yPos < m_iHeight - 1; yPos++) {
-        for (int i =0 ; i < 30; i++) {
+        for (int i =0 ; i < 3; i++) {
             Agent p1(b2Vec2(i % 3, yPos), 0);
             p1.initBodyDef(world);
             agents.push_back(p1);
@@ -41,7 +41,7 @@ MapController::MapController(int width, int height, int count, double timeStep)
     }
     
     for (int yPos = 1; yPos < m_iHeight - 1; yPos++) {
-        for (int i =0 ; i < 30; i++) {
+        for (int i =0 ; i < 3; i++) {
             Agent p1(b2Vec2(m_iWidth - (i + 1) % 3, yPos), 1);
             p1.initBodyDef(world);
             agents.push_back(p1);
@@ -170,65 +170,73 @@ MapController::~MapController()
 
 void MapController::render()
 {
-    glPointSize(10);
-    glBegin(GL_POINTS);
-    glColor4f(0.0, 1.0, 0.0, 1.0);
-    glVertex2d(destinationPoints[0].x * MapGridSize + 0.5 * MapGridSize, destinationPoints[0].y * MapGridSize + 0.5 * MapGridSize);
-    glColor4f(0.0, 1.0, 1.0, 1.0);
-    glVertex2d(destinationPoints[1].x * MapGridSize + 0.5 * MapGridSize, destinationPoints[1].y * MapGridSize + 0.5 * MapGridSize);
-    glEnd();
+//    glPointSize(10);
+//    glBegin(GL_POINTS);
+//    glColor4f(0.0, 1.0, 0.0, 1.0);
+//    glVertex2d(destinationPoints[0].x * MapGridSize + 0.5 * MapGridSize, destinationPoints[0].y * MapGridSize + 0.5 * MapGridSize);
+//    glColor4f(0.0, 1.0, 1.0, 1.0);
+//    glVertex2d(destinationPoints[1].x * MapGridSize + 0.5 * MapGridSize, destinationPoints[1].y * MapGridSize + 0.5 * MapGridSize);
+//    glEnd();
     
-    glLineWidth(1);
-    glBegin(GL_LINES);
-    glColor4f(1.0f, 1.0f, 1.0f, 0.1);
-    for (int i = 0; i < m_iWidth; i++) {
-        for (int j = 0; j < m_iHeight; j++) {
-            double xPos = i * MapGridSize;
-            double yPos = j * MapGridSize;
-            
-            for (int k = 0; k < 4; k++) {
-                int kx = i + fourDir[k][0];
-                int ky = j + fourDir[k][1];
-                
-                if (isValid(kx, ky)) {
-                    glVertex2d(xPos , yPos);
-                    glVertex2d(kx * MapGridSize, ky * MapGridSize);
-                }
-            }
-        }
-    }
-    glEnd();
+//    glLineWidth(1);
+//    glBegin(GL_LINES);
+//    glColor4f(1.0f, 1.0f, 1.0f, 0.1);
+//    for (int i = 0; i < m_iWidth; i++) {
+//        for (int j = 0; j < m_iHeight; j++) {
+//            double xPos = i * MapGridSize;
+//            double yPos = j * MapGridSize;
+//            
+//            for (int k = 0; k < 4; k++) {
+//                int kx = i + fourDir[k][0];
+//                int ky = j + fourDir[k][1];
+//                
+//                if (isValid(kx, ky)) {
+//                    glVertex2d(xPos , yPos);
+//                    glVertex2d(kx * MapGridSize, ky * MapGridSize);
+//                }
+//            }
+//        }
+//    }
+//    glEnd();
+//    
+//    glBegin(GL_QUADS);
+//    glColor3f(1.0f, 0.0f, 0.0f);
+//    
+//    for (int i = 0 ; i < obstacles.size(); i++) {
+//        b2Vec2 o = obstacles[i];
+//        
+//        int x = o.x;
+//        int y = o.y;
+//        
+//        glVertex2d(x * MapGridSize, y * MapGridSize);
+//        glVertex2d((x + 1) * MapGridSize, y * MapGridSize);
+//        glVertex2d((x + 1) * MapGridSize, (y + 1) * MapGridSize);
+//        glVertex2d(x * MapGridSize, (y + 1) * MapGridSize);
+//    }
+//    glEnd();
     
-    glBegin(GL_QUADS);
-    glColor3f(1.0f, 0.0f, 0.0f);
-    
-    for (int i = 0 ; i < obstacles.size(); i++) {
-        b2Vec2 o = obstacles[i];
-        
-        int x = o.x;
-        int y = o.y;
-        
-        glVertex2d(x * MapGridSize, y * MapGridSize);
-        glVertex2d((x + 1) * MapGridSize, y * MapGridSize);
-        glVertex2d((x + 1) * MapGridSize, (y + 1) * MapGridSize);
-        glVertex2d(x * MapGridSize, (y + 1) * MapGridSize);
-    }
-    glEnd();
-
-    
-    glPointSize(5);
-    glBegin(GL_POINTS);
-    for (int i = 0; i < agents.size(); i++) {
-        
+//    glPointSize(5);
+//    glBegin(GL_POINTS);
+    for (int i = 0; i < agents.size(); i++)
+    {
         Agent &agent = agents[i];
-        if (agent.group == 0) {
-            glColor3f(1.0f, 0.0f, 1.0f);
-        } else {
-            glColor3f(1.0f, 1.0f, 1.0f);
-        }
-        glVertex2f(agent.getPosition().x * MapGridSize + 0.5 * MapGridSize, agent.getPosition().y * MapGridSize + 0.5 * MapGridSize);
+        
+        glPushMatrix();
+        glTranslatef(agent.getPosition().x, 0.0f, agent.getPosition().y);
+        glutSolidSphere(0.5, 5, 5);
+        glColor4f(1, .5, .5, 1); // pink head
+        glTranslatef(0.0f, 0.5f, 0.0f);
+        glutSolidSphere(.25, 5, 5);
+        glPopMatrix();
+//
+//        if (agent.group == 0) {
+//            glColor3f(1.0f, 0.0f, 1.0f);
+//        } else {
+//            glColor3f(1.0f, 1.0f, 1.0f);
+//        }
+//        glVertex2f(agent.getPosition().x, agent.getPosition().y);
     }
-    glEnd();
+ //   glEnd();
 }
 
 void MapController::update()
