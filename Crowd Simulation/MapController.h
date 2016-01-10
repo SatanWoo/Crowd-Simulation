@@ -61,6 +61,7 @@ protected:
     b2Vec2 steeringBehaviourAlignment(Agent &agent);
     b2Vec2 steeringBehaviourCohesion(Agent &agent);
     b2Vec2 steerTowards(Agent &agent, b2Vec2 direction);
+    b2Vec2 steerAvoid(Agent& agent);
     
 public:
 	MapController(int width, int height, int count, double timeStep = 0.02);

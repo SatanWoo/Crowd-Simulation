@@ -58,14 +58,14 @@ MapController::MapController(int width, int height, int count, double timeStep)
         agents.push_back(p3);
     }
     
-    for (int i = 0; i < m_iHeight; i++) {
-        if (i >= m_iHeight / 2 - 2 && i < m_iHeight / 2 + 2) {
-            continue;
-        }
-        for (int y = 6; y < m_iWidth - 6; y++) {
-            obstacles.push_back(b2Vec2(y, i));
-        }
-    }
+//    for (int i = 0; i < m_iHeight; i++) {
+//        if (i >= m_iHeight / 2 - 2 && i < m_iHeight / 2 + 2) {
+//            continue;
+//        }
+//        for (int y = 6; y < m_iWidth - 6; y++) {
+//            obstacles.push_back(b2Vec2(y, i));
+//        }
+//    }
     
     for (int i = 0; i < obstacles.size(); i++) {
         b2Vec2 pos = obstacles[i];
@@ -243,20 +243,21 @@ void MapController::render()
 
 void MapController::update()
 {
-    updateContinuumCrowdData();
+    //updateContinuumCrowdData();
 
     int size = agents.size();
     for (int i = size - 1; i >= 0; i--) {
         Agent &agent = agents[i];
         
-        b2Vec2 ff = agent.ff;
+        b2Vec2 ff = steeringBehaviourSeek(agent, destinationPoints[agent.group]);;
         
         //cout << "Agent" << i << " " << ff.x << ":" << ff.y << endl;
         b2Vec2 sep = steeringBehaviourSeparation(agent);
         b2Vec2 alg = steeringBehaviourAlignment(agent);
         b2Vec2 coh = steeringBehaviourCohesion(agent);
+        b2Vec2 avd = steerAvoid(agent);
         
-        agent.force = ff + sep * 1.2 + alg * 0.3 + coh * 0.05;
+        agent.force = ff + sep * 1.2 + alg * 0.3 + coh * 0.05 + avd * 10;
         
         float32 lengthSquared =  agent.force.LengthSquared();
         if (lengthSquared > Agent::maxForceSquared) {
@@ -416,6 +417,23 @@ b2Vec2 MapController::steerTowards(Agent &agent, b2Vec2 direction)
     b2Vec2 velocityChange = desiredVelocity - agent.getVelocity();
     //Convert to a force
     return velocityChange * (Agent::maxForce / Agent::maxSpeed);
+}
+
+b2Vec2 MapController::steerAvoid(Agent &agent)
+{
+    double offset = 0;
+    if (agent.group == 0) {
+        offset = 0.25;
+    } else {
+        offset = 0.75;
+    }
+    
+    double y = agent.getPosition().y - offset;
+    double yRounded = round(y);
+    
+    double velocityY = agent.getVelocity().y;
+    
+    return b2Vec2(0, (y - yRounded) * Agent::maxSpeed);
 }
 
 // Continnum Crowd
@@ -697,3 +715,4 @@ bool MapController::isValid(int x, int y)
 {
     return x >=0 && x < m_iWidth && y >= 0 && y < m_iHeight;
 }
+
