@@ -34,11 +34,15 @@ MapController::MapController(int width, int height, int count, double timeStep)
         }
     }
     
+    double k = 100;
+    int K = k;
+
     for (int i = 0; i < 30; ++i) {
-        int x = 1 + floor((rand() % 1) * (m_iWidth - 3));
-        int y = floor((rand() % 1) * (m_iHeight - 2));
+        double xRand = double(rand() % K) / k;
+        double yRand = double(rand() % K) / k;
         
-        cout << "X: " << x << "Y:" << y << endl;
+        int x = 1 + floor(xRand * (m_iWidth - 3));
+        int y = floor(yRand * (m_iHeight - 2));
         
         obstacles.push_back(b2Vec2(x, y));
     }
