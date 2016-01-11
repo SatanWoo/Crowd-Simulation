@@ -36,16 +36,29 @@ void camera()
     glTranslated(-xpos, -ypos, -zpos); //translate the screen to the position of our camera
 }
 
+void drawFloor()
+{
+    glDisable(GL_LIGHTING);
+    glColor3f(0, 0.6f, 0.6f);
+    glBegin(GL_QUADS);
+    glVertex3f(1500.0f, 0, 1500.0f);
+    glVertex3f(1500.0f, 0, -1500.0f);
+    glVertex3f(-1500.0f, 0, -1500.0f);
+    glVertex3f(-1500.0f, 0, 1500.0f);
+    glEnd();
+    glDisable(GL_LIGHTING);
+}
+
 #pragma mark - OpenGL Callback
 void glRender()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     glLoadIdentity();
     glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
-    gluLookAt(10.0, 100.0, 80.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+    gluLookAt(800, 400, 800.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
     
     camera(); // update camera position
-    
+    drawFloor();
     mapController->render();
     glutSwapBuffers();
 }
@@ -63,12 +76,12 @@ void glIdle()
 
 void glMotion(int x, int y)
 {
-    int diffx = x - (int)lastx; //check the difference between the current x and the last x position
-    int diffy = y - (int)lasty; //check the difference between the current y and the last y position
-    lastx = x;                  //set lastx to the current x position
-    lasty = y;                  //set lasty to the current y position
-    xrot += (float)diffy;       //set the xrot to xrot with the addition of the difference in the y position
-    yrot += (float)diffx;       //set the xrot to yrot with the addition of the difference in the x position
+//    int diffx = x - (int)lastx; //check the difference between the current x and the last x position
+//    int diffy = y - (int)lasty; //check the difference between the current y and the last y position
+//    lastx = x;                  //set lastx to the current x position
+//    lasty = y;                  //set lasty to the current y position
+//    xrot += (float)diffy;       //set the xrot to xrot with the addition of the difference in the y position
+//    yrot += (float)diffx;       //set the xrot to yrot with the addition of the difference in the x position
 }
 
 void glMouse(int button, int state, int x, int y)

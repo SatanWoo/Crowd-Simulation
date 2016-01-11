@@ -156,6 +156,9 @@ void MapController::render()
 //        glPopMatrix();
 //    }
     
+    int xOffset = 0;
+    int yOffset = 0;
+    
     glBegin(GL_QUADS);
     glColor3f(1.0f, 0.0f, 0.0f);
     
@@ -165,10 +168,10 @@ void MapController::render()
         int x = o.x;
         int y = o.y;
         
-        glVertex2d(x * MapGridSize, y * MapGridSize);
-        glVertex2d((x + 1) * MapGridSize, y * MapGridSize);
-        glVertex2d((x + 1) * MapGridSize, (y + 1) * MapGridSize);
-        glVertex2d(x * MapGridSize, (y + 1) * MapGridSize);
+        glVertex3f(x * MapGridSize - xOffset, 0, y * MapGridSize - yOffset);
+        glVertex3f((x + 1) * MapGridSize - xOffset, 0, y * MapGridSize - yOffset);
+        glVertex3f((x + 1) * MapGridSize - xOffset, 0, (y + 1) * MapGridSize - yOffset);
+        glVertex3f(x * MapGridSize - xOffset, 0, (y + 1) * MapGridSize - yOffset);
     }
     glEnd();
     
@@ -182,7 +185,7 @@ void MapController::render()
         } else {
             glColor3f(1.0f, 1.0f, 1.0f);
         }
-        glVertex2f(agent.getPosition().x * MapGridSize + 0.5 * MapGridSize, agent.getPosition().y * MapGridSize + 0.5 * MapGridSize);
+        glVertex3f(agent.getPosition().x * MapGridSize + 0.5 * MapGridSize - yOffset,  0, agent.getPosition().y * MapGridSize + 0.5 * MapGridSize - yOffset);
     }
     glEnd();
 }
