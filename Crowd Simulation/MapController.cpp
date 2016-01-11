@@ -159,21 +159,7 @@ void MapController::render()
     int xOffset = 0;
     int yOffset = 0;
     
-    glBegin(GL_QUADS);
-    glColor3f(1.0f, 0.0f, 0.0f);
     
-    for (int i = 0 ; i < obstacles.size(); i++) {
-        b2Vec2 o = obstacles[i];
-        
-        int x = o.x;
-        int y = o.y;
-        
-        glVertex3f(x * MapGridSize - xOffset, 0, y * MapGridSize - yOffset);
-        glVertex3f((x + 1) * MapGridSize - xOffset, 0, y * MapGridSize - yOffset);
-        glVertex3f((x + 1) * MapGridSize - xOffset, 0, (y + 1) * MapGridSize - yOffset);
-        glVertex3f(x * MapGridSize - xOffset, 0, (y + 1) * MapGridSize - yOffset);
-    }
-    glEnd();
     
     glPointSize(5);
     glBegin(GL_POINTS);
@@ -188,6 +174,46 @@ void MapController::render()
         glVertex3f(agent.getPosition().x * MapGridSize + 0.5 * MapGridSize - yOffset,  0, agent.getPosition().y * MapGridSize + 0.5 * MapGridSize - yOffset);
     }
     glEnd();
+    
+    glBegin(GL_QUADS);
+    glColor3f(1.0f, 0.0f, 0.0f);
+    
+    int height = 150;
+    
+    for (int i = 0 ; i < obstacles.size(); i++) {
+        b2Vec2 o = obstacles[i];
+        
+        int x = o.x;
+        int y = o.y;
+        
+        glVertex3f(x * MapGridSize - xOffset, 0, y * MapGridSize - yOffset);
+        glVertex3f((x + 1) * MapGridSize - xOffset, 0, y * MapGridSize - yOffset);
+        glVertex3f((x + 1) * MapGridSize - xOffset, 0, (y + 1) * MapGridSize - yOffset);
+        glVertex3f(x * MapGridSize - xOffset, 0, (y + 1) * MapGridSize - yOffset);
+        
+        glVertex3f(x * MapGridSize - xOffset, height, y * MapGridSize - yOffset);
+        glVertex3f((x + 1) * MapGridSize - xOffset, height, y * MapGridSize - yOffset);
+        glVertex3f((x + 1) * MapGridSize - xOffset, height, (y + 1) * MapGridSize - yOffset);
+        glVertex3f(x * MapGridSize - xOffset, height, (y + 1) * MapGridSize - yOffset);
+        
+        glVertex3f(x * MapGridSize - xOffset, 0, y * MapGridSize - yOffset);
+        glVertex3f((x + 1) * MapGridSize - xOffset, 0, y * MapGridSize - yOffset);
+        glVertex3f((x + 1) * MapGridSize - xOffset, height, y * MapGridSize - yOffset);
+        glVertex3f(x * MapGridSize - xOffset, height, y * MapGridSize - yOffset);
+        
+        glVertex3f(x * MapGridSize - xOffset, 0, y * MapGridSize - yOffset);
+        glVertex3f(x * MapGridSize - xOffset, 0, (y + 1) * MapGridSize - yOffset);
+        glVertex3f(x * MapGridSize - xOffset, height, (y + 1) * MapGridSize - yOffset);
+        glVertex3f(x * MapGridSize - xOffset, height, y * MapGridSize - yOffset);
+        
+        glVertex3f((x + 1) * MapGridSize - xOffset, 0, (y + 1) * MapGridSize - yOffset);
+        glVertex3f((x + 1) * MapGridSize - xOffset, 0, y * MapGridSize - yOffset);
+        glVertex3f((x + 1) * MapGridSize - xOffset, height, y * MapGridSize - yOffset);
+        glVertex3f((x + 1) * MapGridSize - xOffset, height, (y + 1) * MapGridSize - yOffset);
+    }
+    glEnd();
+    
+    
 }
 
 void MapController::update()

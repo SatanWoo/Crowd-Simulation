@@ -26,7 +26,7 @@ double xpos = 0, ypos = 0, zpos = 0, xrot = 0, yrot = 0, angle=0.0;
 int lastx, lasty;
 double xrotrad, yrotrad;
 
-bool shouldPause = false;
+bool shouldPause = true;
 
 #pragma mark - Private
 void camera()
@@ -55,7 +55,7 @@ void glRender()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     glLoadIdentity();
     glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
-    gluLookAt(800, 400, 800.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+    gluLookAt(800, 600, 800.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
     
     camera(); // update camera position
     drawFloor();
@@ -65,6 +65,10 @@ void glRender()
 
 void glIdle()
 {
+    if (shouldPause) {
+        return;
+    }
+    
     int n = 1;
     while (n--)
     {
@@ -76,12 +80,12 @@ void glIdle()
 
 void glMotion(int x, int y)
 {
-//    int diffx = x - (int)lastx; //check the difference between the current x and the last x position
-//    int diffy = y - (int)lasty; //check the difference between the current y and the last y position
-//    lastx = x;                  //set lastx to the current x position
-//    lasty = y;                  //set lasty to the current y position
-//    xrot += (float)diffy;       //set the xrot to xrot with the addition of the difference in the y position
-//    yrot += (float)diffx;       //set the xrot to yrot with the addition of the difference in the x position
+    int diffx = x - (int)lastx; //check the difference between the current x and the last x position
+    int diffy = y - (int)lasty; //check the difference between the current y and the last y position
+    lastx = x;                  //set lastx to the current x position
+    lasty = y;                  //set lasty to the current y position
+    xrot += (float)diffy;       //set the xrot to xrot with the addition of the difference in the y position
+    yrot += (float)diffx;       //set the xrot to yrot with the addition of the difference in the x position
 }
 
 void glMouse(int button, int state, int x, int y)
