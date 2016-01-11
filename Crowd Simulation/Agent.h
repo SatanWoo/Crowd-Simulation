@@ -17,20 +17,27 @@ struct Agent {
     b2Vec2 force;
     int group;
     
-    static int maxForce; //rate of acceleration
-    static int maxSpeed; //grid squares / second
+    float32 maxForce;
+    float32 maxSpeed;
     
-    static float32 radius;
-    static float32 minSeparation; // We'll move away from anyone nearer than this
+    float32 radius;
+    float32 neighbourRadius;
     
-    static int maxCohesion; //We'll move closer to anyone within this bound
-    
-    static int maxForceSquared;
-    static int maxSpeedSquared;
+    float32 maxForceSquared;
+    float32 maxSpeedSquared;
     
     Agent(b2Vec2 pos, int group){
         this->group = group;
         this->pos = pos;
+        
+        maxForce = 50;
+        maxSpeed = 4;
+        radius = 0.23;
+        
+        neighbourRadius = 3;
+        
+        maxForceSquared = maxForce * maxForce;
+        maxSpeedSquared = maxSpeed * maxSpeed;
     }
     
     b2Vec2 getPosition()const{return this->body->GetPosition();}
@@ -53,7 +60,7 @@ struct Agent {
         fixtureDef->density = 20.0;
         fixtureDef->friction = 0.0;
         fixtureDef->restitution = 0.0;
-        fixtureDef->shape = new b2CircleShape(Agent::radius);
+        fixtureDef->shape = new b2CircleShape(this->radius);
         fixture = body->CreateFixture(fixtureDef);
     }
     

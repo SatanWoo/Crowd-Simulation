@@ -17,21 +17,13 @@ private:
     std::vector<b2Vec2> obstacles;
     
     b2Vec2 **flow;
-    b2Vec2 **avgVelocityField;
+    bool **lost;
+    float32 **dijkstra;
     
-    float32 **potentialField;
-    float32 **densityField;
-    float32 **discomfortField;
-    FourGrid **speedField;
-    FourGrid **costField;
-    
-    bool **visited;
-        
     b2World *world;
 
 	int m_iWidth;
 	int m_iHeight;
-    
     
 	double m_dTimeStep;
     
@@ -43,17 +35,11 @@ protected:
     
     void deinitializeField(b2Vec2 **field);
     void deinitializeField(float32 **field);
+    void deinitializeField(bool **field);
     
-    void updateContinuumCrowdData();
-    void ccClearBuffers();
-    void ccCalculateDensityAndAverageSpeed();
-    void ccCalculateUnitCostField();
-    
-    void ccAddDensity(int x, int y, const b2Vec2& vec, float32 weight);
     void ccGenerateFlowField();
-    void ccClearPotentialField();
-    
-    void ccPotentialFieldEikonalFill(b2Vec2 des);
+    void ccGenerateDijkstraField();
+    void calculateLost(CostNode at, CostNode pathEnd);
     
     b2Vec2 steeringBehaviourFlowField(Agent &agent);
     b2Vec2 steeringBehaviourSeek(Agent &agent, b2Vec2 dest);
@@ -61,6 +47,9 @@ protected:
     b2Vec2 steeringBehaviourAlignment(Agent &agent);
     b2Vec2 steeringBehaviourCohesion(Agent &agent);
     b2Vec2 steerTowards(Agent &agent, b2Vec2 direction);
+    
+    std::vector<b2Vec2> allNeighbours(b2Vec2& pos);
+    std::vector<CostNode> directNeighbours(CostNode& pos);
     
 public:
 	MapController(int width, int height, int count, double timeStep = 0.02);
@@ -74,7 +63,6 @@ public:
 	void update();
     
 	double getTimeStep()const{return m_dTimeStep;}
-    b2Vec2 flock(int pID);
 
 	static const double MapGridSize;
 	static const double restDensity;

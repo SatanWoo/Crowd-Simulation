@@ -21,6 +21,13 @@ public:
         
         return minVal;
     }
+    
+    static int sign(float32 val)
+    {
+        if (val > 0) return 1;
+        if (val < 0) return -1;
+        return 0;
+    }
 };
 
 #endif

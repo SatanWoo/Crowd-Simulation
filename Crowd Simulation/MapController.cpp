@@ -13,9 +13,6 @@ using namespace std;
 const double MapController::restDensity = 1.0;
 const double MapController::MapGridSize = 32;
 
-static int fourDir[4][2] = {{0, -1}, {1, 0}, {0, 1}, {-1, 0}};
-static int eightDir[8][2] = {{0, -1}, {1, 0}, {0, 1}, {-1, 0}, {1, 1}, {1, -1}, {-1, -1}, {-1, 1}};
-
 MapController::MapController(int width, int height, int count, double timeStep)
 {
 	m_iWidth = width;
@@ -27,10 +24,7 @@ MapController::MapController(int width, int height, int count, double timeStep)
     srand((unsigned)time(NULL));
     
     b2Vec2 v1(m_iWidth - 2, m_iHeight / 2);
-    b2Vec2 v2(1, m_iHeight / 2);
-    
     destinationPoints.push_back(v1);
-    destinationPoints.push_back(v2);
 
     for (int yPos = 1; yPos < m_iHeight - 1; yPos++) {
         for (int i =0 ; i < 3; i++) {
@@ -40,21 +34,13 @@ MapController::MapController(int width, int height, int count, double timeStep)
         }
     }
     
-    for (int yPos = 1; yPos < m_iHeight - 1; yPos++) {
-        for (int i =0 ; i < 3; i++) {
-            Agent p1(b2Vec2(m_iWidth - (i + 1) % 3, yPos), 1);
-            p1.initBodyDef(world);
-            agents.push_back(p1);
-        }
-    }
-    
-    for (int i = 0; i < m_iHeight; i++) {
-        if (i >= m_iHeight / 2 - 2 && i < m_iHeight / 2 + 2) {
-            continue;
-        }
-        for (int y = 6; y < m_iWidth - 6; y++) {
-            obstacles.push_back(b2Vec2(y, i));
-        }
+    for (int i = 0; i < 30; ++i) {
+        int x = 1 + floor((rand() % 1) * (m_iWidth - 3));
+        int y = floor((rand() % 1) * (m_iHeight - 2));
+        
+        cout << "X: " << x << "Y:" << y << endl;
+        
+        obstacles.push_back(b2Vec2(x, y));
     }
     
     for (int i = 0; i < obstacles.size(); i++) {
@@ -71,7 +57,6 @@ MapController::MapController(int width, int height, int count, double timeStep)
         
         b2PolygonShape *shape = (b2PolygonShape *)fixDef->shape;
         shape->SetAsBox(0.5, 0.5);
-
         
         bodyDef->type = b2_staticBody;
         bodyDef->position.Set(pos.x, pos.y);
@@ -80,22 +65,15 @@ MapController::MapController(int width, int height, int count, double timeStep)
     }
     
     flow = initializeVecField();
-    
-    avgVelocityField = initializeVecField();
-    
-    densityField = initializeFloatField();
-    potentialField = initializeFloatField();
-    discomfortField = initializeFloatField();
-    
-    visited = new bool*[width];
-    costField = new FourGrid*[width];
-    speedField = new FourGrid*[width];
+    dijkstra = initializeFloatField();
+    lost = new bool*[width];
 	for (int i = 0; i < width; i++)
     {
-        visited[i] = new bool [height];
-        costField[i] = new FourGrid[height];
-        speedField[i] = new FourGrid[height];
+        lost[i] = new bool [height];
 	}
+    
+    ccGenerateDijkstraField();
+    ccGenerateFlowField();
 }
 
 b2Vec2** MapController::initializeVecField()
@@ -140,130 +118,91 @@ void MapController::deinitializeField(float32 **field)
     field = NULL;
 }
 
+void MapController::deinitializeField(bool **field)
+{
+    for (int i = 0; i < m_iWidth; i++) {
+        delete [] field[i];
+        field[i] = NULL;
+    }
+    
+    delete [] field;
+    field = NULL;
+}
+
 MapController::~MapController()
 {
     deinitializeField(flow);
-    deinitializeField(potentialField);
-    deinitializeField(discomfortField);
-    deinitializeField(avgVelocityField);
-    
-	for (int i = 0; i < m_iWidth; i++)
-	{
-        delete [] visited[i];
-        delete [] costField[i];
-        delete [] speedField[i];
-        
-        visited[i] = NULL;
-        costField[i] = NULL;
-        speedField[i] = NULL;
-	}
-
-    delete [] visited;
-    visited = NULL;
-    
-    delete [] costField;
-    costField = NULL;
-    
-    delete [] speedField;
-    speedField = NULL;
+    deinitializeField(dijkstra);
+    deinitializeField(lost);
 }
 
+#pragma mark -
 void MapController::render()
 {
-//    glPointSize(10);
-//    glBegin(GL_POINTS);
-//    glColor4f(0.0, 1.0, 0.0, 1.0);
-//    glVertex2d(destinationPoints[0].x * MapGridSize + 0.5 * MapGridSize, destinationPoints[0].y * MapGridSize + 0.5 * MapGridSize);
-//    glColor4f(0.0, 1.0, 1.0, 1.0);
-//    glVertex2d(destinationPoints[1].x * MapGridSize + 0.5 * MapGridSize, destinationPoints[1].y * MapGridSize + 0.5 * MapGridSize);
-//    glEnd();
-    
-//    glLineWidth(1);
-//    glBegin(GL_LINES);
-//    glColor4f(1.0f, 1.0f, 1.0f, 0.1);
-//    for (int i = 0; i < m_iWidth; i++) {
-//        for (int j = 0; j < m_iHeight; j++) {
-//            double xPos = i * MapGridSize;
-//            double yPos = j * MapGridSize;
-//            
-//            for (int k = 0; k < 4; k++) {
-//                int kx = i + fourDir[k][0];
-//                int ky = j + fourDir[k][1];
-//                
-//                if (isValid(kx, ky)) {
-//                    glVertex2d(xPos , yPos);
-//                    glVertex2d(kx * MapGridSize, ky * MapGridSize);
-//                }
-//            }
-//        }
-//    }
-//    glEnd();
-//    
-//    glBegin(GL_QUADS);
-//    glColor3f(1.0f, 0.0f, 0.0f);
-//    
-//    for (int i = 0 ; i < obstacles.size(); i++) {
-//        b2Vec2 o = obstacles[i];
+//    for (int i = 0; i < agents.size(); i++)
+//    {
+//        Agent &agent = agents[i];
 //        
-//        int x = o.x;
-//        int y = o.y;
-//        
-//        glVertex2d(x * MapGridSize, y * MapGridSize);
-//        glVertex2d((x + 1) * MapGridSize, y * MapGridSize);
-//        glVertex2d((x + 1) * MapGridSize, (y + 1) * MapGridSize);
-//        glVertex2d(x * MapGridSize, (y + 1) * MapGridSize);
+//        glPushMatrix();
+//        glTranslatef(agent.getPosition().x, 0.0f, agent.getPosition().y);
+//        glutSolidSphere(0.5, 5, 5);
+//        glColor4f(1, .5, .5, 1); // pink head
+//        glTranslatef(0.0f, 0.5f, 0.0f);
+//        glutSolidSphere(.25, 5, 5);
+//        glPopMatrix();
 //    }
-//    glEnd();
     
-//    glPointSize(5);
-//    glBegin(GL_POINTS);
-    for (int i = 0; i < agents.size(); i++)
-    {
-        Agent &agent = agents[i];
+    glBegin(GL_QUADS);
+    glColor3f(1.0f, 0.0f, 0.0f);
+    
+    for (int i = 0 ; i < obstacles.size(); i++) {
+        b2Vec2 o = obstacles[i];
         
-        glPushMatrix();
-        glTranslatef(agent.getPosition().x, 0.0f, agent.getPosition().y);
-        glutSolidSphere(0.5, 5, 5);
-        glColor4f(1, .5, .5, 1); // pink head
-        glTranslatef(0.0f, 0.5f, 0.0f);
-        glutSolidSphere(.25, 5, 5);
-        glPopMatrix();
-//
-//        if (agent.group == 0) {
-//            glColor3f(1.0f, 0.0f, 1.0f);
-//        } else {
-//            glColor3f(1.0f, 1.0f, 1.0f);
-//        }
-//        glVertex2f(agent.getPosition().x, agent.getPosition().y);
+        int x = o.x;
+        int y = o.y;
+        
+        glVertex2d(x * MapGridSize, y * MapGridSize);
+        glVertex2d((x + 1) * MapGridSize, y * MapGridSize);
+        glVertex2d((x + 1) * MapGridSize, (y + 1) * MapGridSize);
+        glVertex2d(x * MapGridSize, (y + 1) * MapGridSize);
     }
- //   glEnd();
+    glEnd();
+    
+    glPointSize(5);
+    glBegin(GL_POINTS);
+    for (int i = 0; i < agents.size(); i++) {
+        
+        Agent &agent = agents[i];
+        if (agent.group == 0) {
+            glColor3f(1.0f, 0.0f, 1.0f);
+        } else {
+            glColor3f(1.0f, 1.0f, 1.0f);
+        }
+        glVertex2f(agent.getPosition().x * MapGridSize + 0.5 * MapGridSize, agent.getPosition().y * MapGridSize + 0.5 * MapGridSize);
+    }
+    glEnd();
 }
 
 void MapController::update()
 {
-    updateContinuumCrowdData();
-
-    int size = agents.size();
-    for (int i = size - 1; i >= 0; i--) {
+    for (int i = agents.size() - 1; i >= 0; i--) {
         Agent &agent = agents[i];
         
-        b2Vec2 ff = agent.ff;
-        
-        //cout << "Agent" << i << " " << ff.x << ":" << ff.y << endl;
+        b2Vec2 ff  = steeringBehaviourFlowField(agent);
         b2Vec2 sep = steeringBehaviourSeparation(agent);
         b2Vec2 alg = steeringBehaviourAlignment(agent);
         b2Vec2 coh = steeringBehaviourCohesion(agent);
         
-        agent.force = ff + sep * 1.2 + alg * 0.3 + coh * 0.05;
+        agent.force = ff + sep * 2 + alg * 0.5 + coh * 0.2;
         
         float32 lengthSquared =  agent.force.LengthSquared();
-        if (lengthSquared > Agent::maxForceSquared) {
-             agent.force *= (agent.maxForce / sqrt(lengthSquared));
+        if (lengthSquared > agent.maxForceSquared) {
+            agent.force *= (agent.maxForce / sqrt(lengthSquared));
         }
     }
     
     //Move agents based on forces being applied (aka physics)
-    for (int i = size - 1; i >= 0; i--) {
+    for (int i = agents.size() - 1; i >= 0; i--) {
         Agent &agent = agents[i];
         agent.body->ApplyLinearImpulse(agent.force * m_dTimeStep, agent.getPosition());
     }
@@ -313,11 +252,11 @@ b2Vec2 MapController::steeringBehaviourSeek(Agent &agent, b2Vec2 dest)
     
     b2Vec2 desired = dest - agent.getPosition();
    
-    desired *= (Agent::maxSpeed / desired.Length());
+    desired *= (agent.maxSpeed / desired.Length());
    
     b2Vec2 velocityChange = desired - agent.getVelocity();
     
-    return velocityChange * (Agent::maxForce / Agent::maxSpeed);
+    return velocityChange * (agent.maxForce / agent.maxSpeed);
 }
 
 b2Vec2 MapController::steeringBehaviourSeparation(Agent &agent)
@@ -330,12 +269,12 @@ b2Vec2 MapController::steeringBehaviourSeparation(Agent &agent)
         Agent &a = agents[i];
         if (&a != &agent) {
             float32 distance = B2Vec2DHelper::distanceTo(agent.getPosition(), a.getPosition());
-            if (distance < agent.minSeparation && distance > 0) {
+            if (distance < agent.neighbourRadius && distance > 0) {
                 b2Vec2 pushForce = agent.getPosition() - a.getPosition();
                 float32 length = pushForce.Normalize(); //Normalize returns the original length
-                float32 r = (Agent::radius + Agent::radius);
+                float32 r = (agent.radius + a.radius);
                 
-                totalForce += pushForce * (1 - ((length - r) / (Agent::minSeparation - r)));//agent.minSeparation)));
+                totalForce += pushForce * (1 - length / agent.neighbourRadius);//agent.minSeparation)));
                 neighboursCount++;
             }
         }
@@ -345,7 +284,7 @@ b2Vec2 MapController::steeringBehaviourSeparation(Agent &agent)
         return totalForce; //Zero
     }
     
-    return totalForce * (Agent::maxForce / neighboursCount);
+    return totalForce * (agent.maxForce / neighboursCount);
 }
 
 b2Vec2 MapController::steeringBehaviourCohesion(Agent &agent)
@@ -355,9 +294,9 @@ b2Vec2 MapController::steeringBehaviourCohesion(Agent &agent)
     
     for (int i = 0; i < agents.size(); i++) {
         Agent &a = agents[i];
-        if (&a != &agent && a.group == agent.group) {
+        if (&a != &agent) {
             float32 distance = B2Vec2DHelper::distanceTo(agent.getPosition(), a.getPosition());
-            if (distance < Agent::maxCohesion) {
+            if (distance < agent.neighbourRadius) {
                 //sum up the position of our neighbours
                 centerOfMass += a.body->GetPosition();
                 neighboursCount++;
@@ -386,7 +325,7 @@ b2Vec2 MapController::steeringBehaviourAlignment(Agent &agent)
         Agent &a = agents[i];
         float32 distance = B2Vec2DHelper::distanceTo(agent.getPosition(), a.getPosition());
         //That are within the max distance and are moving
-        if (distance < Agent::maxCohesion && a.getVelocity().Length() > 0 && a.group == agent.group) {
+        if (distance < agent.neighbourRadius && a.getVelocity().Length() > 0) {
             //Sum up our headings
             b2Vec2 head = a.getVelocity();
             head.Normalize();
@@ -408,184 +347,113 @@ b2Vec2 MapController::steeringBehaviourAlignment(Agent &agent)
 
 b2Vec2 MapController::steerTowards(Agent &agent, b2Vec2 direction)
 {
-    b2Vec2 desiredVelocity = direction * Agent::maxSpeed;
+    b2Vec2 desiredVelocity = direction * agent.maxSpeed;
     
     //The velocity change we want
     b2Vec2 velocityChange = desiredVelocity - agent.getVelocity();
     //Convert to a force
-    return velocityChange * (Agent::maxForce / Agent::maxSpeed);
+    return velocityChange * (agent.maxForce / agent.maxSpeed);
 }
 
-// Continnum Crowd
-void MapController::updateContinuumCrowdData()
+void MapController::ccGenerateDijkstraField()
 {
-    ccClearBuffers();
+    for (int x = 0; x < m_iWidth; x++) {
+        for (int y = 0; y < m_iHeight; y++) {
+            dijkstra[x][y] = -1;
+            lost[x][y] = false;
+        }
+    }
     
-    //Update density field and average speed map (4.1)
-    ccCalculateDensityAndAverageSpeed();
+    //Set all places where obstacles are as being weight MAXINT, which will stand for not able to go here
+    for (int i = 0; i < obstacles.size(); i++) {
+        b2Vec2& t = obstacles[i];
+        dijkstra[int(t.x)][int(t.y)] = FLT_MAX;
+    }
     
-    //CC Paper says this is group dependant, but I'm not sure how...
-    ccCalculateUnitCostField();
+    //flood fill out from the end point
+    CostNode pathEnd;
+    pathEnd.cost = 0;
+    pathEnd.point.x = destinationPoints[0].x;
+    pathEnd.point.y = destinationPoints[0].y;
     
-    for (int group = 0; group <= 1; group++) //foreach group
-    {
-        ccClearPotentialField();
+    dijkstra[int(pathEnd.point.x)][int(pathEnd.point.y)] = 0;
+    lost[int(pathEnd.point.x)][int(pathEnd.point.y)] = true;
+    
+    std::vector<CostNode> toVisit;
+    toVisit.push_back(pathEnd);
+    
+    //for each node we need to visit, starting with the pathEnd
+    for (int i = 0; i < toVisit.size(); i++) {
+        CostNode at = toVisit[i];
         
-        //Construct the potential
-        ccPotentialFieldEikonalFill(destinationPoints[group]);
-        //Compute the gradient
-        //ccCalculatePotentialFieldGradient();
-        ccGenerateFlowField(); //TODO: This does not use the way of calculating described in the paper (I think)
+        //cout << "at.x" << at.point.x << "at.y" << at.point.y << "cost" << at.cost << endl;
         
-        //(use these for steering later)
-        for (int i = agents.size() - 1; i >= 0; i--) {
-            if (agents[i].group == group) {
-                agents[i].ff = steeringBehaviourFlowField(agents[i]);
-            }
-        }
-    }
-}
-
-void MapController::ccClearBuffers()
-{
-    for (int i = 0; i < m_iWidth; i++)
-    {
-        for (int j = 0; j < m_iHeight; j++)
-        {
-            densityField[i][j] = 0;
-            discomfortField[i][j] = 0;
-            avgVelocityField[i][j].SetZero();
-        }
-    }
-    
-    for (int i = obstacles.size() - 1; i >= 0; i--) {
-        b2Vec2 o = obstacles[i];
-        int x = o.x, y = o.y;
-        discomfortField[x][y] = INT_MAX;
-    }
-}
-
-void MapController::ccCalculateDensityAndAverageSpeed()
-{
-    float32 perAgentDensity = 1.0;
-    
-    for (int i = 0; i < agents.size(); i++)
-    {
-        Agent &pi = agents[i];
+        //Calculate if we have LOS
+        //Only need to see if don't have LOS if we aren't the end
+        calculateLost(at, pathEnd);
         
-        b2Vec2 floor = B2Vec2DHelper::floorV(pi.getPosition());
-        float32 xWeight = pi.getPosition().x - floor.x;
-        float32 yWeight = pi.getPosition().y - floor.y;
+        std::vector<CostNode> neighbours = directNeighbours(at);
         
-        //top left
-        if (isValid(floor.x, floor.y)) {
-            ccAddDensity(floor.x, floor.y, pi.getVelocity(), perAgentDensity * (1 - xWeight) * (1 - yWeight));
-        }
-        //top right
-        if (isValid(floor.x + 1, floor.y)) {
-            ccAddDensity(floor.x + 1, floor.y, pi.getVelocity(), perAgentDensity * (xWeight) * (1 - yWeight));
-        }
-        //bottom left
-        if (isValid(floor.x, floor.y + 1)) {
-            ccAddDensity(floor.x, floor.y + 1, pi.getVelocity(), perAgentDensity * (1 - xWeight) * (yWeight));
-        }
-        //bottom right
-        if (isValid(floor.x + 1, floor.y + 1)) {
-            ccAddDensity(floor.x + 1, floor.y + 1, pi.getVelocity(), perAgentDensity * (xWeight) * (yWeight));
-        }
-    }
-    
-    for (int i = 0; i < m_iWidth; i++)
-    {
-        for (int j = 0; j < m_iHeight; j++)
-        {
-            b2Vec2& velocity = avgVelocityField[i][j];
-            float32 density = densityField[i][j];
-            if (density > 0) {
-                velocity *= (1/density);
-            }
-        }
-    }
-}
-
-void MapController::ccAddDensity(int x, int y, const b2Vec2& vec, float32 weight)
-{
-    densityField[x][y] += weight;
-    
-    b2Vec2& v = avgVelocityField[x][y];
-    v.x += vec.x * weight;
-    v.y += vec.y * weight;
-}
-
-void MapController::ccCalculateUnitCostField()
-{
-    float32 densityMin = 0.5;
-    float32 densityMax = 0.8;
-    
-    //Weights for formula (4) on page 4
-    float32 lengthWeight = 1;
-    float32 timeWeight = 1;
-    float32 discomfortWeight = 1;
-    
-    for (int i = 0; i < m_iWidth; i++) {
-        for (int j = 0; j < m_iHeight; j++) {
+        //for each neighbour of this node (only straight line neighbours, not diagonals)
+        for (int j = 0; j < neighbours.size(); j++) {
+            CostNode n = neighbours[j];
             
-            //foreach direction we can leave that cell
-            for (int dir = 0; dir < 4; dir++) {
-                int targetX = i + fourDir[dir][0];
-                int targetY = j + fourDir[dir][1];
-                
-                if (!isValid(targetX, targetY)) {
-                    speedField[i][j].value[dir] = FLT_MAX;
-                    continue;
-                }
-                
-                float32 veloX = fourDir[dir][0] * avgVelocityField[targetX][targetY].x;
-                float32 veloY = fourDir[dir][1] * avgVelocityField[targetX][targetY].y;
-                
-                //Get the only speed value as one will be zero
-                // this is like speedVecX != 0 ? : speedVecX : speedVecY
-                float32 flowSpeed = fourDir[dir][0] != 0 ? veloX : veloY;
-                
-                float32 density = densityField[targetX][targetY];
-                
-                //cout << "X " << targetX << " Y " << targetY << " " << densityField[targetX][targetY] << endl;
-                
-                float32 discomfort = discomfortField[targetX][targetY];
-                
-                if (density >= densityMax) {
-                    speedField[i][j].value[dir] = flowSpeed;
-                } else if (density <= densityMin) {
-                    speedField[i][j].value[dir] = Agent::maxSpeed;
-                } else {
-                    //medium speed
-                    speedField[i][j].value[dir] = Agent::maxSpeed - (density - densityMin) / (densityMax - densityMin) * (4 - flowSpeed);
-                }
-                
-                //we're going to divide by speed later, so make sure it's not zero
-                float32 speed = speedField[i][j].value[dir];
-                float32 threshold = 0.001;
-                speedField[i][j].value[dir] = max(threshold, speed);
-                
-               
-                
-                //Work out the cost to move in to the destination cell
-                costField[i][j].value[dir] = (speedField[i][j].value[dir] * lengthWeight + timeWeight + discomfortWeight * discomfort) / speedField[i][j].value[dir];
-                
-                
-                //cout << "X:" << i << "Y:" << j << "I:" << dir << " " <<costField[i][j].value[dir] << endl;
+            //We will only ever visit every node once as we are always visiting nodes in the most efficient order
+            if (dijkstra[int(n.point.x)][int(n.point.y)] == -1) {
+                n.cost = at.cost + 1;
+                dijkstra[int(n.point.x)][int(n.point.y)] = n.cost;
+                toVisit.push_back(n);
             }
         }
     }
 }
 
-void MapController::ccClearPotentialField()
+void MapController::calculateLost(CostNode at, CostNode pathEnd)
 {
-    for (int i = 0; i < m_iWidth; i++) {
-        for (int j = 0; j < m_iHeight; j++) {
-            potentialField[i][j] = FLT_MAX;
+    float32 xDif = pathEnd.point.x - at.point.x;
+    float32 yDif = pathEnd.point.y - at.point.y;
+    
+    float32 xDifAbs = fabs(xDif);
+    float32 yDifAbs = fabs(yDif);
+    
+    bool hasLos = false;
+    
+    int xDifOne = MathLib::sign(xDif);
+    int yDifOne = MathLib::sign(yDif);
+    
+    //Check the direction we are furtherest from the destination on (or both if equal)
+    // If it has LOS then we might
+    
+    //Check in the x direction
+    if (xDifAbs >= yDifAbs) {
+        
+        if (lost[int(at.point.x + xDifOne)][int(at.point.y)]) {
+            hasLos = true;
         }
     }
+    //Check in the y direction
+    if (yDifAbs >= xDifAbs) {
+        
+        if (lost[int(at.point.x)][int(at.point.y + yDifOne)]) {
+            hasLos = true;
+        }
+    }
+    
+    //If we are not a straight line vertically/horizontally to the exit
+    if (yDifAbs > 0 && xDifAbs > 0) {
+        //If the diagonal doesn't have LOS, we don't
+        if (!lost[int(at.point.x + xDifOne)][int(at.point.y + yDifOne)]) {
+            hasLos = false;
+        } else if (yDifAbs == xDifAbs) {
+            //If we are an exact diagonal and either straight direction is a wall, we don't have LOS
+            if (dijkstra[int(at.point.x + xDifOne)][int(at.point.y)] == FLT_MAX ||
+                dijkstra[int(at.point.x)][int(at.point.y + yDifOne)] == FLT_MAX) {
+                hasLos = false;
+            }
+        }
+    }
+    //It's a definite now
+    lost[int(at.point.x)][int(at.point.y)] = hasLos;
 }
 
 void MapController::ccGenerateFlowField()
@@ -600,83 +468,43 @@ void MapController::ccGenerateFlowField()
     {
         for (int j = 0; j < m_iHeight; j++)
         {
-            if (potentialField[i][j] == FLT_MAX) continue;
+            if (dijkstra[i][j] == FLT_MAX) continue;
+            
+            if (lost[i][j]) {
+                b2Vec2 p = destinationPoints[0];
+                
+                p.x -= i;
+                p.y -= j;
+                p.Normalize();
+                
+                flow[i][j] = p;
+                continue;
+            }
+            
+            b2Vec2 pos(i, j);
+            
+            std::vector<b2Vec2> neighbours = allNeighbours(pos);
             
             bool isMinFound = false;
             b2Vec2 min;
             float32 minDist = FLT_MAX;
             
-            for (int d = 0; d < 8; d++) {
-                if (isValid(i + eightDir[d][0], j + eightDir[d][1])) {
-                    float32 dist = potentialField[i + eightDir[d][0]][j + eightDir[d][1]];
+            for (int i = 0; i < neighbours.size(); ++i) {
+                b2Vec2 n = neighbours[i];
+                float32 dist = dijkstra[int(n.x)][int(n.y)] - dijkstra[int(pos.x)][int(pos.y)];
+        
+                if (dist < minDist) {
+                    min = n;
+                    minDist = dist;
                     
-                    if (dist < minDist) {
-                        min.x = eightDir[d][0];
-                        min.y = eightDir[d][1];
-                        minDist = dist;
-                        
-                        isMinFound = true;
-                    }
+                    isMinFound = true;
                 }
             }
             
             if (isMinFound) {
-                flow[i][j].Set(min.x, min.y);
-                flow[i][j].Normalize();
-            }
-        }
-    }
-}
-
-void MapController::ccPotentialFieldEikonalFill(b2Vec2 des)
-{
-    for (int i = 0; i < m_iWidth; i++) {
-        for (int j = 0; j < m_iHeight; j++) {
-            visited[i][j] = false;
-        }
-    }
-    
-    int candidatesCount = 0;
-    
-    CostNode desNode;
-    desNode.cost = 0;
-    desNode.point = des;
-    
-    priority_queue<CostNode> pQueue;
-    pQueue.push(desNode);
-    
-    while (!pQueue.empty()) {
-        candidatesCount++;
-        CostNode at = pQueue.top();
-        pQueue.pop();
-        
-        int x = at.point.x;
-        int y = at.point.y;
-        
-        if (potentialField[x][y] >= at.cost && !visited[x][y]) {
-            potentialField[x][y] = at.cost;
-            visited[x][y] = true;
-            
-            for (int i = 0; i < 4; i++) {
-                int toX = x + fourDir[i][0];
-                int toY = y + fourDir[i][1];
-                if (isValid(toX, toY)) {
-                    //Cost to go from our target cell to the start
-                    //Our cost + cost of moving from the target to us
-                    float32 toCost = at.cost + costField[toX][toY].value[(i + 2) % 4];
-                    
-                    //If we present a better path, overwrite the cost and queue up going to that cell
-                    if (toCost < potentialField[toX][toY]) {
-                        potentialField[toX][toY] = toCost;
-                        visited[x][y] = false;
-                        
-                        CostNode toP ;
-                        toP.point.x = toX;
-                        toP.point.y = toY;
-                        toP.cost = toCost;
-                        pQueue.push(toP);
-                    }
-                }
+                b2Vec2 v = min - pos;
+                v.Normalize();
+                flow[i][j] = v;
             }
         }
     }
@@ -686,12 +514,93 @@ void MapController::updateDestinationPoint(b2Vec2 newDest)
 {
     destinationPoints[0].x = newDest.x;
     destinationPoints[0].y = newDest.y;
-    
-    destinationPoints[1].x = m_iWidth - destinationPoints[0].x - 1;
-    destinationPoints[1].y = m_iHeight - destinationPoints[0].y - 1;
 }
 
 bool MapController::isValid(int x, int y)
 {
-    return x >=0 && x < m_iWidth && y >= 0 && y < m_iHeight;
+    return x >=0 && x < m_iWidth && y >= 0 && y < m_iHeight && dijkstra[x][y] != FLT_MAX;
+}
+
+std::vector<b2Vec2> MapController::allNeighbours(b2Vec2 &v)
+{
+    std::vector<b2Vec2> res;
+    int x = v.x;
+    int y = v.y;
+    
+    int up = isValid(x, y - 1);
+    int down = isValid(x, y + 1);
+    int left = isValid(x - 1, y);
+    int right = isValid(x + 1, y);
+    
+    //We test each straight direction, then subtest the next one clockwise
+    
+    if (left) {
+        res.push_back(b2Vec2(x - 1, y));
+        
+        //left up
+        if (up && isValid(x - 1, y - 1)) {
+            res.push_back(b2Vec2(x - 1, y - 1));
+        }
+    }
+    
+    if (up) {
+        res.push_back(b2Vec2(x, y - 1));
+        
+        //up right
+        if (right && isValid(x + 1, y - 1)) {
+            res.push_back(b2Vec2(x + 1, y - 1));
+        }
+    }
+    
+    if (right) {
+        res.push_back(b2Vec2(x + 1, y));
+        
+        //right down
+        if (down && isValid(x + 1, y + 1)) {
+            res.push_back(b2Vec2(x + 1, y + 1));
+        }
+    }
+    
+    if (down) {
+        res.push_back(b2Vec2(x, y + 1));
+        
+        //down left
+        if (left && isValid(x - 1, y + 1)) {
+            res.push_back(b2Vec2(x - 1, y + 1));
+        }
+    }
+    
+    return res;
+}
+
+std::vector<CostNode> MapController::directNeighbours(CostNode &v)
+{
+    std::vector<CostNode> ret;
+    if (v.point.x > 0) {
+        CostNode node;
+        node.point.x = v.point.x - 1;
+        node.point.y = v.point.y;
+        ret.push_back(node);
+    }
+    if (v.point.y > 0) {
+        CostNode node;
+        node.point.x = v.point.x;
+        node.point.y = v.point.y - 1;
+        ret.push_back(node);
+    }
+    
+    if (v.point.x < m_iWidth - 1) {
+        CostNode node;
+        node.point.x = v.point.x + 1;
+        node.point.y = v.point.y;
+        ret.push_back(node);
+    }
+    if (v.point.y < m_iHeight - 1) {
+        CostNode node;
+        node.point.x = v.point.x;
+        node.point.y = v.point.y + 1;
+        ret.push_back(node);
+    }
+    
+    return ret;
 }
